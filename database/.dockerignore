@@ -1,0 +1,16 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Virtual environment
+bin/
+include/
+lib/
+pyvenv.cfg
+
+# Logs
+*.log
+
+# Extra
+Dockerfile
+.dockerignore
+.DS_Store
