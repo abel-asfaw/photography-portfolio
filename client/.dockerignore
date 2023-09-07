@@ -1,0 +1,17 @@
+# Dependencies
+node_modules
+
+# Production build output
+dist
+
+# Logs
+*.log
+
+# Extra
+Dockerfile
+.dockerignore
+.DS_Store
+.prettierrc*
+.npmrc
+.yarnrc
+*.pem
