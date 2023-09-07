@@ -1,1 +1,2 @@
 # photography-portfolio
+This project is a dynamic web application that allows users to securely upload and display images. It's built using Vite.js with React for the frontend, integrated with an S3 bucket for image storage, and utilizes PostgreSQL as the database for image metadata. Auth0 is implemented for authentication, ensuring selective access to the upload feature. The backend, crafted with FastAPI, manages image uploads and data retrieval, while Docker facilitates containerization for consistent deployment and scalability.
