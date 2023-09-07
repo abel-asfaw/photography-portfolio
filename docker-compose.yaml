@@ -1,0 +1,36 @@
+services:
+  database_service:
+    image: postgres:15
+    restart: always
+    ports:
+      - 4000:5432
+    environment:
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+      POSTGRES_DB: $DB_NAME
+    volumes:
+      - db_data_volume:/var/lib/postgresql/data
+    networks:
+      - internal_network
+
+  api_service:
+    build:
+      context: database/
+      dockerfile: Dockerfile
+    # restart: always
+    ports:
+      - 4001:4001
+    depends_on:
+      - database_service
+    env_file:
+      - .env
+    networks:
+      - internal_network
+    platform: linux/amd64
+
+volumes:
+  db_data_volume:
+
+networks:
+  internal_network:
+    driver: bridge
