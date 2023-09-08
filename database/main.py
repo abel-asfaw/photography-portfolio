@@ -26,11 +26,6 @@ app.add_middleware(
 )
 
 
-@app.get("/status")
-async def check_status():
-    return "Up"
-
-
 @app.post("/photos", status_code=status.HTTP_201_CREATED, response_model=PhotoModel)
 async def add_photo(file: UploadFile):
     """
