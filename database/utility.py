@@ -21,7 +21,6 @@ AWS_SECRET = config("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = config("AWS_REGION")
 
 
-# Utility Functions
 def create_file_hash(file):
     """
     Generates a unique identifier based on the SHA-256 hash of the file's content.
@@ -76,7 +75,6 @@ def upload_to_s3(file, photo_name):
         if file.size > MAX_FILE_SIZE or file.content_type != JPEG_MIME_TYPE:
             upload_stream = optimize_image(file)
 
-        # Upload to S3 bucket
         s3 = boto3.resource(
             "s3",
             aws_access_key_id=AWS_ACCESS,
