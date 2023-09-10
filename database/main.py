@@ -1,7 +1,7 @@
 import psycopg2
 import uvicorn
 
-from utility import *
+from utils import *
 from fastapi import FastAPI, UploadFile, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
