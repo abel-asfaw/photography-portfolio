@@ -28,6 +28,17 @@ services:
       - internal_network
     platform: linux/amd64
 
+  frontend:
+    build:
+      context: client/
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+    env_file:
+      - .env
+    networks:
+      - internal_network
+
 volumes:
   db_data_volume:
 
