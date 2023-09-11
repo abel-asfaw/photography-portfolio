@@ -54,7 +54,6 @@ def optimize_image(file):
             quality=(70 if file.size > MAX_FILE_SIZE else "keep"),
             optimize=True,
         )
-
         buffer.seek(0)
         return buffer
 
@@ -88,3 +87,18 @@ def upload_to_s3(file, photo_name):
         if file.file is not upload_stream:
             upload_stream.close()
         file.file.close()
+
+
+def delete_from_s3(photo_name):
+    """
+    Deletes a specific photo object from an S3 bucket based on its name.
+
+    :param photo_name: The name of the photo object to be deleted from the S3 bucket.
+    """
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=AWS_ACCESS,
+        aws_secret_access_key=AWS_SECRET,
+        region_name=AWS_REGION,
+    )
+    s3.Object(S3_BUCKET_NAME, photo_name).delete()

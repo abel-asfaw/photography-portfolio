@@ -72,6 +72,7 @@ async def delete_photo(photo_id: str):
     :param photo_id: The unique identifier (SHA-256 hash) of the photo to be deleted.
     """
     try:
+        delete_from_s3(photo_id[:10] + JPEG_EXTENSION)
         with psycopg2.connect(
             database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
         ) as conn:
