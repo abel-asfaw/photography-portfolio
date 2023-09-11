@@ -15,11 +15,11 @@ class PhotoModel(BaseModel):
     photo_url: str
 
 
-app = FastAPI(debug=True)
+app = FastAPI(root_path="/api", debug=True)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:4002"],
+    allow_origins=[],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -117,4 +117,4 @@ async def get_photos():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=4001, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=4000, reload=True)
