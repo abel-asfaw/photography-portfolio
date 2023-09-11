@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import Spinner from './Spinner';
-import { useState } from 'react';
 
 export default function FileInput({
     fileInputRef,
@@ -11,7 +10,6 @@ export default function FileInput({
 }) {
     const handleButtonClick = () => {
         onFileUpload();
-        fileInputRef.current.value = '';
     };
 
     const buttonClasses = classNames(

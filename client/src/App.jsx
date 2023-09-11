@@ -43,6 +43,7 @@ export default function App() {
             const data = await response.json();
             updatePhotosAndStorage(data);
         }
+        fileInputRef.current.value = '';
         setIsFileSelected(false);
         setShowSpinner(false);
     };
