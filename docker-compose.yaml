@@ -1,5 +1,5 @@
 services:
-  database_service:
+  database:
     image: postgres:15
     restart: always
     ports:
@@ -13,7 +13,7 @@ services:
     networks:
       - internal_network
 
-  api_service:
+  api:
     build:
       context: database/
       dockerfile: Dockerfile
@@ -21,7 +21,7 @@ services:
     ports:
       - 4001:4001
     depends_on:
-      - database_service
+      - database
     env_file:
       - .env
     networks:
