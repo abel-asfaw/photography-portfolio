@@ -13,7 +13,7 @@ services:
 
   api:
     build:
-      context: database/
+      context: api/
       dockerfile: Dockerfile
     restart: always
     depends_on:
