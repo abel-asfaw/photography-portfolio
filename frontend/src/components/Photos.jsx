@@ -1,30 +1,11 @@
-import { useEffect } from 'react';
+import usePhotosContext from '../hooks/usePhotosContext';
 import Photo from './Photo';
 
-export default function Photos({ photos, onUpdatePhotos }) {
-    useEffect(() => {
-        const localData = localStorage.getItem('photos');
-        if (localData) {
-            onUpdatePhotos(JSON.parse(localData));
-        } else {
-            fetchPhotos();
-        }
-    }, []);
+export default function Photos() {
+    const { photos } = usePhotosContext();
 
-    const fetchPhotos = async () => {
-        const response = await fetch(
-            import.meta.env.VITE_API_BASE_URL + '/photos',
-        );
-
-        if (response.ok) {
-            const data = await response.json();
-            onUpdatePhotos(data);
-            localStorage.setItem('photos', JSON.stringify(data));
-        }
-    };
-
-    const renderedPhotos = photos.map(({ id, photo_name, photo_url }) => (
-        <Photo key={id} id={photo_name} imageSrc={photo_url} loading="lazy" />
+    const renderedPhotos = photos.map(photo => (
+        <Photo key={photo.id} photo={photo} loading="lazy" />
     ));
 
     return (
