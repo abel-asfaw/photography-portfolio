@@ -1,5 +1,6 @@
-import { useState, createContext, useCallback } from 'react';
-import { uploadPhoto, fetchPhotos, deletePhotoById } from '../api/PhotosAPI';
+import { createContext, useCallback, useState } from 'react';
+
+import { deletePhotoById, fetchPhotos, uploadPhoto } from '../api/PhotosAPI';
 
 const PhotosContext = createContext({
     photos: [],
@@ -23,15 +24,9 @@ function Provider({ children }) {
 
     const fetchPhotosAndSync = useCallback(async () => {
         try {
-            let photos;
-            const localData = getPhotosFromLocalStorage();
-            if (localData) {
-                photos = localData;
-            } else {
-                photos = await fetchPhotos();
-                savePhotosToLocalStorage(photos);
-            }
+            const photos = await fetchPhotos();
             setPhotos(photos);
+            savePhotosToLocalStorage(photos);
         } catch (err) {
             console.error('Error fetching photos:', err);
         }
