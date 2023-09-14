@@ -15,11 +15,9 @@ export default function FileInput({ fileInputRef, showSpinner }) {
     };
 
     const handleFileUpload = async () => {
-        const formData = new FormData();
-        formData.append('file', selectedFile, selectedFile.name);
         uploadPhotoAndSync(selectedFile);
-        fileInputRef.current.value = '';
         setIsFileSelected(false);
+        fileInputRef.current.value = '';
     };
 
     const buttonClasses = classNames(
