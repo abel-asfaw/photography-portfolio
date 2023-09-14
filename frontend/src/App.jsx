@@ -1,11 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import FileInput from './components/FileInput';
 import Photos from './components/Photos';
 import usePhotosContext from './hooks/usePhotosContext';
 
 export default function App() {
-    const { photos, showSpinner, fetchPhotosAndSync } = usePhotosContext();
-    const fileInputRef = useRef(null);
+    const { fetchPhotosAndSync } = usePhotosContext();
 
     useEffect(() => {
         fetchPhotosAndSync();
@@ -13,8 +12,8 @@ export default function App() {
 
     return (
         <div>
-            <FileInput fileInputRef={fileInputRef} showSpinner={showSpinner} />
-            <Photos photos={photos} />
+            <FileInput />
+            <Photos />
         </div>
     );
 }

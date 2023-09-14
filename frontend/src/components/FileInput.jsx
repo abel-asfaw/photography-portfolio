@@ -1,12 +1,13 @@
-import { useState } from 'react';
 import classNames from 'classnames';
+import { useState, useRef } from 'react';
 import usePhotosContext from '../hooks/usePhotosContext';
 import Spinner from './Spinner';
 
-export default function FileInput({ fileInputRef, showSpinner }) {
+export default function FileInput() {
     const [isFileSelected, setIsFileSelected] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
-    const { uploadPhotoAndSync } = usePhotosContext();
+    const { showSpinner, uploadPhotoAndSync } = usePhotosContext();
+    const fileInputRef = useRef(null);
 
     const handleInputChange = e => {
         const file = e.target.files[0];
