@@ -1,11 +1,11 @@
 import usePhotosContext from '../hooks/usePhotosContext';
-import Photo from './Photo';
+import PhotoView from './PhotoView';
 
-export default function Photos() {
+export default function PhotoList() {
     const { photos } = usePhotosContext();
 
     const renderedPhotos = photos.map(({ id, photo_url }) => (
-        <Photo key={id} photoId={id} photoUrl={photo_url} loading="lazy" />
+        <PhotoView key={id} photoId={id} photoUrl={photo_url} loading="lazy" />
     ));
 
     return (

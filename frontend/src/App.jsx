@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import PhotoUploader from './components/PhotoUploader';
-import Photos from './components/Photos';
+import PhotoList from './components/PhotoList';
 import usePhotosContext from './hooks/usePhotosContext';
 
 export default function App() {
@@ -13,7 +13,7 @@ export default function App() {
     return (
         <div>
             <PhotoUploader />
-            <Photos />
+            <PhotoList />
         </div>
     );
 }

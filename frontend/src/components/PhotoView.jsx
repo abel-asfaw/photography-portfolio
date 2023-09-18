@@ -1,6 +1,6 @@
 import usePhotosContext from '../hooks/usePhotosContext';
 
-export default function Photo({ photoId, photoUrl, ...rest }) {
+export default function PhotoView({ photoId, photoUrl, ...rest }) {
     const { deletePhotoAndSync } = usePhotosContext();
 
     const handleDelete = () => {
