@@ -13,9 +13,18 @@ export default function Photo({ photoId, photoUrl, ...rest }) {
                 <img src={photoUrl} className="h-auto w-full" {...rest} />
                 <button
                     onClick={handleDelete}
-                    className="hidden group-hover:block bg-slate-300 absolute top-2 right-2"
+                    className="absolute right-2 top-2 hidden h-8 w-8 items-center justify-center rounded-full bg-white p-2.5 shadow-xl drop-shadow-xl group-hover:inline-flex"
                 >
-                    Delete
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                        <path
+                            d="M21.5 4.5H26.5V43.5H21.5Z"
+                            transform="rotate(45 24 24)"
+                        />
+                        <path
+                            d="M21.5 4.5H26.5V43.5H21.5Z"
+                            transform="rotate(135 24 24)"
+                        />
+                    </svg>
                 </button>
             </div>
         </div>
