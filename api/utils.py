@@ -1,6 +1,8 @@
+import psycopg2
 import hashlib
 import boto3
 
+from contextlib import contextmanager
 from PIL import Image
 from io import BytesIO
 from decouple import config
@@ -60,6 +62,15 @@ def optimize_image(file):
     finally:
         if "image" in locals():
             image.close()
+
+
+@contextmanager
+def get_cursor():
+    with psycopg2.connect(
+        database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
+    ) as conn:
+        with conn.cursor() as cur:
+            yield cur
 
 
 def upload_to_s3(file, photo_name):

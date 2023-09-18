@@ -1,4 +1,3 @@
-import psycopg2
 import uvicorn
 
 from utils import *
@@ -39,20 +38,13 @@ async def add_photo(file: UploadFile):
     try:
         photo_id = create_file_hash(file.file)
         photo_name = photo_id[:10] + JPEG_EXTENSION
-        upload_to_s3(file, photo_name)
         photo_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
 
-        with psycopg2.connect(
-            database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
-        ) as conn:
-            with conn.cursor() as cur:
-                query = (
-                    "INSERT INTO photos (id, photo_name, photo_url) VALUES (%s, %s, %s)"
-                )
-                cur.execute(query, (photo_id, photo_name, photo_url))
-                photo = PhotoModel(
-                    id=photo_id, photo_name=photo_name, photo_url=photo_url
-                )
+        upload_to_s3(file, photo_name)
+        with get_cursor() as cur:
+            query = "INSERT INTO photos (id, photo_name, photo_url) VALUES (%s, %s, %s)"
+            cur.execute(query, (photo_id, photo_name, photo_url))
+            photo = PhotoModel(id=photo_id, photo_name=photo_name, photo_url=photo_url)
 
         return photo
 
@@ -73,12 +65,9 @@ async def delete_photo(photo_id: str):
     """
     try:
         delete_from_s3(photo_id[:10] + JPEG_EXTENSION)
-        with psycopg2.connect(
-            database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
-        ) as conn:
-            with conn.cursor() as cur:
-                query = "DELETE FROM photos WHERE id=(%s)"
-                cur.execute(query, (photo_id,))
+        with get_cursor() as cur:
+            query = "DELETE FROM photos WHERE id=(%s)"
+            cur.execute(query, (photo_id,))
 
     except Exception as e:
         logger.error(f"Failed to delete photo: {e}")
@@ -96,15 +85,12 @@ async def get_photos():
     :return: A list of PhotoModel objects, each representing the metadata of a photo.
     """
     try:
-        with psycopg2.connect(
-            database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
-        ) as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT id, photo_name, photo_url FROM photos")
-                photos = [
-                    PhotoModel(id=row[0], photo_name=row[1], photo_url=row[2])
-                    for row in cur.fetchall()
-                ]
+        with get_cursor() as cur:
+            cur.execute("SELECT id, photo_name, photo_url FROM photos")
+            photos = [
+                PhotoModel(id=row[0], photo_name=row[1], photo_url=row[2])
+                for row in cur.fetchall()
+            ]
 
         return photos
 
