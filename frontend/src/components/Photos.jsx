@@ -4,8 +4,8 @@ import Photo from './Photo';
 export default function Photos() {
     const { photos } = usePhotosContext();
 
-    const renderedPhotos = photos.map(photo => (
-        <Photo key={photo.id} photo={photo} loading="lazy" />
+    const renderedPhotos = photos.map(({ id, photo_url }) => (
+        <Photo key={id} photoId={id} photoUrl={photo_url} loading="lazy" />
     ));
 
     return (
