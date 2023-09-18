@@ -66,6 +66,11 @@ def optimize_image(file):
 
 @contextmanager
 def get_cursor():
+    """
+    Context manager for acquiring a psycopg2 database cursor.
+    
+    :yield: A psycopg2 cursor object.
+    """
     with psycopg2.connect(
         database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
     ) as conn:
