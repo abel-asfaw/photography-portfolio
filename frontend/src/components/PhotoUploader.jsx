@@ -4,7 +4,7 @@ import usePhotosContext from '../hooks/usePhotosContext';
 import Spinner from './Spinner';
 import Button from './Button';
 
-export default function FileInput() {
+export default function PhotoUploader() {
     const [isFileSelected, setIsFileSelected] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const { showSpinner, uploadPhotoAndSync } = usePhotosContext();
