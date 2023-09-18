@@ -9,7 +9,7 @@ Soon, Auth0 will be introduced to the mix for authentication for selective acces
   - [ ] Place the photo upload feature behind authentication to ensure only authorized users can upload photos.
 
 - [ ] **Photo Management**
-  - [ ] Implement a "Delete Photo" feature on the frontend.
+  - [x] Implement a "Delete Photo" feature on the frontend.
     - Make API calls to the backend for deletion.
     - Ensure the corresponding image gets deleted from both the database and the S3 bucket.
   - [ ] Place the "Delete Photo" feature behind authentication to restrict access.
