@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { useState, useRef } from 'react';
 import usePhotosContext from '../hooks/usePhotosContext';
 import Spinner from './Spinner';
+import Button from './Button';
 
 export default function FileInput() {
     const [isFileSelected, setIsFileSelected] = useState(false);
@@ -21,14 +22,11 @@ export default function FileInput() {
         fileInputRef.current.value = '';
     };
 
-    const buttonClasses = classNames(
-        'flex gap-2 rounded-md border-0 bg-green-600 px-4 py-2 text-sm font-semibold text-white',
-        {
-            'cursor-not-allowed': !isFileSelected,
-            'opacity-50': !isFileSelected,
-            'hover:bg-green-700': isFileSelected,
-        },
-    );
+    const buttonClasses = classNames({
+        'cursor-not-allowed': !isFileSelected,
+        'opacity-50': !isFileSelected,
+        'hover:bg-green-700': isFileSelected,
+    });
 
     const inputClasses = classNames(
         'rounded-md bg-zinc-800 text-sm text-gray-400 file:mr-2 file:rounded-md',
@@ -44,15 +42,14 @@ export default function FileInput() {
                 onChange={handleInputChange}
                 className={inputClasses}
             />
-            <button
-                type="button"
-                disabled={!isFileSelected}
-                onClick={handleFileUpload}
+            <Button
                 className={buttonClasses}
+                disabled={!isFileSelected}
+                onButtonClick={handleFileUpload}
             >
                 {showSpinner && <Spinner />}
                 Upload
-            </button>
+            </Button>
         </div>
     );
 }
