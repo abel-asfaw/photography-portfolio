@@ -4,9 +4,9 @@ This project is a dynamic web application that allows users (me) to securely upl
 Soon, Auth0 will be introduced to the mix for authentication for selective access to the upload and delete features.
 
 ## TODOs:
-- [ ] **Authentication with Auth0**
+- [x] **Authentication with Auth0**
   - [x] Integrate Auth0 with the frontend to enable user login and authentication.
-  - [ ] Integrate Auth0 with the backend to secure endpoints.
+  - [x] Integrate Auth0 with the backend to secure endpoints.
 
 - [x] **Photo Management**
   - [x] Implement a "Delete Photo" feature on the frontend.
