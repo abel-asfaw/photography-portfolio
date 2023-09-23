@@ -13,7 +13,7 @@ export default function PhotoView({ photoId, photoUrl, ...rest }) {
                 <img src={photoUrl} className="h-auto w-full" {...rest} />
                 <button
                     onClick={handleDelete}
-                    className="absolute right-2 top-2 hidden h-8 w-8 items-center justify-center rounded-full bg-white p-2.5 shadow-xl drop-shadow-xl group-hover:inline-flex"
+                    className="absolute right-2 top-2 hidden h-8 w-8 items-center justify-center rounded-full bg-white p-2.5 shadow-xl drop-shadow-xl hover:bg-gray-200 group-hover:flex"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                         <path

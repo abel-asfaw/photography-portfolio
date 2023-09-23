@@ -1,5 +1,5 @@
 import { createContext, useCallback, useState } from 'react';
-import { deletePhotoById, fetchPhotos, uploadPhoto } from '../api/PhotosAPI';
+import { uploadPhoto, fetchPhotos, deletePhotoById } from '../api/PhotosAPI';
 
 const PhotosContext = createContext({
     photos: [],
@@ -35,11 +35,13 @@ function Provider({ children }) {
     };
 
     const deletePhotoAndSync = async id => {
+        const photoToDelete = photos.find(photo => photo.id === id)
         try {
-            await deletePhotoById(id);
             setPhotos(photos.filter(photo => photo.id !== id));
+            await deletePhotoById(id);
         } catch (err) {
             console.error('Error deleting photo:', err);
+            setPhotos([...photos, photoToDelete]);
         }
     };
 
