@@ -1,11 +1,12 @@
 import uvicorn
 
 from utils import *
-from fastapi import FastAPI, UploadFile, HTTPException, status
+from fastapi import FastAPI, Depends, Response, UploadFile, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer
 from loguru import logger
 from pydantic import BaseModel
-from typing import List
+from typing import List, Annotated
 
 
 class PhotoModel(BaseModel):
@@ -13,6 +14,8 @@ class PhotoModel(BaseModel):
     photo_name: str
     photo_url: str
 
+
+token_auth_scheme = HTTPBearer()
 
 app = FastAPI(root_path="/api", debug=True)
 
@@ -25,8 +28,24 @@ app.add_middleware(
 )
 
 
+@app.get("/private")
+async def private(
+    response: Response, token: Annotated[str, Depends(token_auth_scheme)]
+):
+    """A valid access token is required to access this route"""
+    result = VerifyToken(token.credentials).verify()
+
+    if result.get("status"):
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return result
+
+    return result
+
+
 @app.post("/photos", status_code=status.HTTP_201_CREATED, response_model=PhotoModel)
-async def add_photo(file: UploadFile):
+async def add_photo(
+    file: UploadFile, token: Annotated[str, Depends(token_auth_scheme)]
+):
     """
     Uploads a photo to an S3 bucket and records its details in the database. The photo's name
     is derived from the SHA-256 hash of its content, ensuring a unique identifier for each photo.
@@ -35,6 +54,14 @@ async def add_photo(file: UploadFile):
     :return: A PhotoModel instance with the photo's unique ID (hash-based), generated name,
             and the corresponding URL in the S3 bucket.
     """
+    result = VerifyToken(token.credentials).verify()
+
+    if result.get("status"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid token",
+        )
+
     try:
         photo_id = create_file_hash(file.file)
         photo_name = photo_id[:10] + JPEG_EXTENSION
@@ -57,17 +84,27 @@ async def add_photo(file: UploadFile):
 
 
 @app.delete("/photos/{photo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_photo(photo_id: str):
+async def delete_photo(
+    photo_id: str, token: Annotated[str, Depends(token_auth_scheme)]
+):
     """
     Deletes a photo's entry from the database using its unique identifier (SHA-256 hash).
 
     :param photo_id: The unique identifier (SHA-256 hash) of the photo to be deleted.
     """
+    result = VerifyToken(token.credentials).verify()
+
+    if result.get("status"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid token",
+        )
+
     try:
-        delete_from_s3(photo_id[:10] + JPEG_EXTENSION)
         with get_cursor() as cur:
             query = "DELETE FROM photos WHERE id=(%s)"
             cur.execute(query, (photo_id,))
+        delete_from_s3(photo_id[:10] + JPEG_EXTENSION)
 
     except Exception as e:
         logger.error(f"Failed to delete photo: {e}")
