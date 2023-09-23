@@ -9,7 +9,7 @@ const PhotosContext = createContext({
     deletePhotoAndSync: async () => {},
 });
 
-function Provider({ children }) {
+function PhotosProvider({ children }) {
     const [photos, setPhotos] = useState([]);
     const [showSpinner, setShowSpinner] = useState(false);
 
@@ -60,5 +60,5 @@ function Provider({ children }) {
     );
 }
 
-export { Provider };
+export { PhotosProvider };
 export default PhotosContext;
