@@ -28,18 +28,29 @@ app.add_middleware(
 )
 
 
-@app.get("/private")
-async def private(
-    response: Response, token: Annotated[str, Depends(token_auth_scheme)]
-):
-    """A valid access token is required to access this route"""
-    result = VerifyToken(token.credentials).verify()
+@app.get("/photos", response_model=List[PhotoModel])
+async def get_photos():
+    """
+    Fetches all photo entries from the database.
 
-    if result.get("status"):
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return result
+    :return: A list of PhotoModel objects, each representing the metadata of a photo.
+    """
+    try:
+        with get_cursor() as cur:
+            cur.execute("SELECT id, photo_name, photo_url FROM photos")
+            photos = [
+                PhotoModel(id=row[0], photo_name=row[1], photo_url=row[2])
+                for row in cur.fetchall()
+            ]
 
-    return result
+        return photos
+
+    except Exception as e:
+        logger.error(f"Failed to fetch photos: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch photos",
+        )
 
 
 @app.post("/photos", status_code=status.HTTP_201_CREATED, response_model=PhotoModel)
@@ -111,31 +122,6 @@ async def delete_photo(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete photo",
-        )
-
-
-@app.get("/photos", response_model=List[PhotoModel])
-async def get_photos():
-    """
-    Fetches all photo entries from the database.
-
-    :return: A list of PhotoModel objects, each representing the metadata of a photo.
-    """
-    try:
-        with get_cursor() as cur:
-            cur.execute("SELECT id, photo_name, photo_url FROM photos")
-            photos = [
-                PhotoModel(id=row[0], photo_name=row[1], photo_url=row[2])
-                for row in cur.fetchall()
-            ]
-
-        return photos
-
-    except Exception as e:
-        logger.error(f"Failed to fetch photos: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch photos",
         )
 
 

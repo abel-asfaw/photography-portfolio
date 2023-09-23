@@ -1,7 +1,11 @@
 # Photography Portfolio
-This project is a dynamic web application that allows users (me) to securely upload and display images. It's built using Vite.js with React for the frontend, integrated with an S3 bucket for image storage, and utilizes PostgreSQL as the database for image metadata. The backend, crafted with FastAPI, manages image uploads and data retrieval, while Docker facilitates containerization for consistent deployment and scalability.
+My project is a dynamic web app that lets me securely upload and showcase images. I used Vite.js and React for the frontend, which includes features like photo management. I can easily upload and also securely delete photos, ensuring images are managed efficiently.
 
-Soon, Auth0 will be introduced to the mix for authentication for selective access to the upload and delete features.
+The app is integrated with an Amazon S3 bucket for storage, which holds all the uploaded images. When photos are deleted, they are removed from both the database and the S3 bucket. For managing image metadata, I use PostgreSQL.
+
+On the backend, FastAPI handles tasks like image uploads, data retrieval, and deletions. I've also set up Auth0 on both the frontend for user login and on the backend to secure endpoints. This means photo upload and deletion are behind authentication, making sure only authorized actions happen.
+
+Lastly, the whole application is containerized using Docker. This helps with consistent deployments and makes scaling easier in the future.
 
 ## TODOs:
 - [x] **Authentication with Auth0**
