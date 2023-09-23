@@ -24,7 +24,7 @@ export default function PhotoUploader() {
         fileInputRef.current.value = '';
     };
 
-    const buttonClasses = classNames({
+    const buttonClasses = classNames('bg-green-600', {
         'cursor-not-allowed': !isFileSelected,
         'opacity-50': !isFileSelected,
         'hover:bg-green-700': isFileSelected,

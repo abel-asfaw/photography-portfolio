@@ -7,7 +7,7 @@ export default function Button({
     ...rest
 }) {
     const classes = classNames(
-        'flex gap-2 rounded-md border-0 bg-green-600 px-4 py-2 text-sm font-semibold text-white',
+        'flex gap-2 rounded-md border-0 px-4 py-2 text-sm font-semibold text-white',
         className,
     );
 
