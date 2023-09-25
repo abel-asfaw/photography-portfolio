@@ -18,3 +18,8 @@ Lastly, the whole application is containerized using Docker. This helps with con
     - Ensure the corresponding image gets deleted from both the database and the S3 bucket.
   - [x] Place the photo deletion feature behind authentication to restrict access.
   - [x] Place the photo upload feature behind authentication to ensure only authorized users can upload photos.
+
+## Video demo of log in and file upload/deletion:
+
+https://github.com/abel-asfaw/photography-portfolio/assets/50559072/f39055ba-8f3f-44f4-80c1-60d7a4e10f98
+
