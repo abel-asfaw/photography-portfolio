@@ -23,6 +23,9 @@ Lastly, the whole application is containerized using Docker. This helps with con
   - [ ] Fix photo order alteration after logout.
   - [ ] Address issue of user being logged out when refreshing.
 
+- [ ] **Deployment**
+  - [ ] Deploy each service (api, frontend, database) to an appropriate cloud platform.
+
 ## Video demo of log in and file upload/deletion:
 
 https://github.com/abel-asfaw/photography-portfolio/assets/50559072/f39055ba-8f3f-44f4-80c1-60d7a4e10f98
