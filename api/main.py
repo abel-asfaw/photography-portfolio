@@ -1,7 +1,15 @@
 import uvicorn
 
-from utils import *
-from fastapi import FastAPI, Depends, Response, UploadFile, HTTPException, status
+from utils import (
+    VerifyToken,
+    get_cursor,
+    create_file_hash,
+    upload_to_s3,
+    delete_from_s3,
+    JPEG_EXTENSION,
+    S3_BUCKET_NAME,
+)
+from fastapi import FastAPI, Depends, UploadFile, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
 from loguru import logger
@@ -37,7 +45,9 @@ async def get_photos():
     """
     try:
         with get_cursor() as cur:
-            cur.execute("SELECT id, photo_name, photo_url FROM photos")
+            cur.execute(
+                "SELECT id, photo_name, photo_url FROM photos ORDER BY date DESC"
+            )
             photos = [
                 PhotoModel(id=row[0], photo_name=row[1], photo_url=row[2])
                 for row in cur.fetchall()

@@ -29,7 +29,7 @@ function PhotosProvider({ children }) {
         setShowSpinner(true);
         try {
             const newPhoto = await uploadPhoto(file, token);
-            setPhotos([...photos, newPhoto]);
+            setPhotos([newPhoto, ...photos]);
         } catch (err) {
             console.error('Error uploading photo:', err);
         } finally {
