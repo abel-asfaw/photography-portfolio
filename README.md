@@ -19,9 +19,8 @@ Lastly, the whole application is containerized using Docker. This helps with con
   - [x] Place the photo deletion feature behind authentication to restrict access.
   - [x] Place the photo upload feature behind authentication to ensure only authorized users can upload photos.
 
-- [ ] **Bug Fixes**
-  - [ ] Fix photo order alteration after logout.
-  - [ ] Address issue of user being logged out when refreshing.
+- [x] **Bug Fixes**
+  - [x] Fix photo order alteration after page refresh.
 
 - [ ] **Deployment**
   - [ ] Deploy each service (api, frontend, database) to an appropriate cloud platform.
