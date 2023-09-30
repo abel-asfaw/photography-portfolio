@@ -5,7 +5,7 @@ export default function PhotoList() {
     const { photos } = usePhotosContext();
 
     const renderedPhotos = photos.map(({ id, photo_url }) => (
-        <PhotoView key={id} photoId={id} photoUrl={photo_url} loading="lazy" />
+        <PhotoView key={id} photoId={id} photoUrl={photo_url} />
     ));
 
     return (
