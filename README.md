@@ -22,15 +22,15 @@ Lastly, the whole application is containerized using Docker. This helps with con
 - [x] **Bug Fixes**
   - [x] Fix photo order alteration after page refresh.
 
-- [ ] **Admin Page Separation**:
-  - [ ] Install and configure `react-router-dom`.
-  - [ ] Create a new `/admin` route and adjust the base route (`/`) in the main app component.
-  - [ ] Create a new `Admin` component:
-    - [ ] Make sure it contains the photo uploader, photo list, login/logout buttons and the delete button.
-    - [ ] Redirect to login page if a user tries to access the admin page without being authenticated.
-  - [ ] Update the main `HomePage` component:
-    - [ ] It should only display the photo list.
-    - [ ] Remove authentication functions and buttons from this component.
+- [x] **Admin Page Separation**:
+  - [x] Install and configure `react-router-dom`.
+  - [x] Create a new `/admin` route and adjust the base route (`/`) in the main app component.
+  - [x] Create a new `Admin` component:
+    - [x] Make sure it contains the photo uploader, photo list, login/logout buttons and the delete button.
+    - [x] Redirect to login page if a user tries to access the admin page without being authenticated.
+  - [x] Update the main `HomePage` component:
+    - [x] It should only display the photo list.
+    - [x] Remove authentication functions and buttons from this component.
 
 - [ ] **UI**
   - [ ] Redesign the photo upload and login/logout buttons (Button component).
