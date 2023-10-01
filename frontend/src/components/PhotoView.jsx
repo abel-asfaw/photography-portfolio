@@ -18,7 +18,7 @@ export default function PhotoView({ photoId, photoUrl, canDelete }) {
                         primary
                         circular
                         onClick={handleDelete}
-                        className="absolute right-2 top-2 text-red-600 opacity-0 shadow-sm shadow-zinc-700 group-hover:opacity-100"
+                        className="absolute right-2 top-2 opacity-0 shadow-sm shadow-zinc-700 group-hover:opacity-100"
                     >
                         <MdClose size={12} />
                     </Button>

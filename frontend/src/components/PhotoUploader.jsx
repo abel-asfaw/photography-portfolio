@@ -31,7 +31,7 @@ export default function PhotoUploader() {
     });
 
     return (
-        <div className="flex flex-wrap items-center justify-center gap-4 p-5 sm:p-10">
+        <div className="flex flex-wrap items-center justify-center gap-4 p-4">
             <FileInput
                 fileInputRef={fileInputRef}
                 onInputChange={handleInputChange}
