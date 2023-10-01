@@ -1,13 +1,24 @@
 import classNames from 'classnames';
 
 export default function Button({
-    children,
-    className,
+    circular,
+    primary,
+    success,
+    danger,
     onButtonClick,
+    className,
+    children,
     ...rest
 }) {
     const classes = classNames(
-        'flex gap-2 rounded-md border-0 px-4 py-2 text-sm font-semibold text-white',
+        'flex text-sm items-center justify-center duration-300',
+        {
+            'rounded-full p-3': circular,
+            'rounded-md px-4 py-2': !circular,
+            'bg-gray-50 hover:bg-gray-300': primary,
+            'bg-green-600 hover:bg-green-700': success,
+            'bg-red-600 hover:bg-red-700': danger,
+        },
         className,
     );
 
