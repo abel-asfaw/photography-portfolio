@@ -1,4 +1,5 @@
 import { MdClose } from 'react-icons/md';
+import Button from './Button';
 import usePhotosContext from '../hooks/usePhotosContext';
 
 export default function PhotoView({ photoId, photoUrl, canDelete }) {
@@ -13,11 +14,14 @@ export default function PhotoView({ photoId, photoUrl, canDelete }) {
             <div className="relative transform-gpu overflow-hidden rounded-2xl duration-700 hover:scale-110">
                 <img src={photoUrl} className="h-auto w-full" loading="lazy" />
                 {canDelete && (
+                    <Button
+                        primary
+                        circular
                         onClick={handleDelete}
-                        className="absolute right-2 top-2 hidden h-8 w-8 items-center justify-center rounded-full bg-white p-2.5 shadow-xl drop-shadow-xl hover:bg-gray-200 group-hover:flex"
+                        className="absolute right-2 top-2 text-red-600 opacity-0 shadow-sm shadow-zinc-700 group-hover:opacity-100"
                     >
-                        <MdClose />
-                    </button>
+                        <MdClose size={12} />
+                    </Button>
                 )}
             </div>
         </div>
