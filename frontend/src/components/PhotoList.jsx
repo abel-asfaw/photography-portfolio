@@ -1,11 +1,16 @@
 import usePhotosContext from '../hooks/usePhotosContext';
 import PhotoView from './PhotoView';
 
-export default function PhotoList() {
+export default function PhotoList({ isAuthenticated }) {
     const { photos } = usePhotosContext();
 
     const renderedPhotos = photos.map(({ id, photo_url }) => (
-        <PhotoView key={id} photoId={id} photoUrl={photo_url} />
+        <PhotoView
+            key={id}
+            photoId={id}
+            photoUrl={photo_url}
+            canDelete={isAuthenticated}
+        />
     ));
 
     return (

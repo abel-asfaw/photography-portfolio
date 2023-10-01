@@ -4,7 +4,7 @@ import PhotoList from './PhotoList';
 import PhotoUploader from './PhotoUploader';
 
 export default function Admin() {
-    const { logout } = useAuth0();
+    const { isAuthenticated, logout } = useAuth0();
 
     return (
         <div>
@@ -14,7 +14,7 @@ export default function Admin() {
                 </Button>
             </div>
             <PhotoUploader />
-            <PhotoList />
+            <PhotoList isAuthenticated={isAuthenticated} />
         </div>
     );
 }
