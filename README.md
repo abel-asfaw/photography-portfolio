@@ -40,5 +40,4 @@ Lastly, the whole application is containerized using Docker. This helps with con
 
 ## Video demo of log in and file upload/deletion:
 
-https://github.com/abel-asfaw/photography-portfolio/assets/50559072/f39055ba-8f3f-44f4-80c1-60d7a4e10f98
-
+https://github.com/abel-asfaw/photography-portfolio/assets/50559072/5bd62583-f07f-4f5c-8946-0cd2ade86960
