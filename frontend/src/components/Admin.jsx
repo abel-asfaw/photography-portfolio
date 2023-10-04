@@ -10,7 +10,11 @@ export default function Admin() {
     return (
         <div>
             <div className="flex justify-end p-4">
-                <Button danger className="text-white gap-1" onButtonClick={logout}>
+                <Button
+                    danger
+                    className="gap-2 text-white"
+                    onButtonClick={logout}
+                >
                     Log out
                     <AiOutlineLogout />
                 </Button>
