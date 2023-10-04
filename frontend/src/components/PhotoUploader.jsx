@@ -38,7 +38,7 @@ export default function PhotoUploader() {
                 accept="image/*"
             />
             <Button
-                className={buttonClasses}
+                className={classNames('gap-2', buttonClasses)}
                 disabled={!isFileSelected}
                 onButtonClick={handleFileUpload}
             >
