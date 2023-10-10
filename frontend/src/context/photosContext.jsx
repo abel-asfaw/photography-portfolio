@@ -41,9 +41,7 @@ function PhotosProvider({ children }) {
         const token = await getAccessTokenSilently();
         const originalPhotos = [...photos];
         try {
-            setPhotos(prevPhotos =>
-                prevPhotos.filter(photo => photo.id !== id),
-            );
+            setPhotos(photos.filter(photo => photo.id !== id));
             await deletePhotoById(id, token);
         } catch (err) {
             console.error('Error deleting photo:', err);
