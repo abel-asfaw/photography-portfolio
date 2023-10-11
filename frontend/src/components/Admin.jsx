@@ -1,24 +1,14 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import Button from './Button';
 import PhotoList from './PhotoList';
 import PhotoUploader from './PhotoUploader';
-import { AiOutlineLogout } from 'react-icons/ai';
+import SessionBar from './SessionBar';
 
 export default function Admin() {
-    const { isAuthenticated, logout } = useAuth0();
+    const { isAuthenticated } = useAuth0();
 
     return (
-        <div>
-            <div className="flex justify-end p-4">
-                <Button
-                    danger
-                    className="gap-2 text-white"
-                    onButtonClick={logout}
-                >
-                    Log out
-                    <AiOutlineLogout />
-                </Button>
-            </div>
+        <div className="text-white">
+            <SessionBar />
             <PhotoUploader />
             <PhotoList isAuthenticated={isAuthenticated} />
         </div>
