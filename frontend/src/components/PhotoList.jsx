@@ -15,7 +15,7 @@ export default function PhotoList({ isAuthenticated }) {
 
     return (
         <div className="flex flex-wrap items-center justify-center gap-20 p-10 text-white sm:p-20">
-            {renderedPhotos}
+            {renderedPhotos.length ? renderedPhotos : 'No photos to display...'}
         </div>
     );
 }
