@@ -85,7 +85,7 @@ async def add_photo(
 
     try:
         photo_id = create_file_hash(file.file)
-        photo_name = photo_id[:10] + JPEG_EXTENSION
+        photo_name = get_file_extension(photo_id)
         photo_url = upload_to_s3(file, photo_name)
 
         upload_to_s3(file, photo_name)
@@ -125,7 +125,7 @@ async def delete_photo(
         with get_cursor() as cur:
             query = "DELETE FROM photos WHERE id=(%s)"
             cur.execute(query, (photo_id,))
-        delete_from_s3(photo_id[:10] + JPEG_EXTENSION)
+        delete_from_s3(get_file_extension(photo_id))
 
     except Exception as e:
         logger.error(f"Failed to delete photo: {e}")

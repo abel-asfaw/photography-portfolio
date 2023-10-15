@@ -124,6 +124,10 @@ def get_cursor():
             yield cur
 
 
+def get_file_extension(photo_id):
+    return photo_id[:10] + JPEG_EXTENSION
+
+
 def upload_to_s3(file, photo_name):
     """
     Uploads a file to S3, compressing and converting to JPEG if needed based on size and format.
