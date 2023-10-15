@@ -1,13 +1,13 @@
 import uvicorn
 
 from utils import (
-    VerifyToken,
-    get_cursor,
-    create_file_hash,
-    upload_to_s3,
-    delete_from_s3,
     JPEG_EXTENSION,
-    S3_BUCKET_NAME,
+    VerifyToken,
+    create_file_hash,
+    delete_from_s3,
+    get_cursor,
+    get_file_extension,
+    upload_to_s3,
 )
 from fastapi import FastAPI, Depends, UploadFile, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -86,7 +86,7 @@ async def add_photo(
     try:
         photo_id = create_file_hash(file.file)
         photo_name = photo_id[:10] + JPEG_EXTENSION
-        photo_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
+        photo_url = upload_to_s3(file, photo_name)
 
         upload_to_s3(file, photo_name)
         with get_cursor() as cur:

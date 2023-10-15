@@ -145,6 +145,9 @@ def upload_to_s3(file, photo_name):
         bucket = s3.Bucket(S3_BUCKET_NAME)
         bucket.upload_fileobj(upload_stream, photo_name)
 
+        photo_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
+        return photo_url
+
     finally:
         if file.file is not upload_stream:
             upload_stream.close()
