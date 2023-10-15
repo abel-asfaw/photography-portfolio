@@ -1,9 +1,11 @@
 import classNames from 'classnames';
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
+import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { CgSpinner } from 'react-icons/cg';
+
 import usePhotosContext from '../hooks/usePhotosContext';
-import FileInput from './FileInput';
 import Button from './Button';
-import Spinner from './Spinner';
+import FileInput from './FileInput';
 
 export default function PhotoUploader() {
     const [isFileSelected, setIsFileSelected] = useState(false);
@@ -24,6 +26,13 @@ export default function PhotoUploader() {
         fileInputRef.current.value = '';
     };
 
+    const displayUploadIcon = () => {
+        const Icon = showSpinner ? CgSpinner : AiOutlineCloudUpload;
+        const className = showSpinner && 'animate-spin';
+
+        return <Icon size={24} className={className} />;
+    };
+
     const buttonClasses = classNames('bg-green-600', {
         'cursor-not-allowed': !isFileSelected,
         'opacity-50': !isFileSelected,
@@ -38,12 +47,11 @@ export default function PhotoUploader() {
                 accept="image/*"
             />
             <Button
-                className={classNames('gap-2', buttonClasses)}
+                className={buttonClasses}
                 disabled={!isFileSelected}
                 onButtonClick={handleFileUpload}
             >
-                {showSpinner && <Spinner />}
-                Upload
+                {displayUploadIcon()}
             </Button>
         </div>
     );
