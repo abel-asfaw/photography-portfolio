@@ -88,7 +88,6 @@ async def add_photo(
         photo_name = get_file_extension(photo_id)
         photo_url = upload_to_s3(file, photo_name)
 
-        upload_to_s3(file, photo_name)
         with get_cursor() as cur:
             query = "INSERT INTO photos (id, photo_name, photo_url) VALUES (%s, %s, %s)"
             cur.execute(query, (photo_id, photo_name, photo_url))
