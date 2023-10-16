@@ -32,8 +32,11 @@ Lastly, the whole application is containerized using Docker. This helps with con
     - [x] It should only display the photo list.
     - [x] Remove authentication functions and buttons from this component.
 
-- [ ] **UI**
-  - [ ] Redesign the photo upload and login/logout buttons (Button component).
+- [x] **UI**
+  - [x] Redesign the photo upload and login/logout buttons (Button component).
+
+- [ ] **Exceptions**
+  - [ ] Raise specific exceptions instead of generic ones for the backend.
 
 - [ ] **Deployment**
   - [ ] Deploy each service (api, frontend, database) to an appropriate cloud platform.
