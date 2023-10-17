@@ -1,7 +1,6 @@
 import uvicorn
 
 from utils import (
-    JPEG_EXTENSION,
     VerifyToken,
     create_file_hash,
     delete_from_s3,
@@ -76,8 +75,8 @@ async def add_photo(
             and the corresponding URL in the S3 bucket.
     """
     result = VerifyToken(token.credentials).verify()
-
-    if result.get("status"):
+    if result.get("error"):
+        logger.error(f'Token verification failed: {result["error"]["message"]}')
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid token",
@@ -113,8 +112,8 @@ async def delete_photo(
     :param photo_id: The unique identifier (SHA-256 hash) of the photo to be deleted.
     """
     result = VerifyToken(token.credentials).verify()
-
-    if result.get("status"):
+    if result.get("error"):
+        logger.error(f'Token verification failed: {result["error"]["message"]}')
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid token",
