@@ -28,9 +28,8 @@ export default function PhotoUploader() {
 
     const displayUploadIcon = () => {
         const Icon = showSpinner ? CgSpinner : AiOutlineCloudUpload;
-        const className = showSpinner && 'animate-spin';
 
-        return <Icon size={24} className={className} />;
+        return <Icon size={24} className={showSpinner && 'animate-spin'} />;
     };
 
     const buttonClasses = classNames('bg-green-600', {
