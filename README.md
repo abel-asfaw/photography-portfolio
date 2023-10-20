@@ -7,6 +7,10 @@ On the backend, FastAPI handles tasks like image uploads, data retrieval, and de
 
 Lastly, the whole application is containerized using Docker. This helps with consistent deployments and makes scaling easier in the future.
 
+## Video demo:
+
+https://github.com/abel-asfaw/photography-portfolio/assets/50559072/6e6de8a2-d10f-409d-aa82-b14fc5e8fbf2
+
 ## TODOs:
 - [x] **Authentication with Auth0**
   - [x] Integrate Auth0 with the frontend to enable user login and authentication.
@@ -40,7 +44,3 @@ Lastly, the whole application is containerized using Docker. This helps with con
 
 - [ ] **Deployment**
   - [ ] Deploy each service (api, frontend, database) to an appropriate cloud platform.
-
-## Video demo of log in and file upload/deletion:
-
-https://github.com/abel-asfaw/photography-portfolio/assets/50559072/6e6de8a2-d10f-409d-aa82-b14fc5e8fbf2
