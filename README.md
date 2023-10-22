@@ -12,35 +12,9 @@ Lastly, the whole application is containerized using Docker. This helps with con
 https://github.com/abel-asfaw/photography-portfolio/assets/50559072/6e6de8a2-d10f-409d-aa82-b14fc5e8fbf2
 
 ## TODOs:
-- [x] **Authentication with Auth0**
-  - [x] Integrate Auth0 with the frontend to enable user login and authentication.
-  - [x] Integrate Auth0 with the backend to secure endpoints.
+- [ ] **Backend Enhancements**:
+  - [ ] Raise specific exceptions instead of generic ones.
+  - [ ] Implement rate limiter to protect API.
 
-- [x] **Photo Management**
-  - [x] Implement a "Delete Photo" feature on the frontend.
-    - Make API calls to the backend for deletion.
-    - Ensure the corresponding image gets deleted from both the database and the S3 bucket.
-  - [x] Place the photo deletion feature behind authentication to restrict access.
-  - [x] Place the photo upload feature behind authentication to ensure only authorized users can upload photos.
-
-- [x] **Bug Fixes**
-  - [x] Fix photo order alteration after page refresh.
-
-- [x] **Admin Page Separation**:
-  - [x] Install and configure `react-router-dom`.
-  - [x] Create a new `/admin` route and adjust the base route (`/`) in the main app component.
-  - [x] Create a new `Admin` component:
-    - [x] Make sure it contains the photo uploader, photo list, login/logout buttons and the delete button.
-    - [x] Redirect to login page if a user tries to access the admin page without being authenticated.
-  - [x] Update the main `HomePage` component:
-    - [x] It should only display the photo list.
-    - [x] Remove authentication functions and buttons from this component.
-
-- [x] **UI**
-  - [x] Redesign the photo upload and login/logout buttons (Button component).
-
-- [ ] **Exceptions**
-  - [ ] Raise specific exceptions instead of generic ones for the backend.
-
-- [ ] **Deployment**
+- [ ] **Deployment**:
   - [ ] Deploy each service (api, frontend, database) to an appropriate cloud platform.
