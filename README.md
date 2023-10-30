@@ -12,9 +12,13 @@ Lastly, the whole application is containerized using Docker. This helps with con
 https://github.com/abel-asfaw/photography-portfolio/assets/50559072/6e6de8a2-d10f-409d-aa82-b14fc5e8fbf2
 
 ## TODOs:
+- [ ] **Frontend Enhancements**:
+  - [ ] Add unit tests
+
 - [ ] **Backend Enhancements**:
   - [ ] Raise specific exceptions instead of generic ones.
   - [ ] Implement rate limiter to protect API.
+  - [ ] Add unit tests
 
 - [ ] **Deployment**:
   - [ ] Deploy each service (api, frontend, database) to an appropriate cloud platform.
