@@ -13,12 +13,13 @@ https://github.com/abel-asfaw/photography-portfolio/assets/50559072/6e6de8a2-d10
 
 ## TODOs:
 - [ ] **Frontend Enhancements**:
-  - [ ] Add unit tests
+  - [ ] Add unit tests.
 
 - [ ] **Backend Enhancements**:
+  - [ ] Switch from using traditional SQL to an ORM to add a layer of abstraction.
   - [ ] Raise specific exceptions instead of generic ones.
-  - [ ] Implement rate limiter to protect API.
-  - [ ] Add unit tests
+  - [ ] Add unit tests.
+  - [ ] Implement rate limiter to protect API (stretch goal).
 
 - [ ] **Deployment**:
   - [ ] Deploy each service (api, frontend, database) to an appropriate cloud platform.
