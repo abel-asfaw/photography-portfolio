@@ -4,11 +4,11 @@ import PhotoView from './PhotoView';
 export default function PhotoList({ isAuthenticated }) {
     const { photos } = usePhotosContext();
 
-    const renderedPhotos = photos.map(({ id, photo_url }) => (
+    const renderedPhotos = photos.map(({ id, url }) => (
         <PhotoView
             key={id}
             photoId={id}
-            photoUrl={photo_url}
+            photoUrl={url}
             canDelete={isAuthenticated}
         />
     ));

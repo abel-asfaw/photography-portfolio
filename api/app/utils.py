@@ -1,37 +1,34 @@
-import hashlib
-import jwt
-import psycopg2
-
-from contextlib import contextmanager
+from hashlib import sha256
 from io import BytesIO
 from PIL import Image
 from decouple import config
+import jwt
+
 from .s3_service import s3
 
 
 MAX_FILE_SIZE = 2000000
 JPEG_MIME_TYPE = "image/jpeg"
 JPEG_EXTENSION = ".jpg"
-
-DB_NAME = config("DB_NAME")
-DB_USER = config("DB_USER")
-DB_PASS = config("DB_PASS")
-DB_HOST = config("DB_HOST")
-
 S3_BUCKET_NAME = config("S3_BUCKET_NAME")
 
 
 class VerifyToken:
-    """Does all the token verification using PyJWT"""
-    
+    """Handles token verification using PyJWT."""
+
     def __init__(self, token):
-        self.token = token
         self.config = self.set_up()
-        jwks_url = f'https://{self.config["DOMAIN"]}/.well-known/jwks.json'
-        self.jwks_client = jwt.PyJWKClient(jwks_url)
+        self.token = token
+        self.jwks_url = f'https://{self.config["DOMAIN"]}/.well-known/jwks.json'
+        self.jwks_client = jwt.PyJWKClient(self.jwks_url)
 
     @staticmethod
     def set_up():
+        """
+        Sets up and returns the configuration dictionary from environment variables.
+        
+        :return: A dictionary containing configuration values.
+        """
         return {
             "DOMAIN": config("DOMAIN"),
             "API_AUDIENCE": config("API_AUDIENCE"),
@@ -40,11 +37,16 @@ class VerifyToken:
         }
 
     def verify(self):
+        """
+        Verifies the JWT token.
+        
+        :return: The payload of the verified token or an error dictionary if verification fails.
+        """
         try:
-            self.signing_key = self.jwks_client.get_signing_key_from_jwt(self.token).key
+            signing_key = self.jwks_client.get_signing_key_from_jwt(self.token).key
             payload = jwt.decode(
                 self.token,
-                self.signing_key,
+                signing_key,
                 algorithms=self.config["ALGORITHMS"],
                 audience=self.config["API_AUDIENCE"],
                 issuer=self.config["ISSUER"],
@@ -58,11 +60,11 @@ class VerifyToken:
 def create_file_hash(file):
     """
     Generates a unique identifier based on the SHA-256 hash of the file's content.
-
+    
     :param file: A file-like object containing the content to be hashed.
-    :return: The SHA-256 hash of the file's content.
+    :return: The SHA-256 hash of the file's content as a string.
     """
-    hasher = hashlib.sha256()
+    hasher = sha256()
     file_content = file.read()
     hasher.update(file_content)
     file.seek(0)
@@ -96,22 +98,13 @@ def optimize_image(file):
             image.close()
 
 
-@contextmanager
-def get_cursor():
+def get_file_name(photo_id):
     """
-    Context manager for acquiring a psycopg2 database cursor.
+    Generates a file name based on the provided photo_id
 
-    :yield: A psycopg2 cursor object.
+    :param photo_id: A unique identifier of a photo.
+    :return: The generated file name with a ".jpg" extension.
     """
-    with psycopg2.connect(
-        database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST
-    ) as conn:
-        with conn.cursor() as cur:
-            yield cur
-        conn.commit()
-
-
-def get_file_extension(photo_id):
     return photo_id[:10] + JPEG_EXTENSION
 
 
