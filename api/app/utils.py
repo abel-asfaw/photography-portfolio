@@ -1,12 +1,12 @@
 import hashlib
 import jwt
 import psycopg2
-import boto3
 
 from contextlib import contextmanager
 from io import BytesIO
 from PIL import Image
 from decouple import config
+from .s3_service import s3
 
 
 MAX_FILE_SIZE = 2000000
@@ -19,9 +19,6 @@ DB_PASS = config("DB_PASS")
 DB_HOST = config("DB_HOST")
 
 S3_BUCKET_NAME = config("S3_BUCKET_NAME")
-AWS_ACCESS = config("AWS_ACCESS_KEY_ID")
-AWS_SECRET = config("AWS_SECRET_ACCESS_KEY")
-AWS_REGION = config("AWS_REGION")
 
 
 class VerifyToken:
@@ -130,14 +127,7 @@ def upload_to_s3(file, photo_name):
         if file.size > MAX_FILE_SIZE or file.content_type != JPEG_MIME_TYPE:
             upload_stream = optimize_image(file)
 
-        s3 = boto3.resource(
-            "s3",
-            aws_access_key_id=AWS_ACCESS,
-            aws_secret_access_key=AWS_SECRET,
-            region_name=AWS_REGION,
-        )
-        bucket = s3.Bucket(S3_BUCKET_NAME)
-        bucket.upload_fileobj(upload_stream, photo_name)
+        s3.Bucket(S3_BUCKET_NAME).upload_fileobj(upload_stream, photo_name)
 
         photo_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
         return photo_url
@@ -154,10 +144,4 @@ def delete_from_s3(photo_name):
 
     :param photo_name: The name of the photo object to be deleted from the S3 bucket.
     """
-    s3 = boto3.resource(
-        "s3",
-        aws_access_key_id=AWS_ACCESS,
-        aws_secret_access_key=AWS_SECRET,
-        region_name=AWS_REGION,
-    )
     s3.Object(S3_BUCKET_NAME, photo_name).delete()
