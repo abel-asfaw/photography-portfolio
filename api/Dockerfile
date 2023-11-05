@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY main.py utils.py /app/
+COPY app/main.py app/utils.py /app/
 
 # The command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "4000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "4000", "--reload"]

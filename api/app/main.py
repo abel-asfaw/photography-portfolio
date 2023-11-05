@@ -1,6 +1,4 @@
-import uvicorn
-
-from utils import (
+from .utils import (
     VerifyToken,
     create_file_hash,
     delete_from_s3,

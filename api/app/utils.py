@@ -1,11 +1,11 @@
+import hashlib
 import jwt
 import psycopg2
-import hashlib
 import boto3
 
 from contextlib import contextmanager
-from PIL import Image
 from io import BytesIO
+from PIL import Image
 from decouple import config
 
 
@@ -111,6 +111,7 @@ def get_cursor():
     ) as conn:
         with conn.cursor() as cur:
             yield cur
+        conn.commit()
 
 
 def get_file_extension(photo_id):
