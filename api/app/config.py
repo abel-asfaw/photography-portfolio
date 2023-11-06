@@ -2,18 +2,20 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    db_name: str
-    db_pass: str
-    db_user: str
-    db_host: str
-    aws_access_key_id: str
-    aws_secret_access_key: str
-    aws_region: str
-    s3_bucket_name: str
-    domain: str
-    api_audience: str
-    issuer: str
-    algorithms: str
+    DB_NAME: str
+    DB_PASS: str
+    DB_USER: str
+    DB_HOST: str
+
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
+    AWS_REGION: str
+    S3_BUCKET_NAME: str
+
+    DOMAIN: str
+    API_AUDIENCE: str
+    ISSUER: str
+    ALGORITHMS: str
 
 
 settings = Settings()

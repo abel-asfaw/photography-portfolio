@@ -1,7 +1,6 @@
 from hashlib import sha256
 from io import BytesIO
 from PIL import Image
-from decouple import config
 import jwt
 
 from app.config import settings
@@ -16,24 +15,9 @@ class VerifyToken:
     """Handles token verification using PyJWT."""
 
     def __init__(self, token):
-        self.config = self.set_up()
         self.token = token
-        self.jwks_url = f'https://{self.config["DOMAIN"]}/.well-known/jwks.json'
+        self.jwks_url = f'https://{settings.DOMAIN}/.well-known/jwks.json'
         self.jwks_client = jwt.PyJWKClient(self.jwks_url)
-
-    @staticmethod
-    def set_up():
-        """
-        Sets up and returns the configuration dictionary from environment variables.
-
-        :return: A dictionary containing configuration values.
-        """
-        return {
-            "DOMAIN": config("DOMAIN"),
-            "API_AUDIENCE": config("API_AUDIENCE"),
-            "ISSUER": config("ISSUER"),
-            "ALGORITHMS": config("ALGORITHMS"),
-        }
 
     def verify(self):
         """
@@ -46,9 +30,9 @@ class VerifyToken:
             payload = jwt.decode(
                 self.token,
                 signing_key,
-                algorithms=self.config["ALGORITHMS"],
-                audience=self.config["API_AUDIENCE"],
-                issuer=self.config["ISSUER"],
+                algorithms=settings.ALGORITHMS,
+                audience=settings.API_AUDIENCE,
+                issuer=settings.ISSUER,
             )
             return payload
 
@@ -119,9 +103,9 @@ def upload_to_s3(file, photo_name):
         if file.size > MAX_FILE_SIZE or file.content_type != JPEG_MIME_TYPE:
             upload_stream = optimize_image(file)
 
-        s3.Bucket(settings.s3_bucket_name).upload_fileobj(upload_stream, photo_name)
+        s3.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(upload_stream, photo_name)
 
-        photo_url = f"https://{settings.s3_bucket_name}.s3.amazonaws.com/{photo_name}"
+        photo_url = f"https://{settings.S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
         return photo_url
 
     finally:
@@ -136,4 +120,4 @@ def delete_from_s3(photo_name):
 
     :param photo_name: The name of the photo object to be deleted from the S3 bucket.
     """
-    s3.Object(settings.s3_bucket_name, photo_name).delete()
+    s3.Object(settings.S3_BUCKET_NAME, photo_name).delete()

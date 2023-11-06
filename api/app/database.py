@@ -5,10 +5,10 @@ from app.config import settings
 
 
 SQLALCHEMY_DATABASE_URL = (
-    f"postgresql://{settings.db_user}:"
-    f"{settings.db_pass}@"
-    f"{settings.db_host}/"
-    f"{settings.db_name}"
+    f"postgresql://{settings.DB_USER}:"
+    f"{settings.DB_PASS}@"
+    f"{settings.DB_HOST}/"
+    f"{settings.DB_NAME}"
 )
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
