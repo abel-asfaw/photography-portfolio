@@ -4,13 +4,13 @@ from PIL import Image
 from decouple import config
 import jwt
 
+from app.config import settings
 from app.s3_service import s3
 
 
 MAX_FILE_SIZE = 2000000
 JPEG_MIME_TYPE = "image/jpeg"
 JPEG_EXTENSION = ".jpg"
-S3_BUCKET_NAME = config("S3_BUCKET_NAME")
 
 class VerifyToken:
     """Handles token verification using PyJWT."""
@@ -25,7 +25,7 @@ class VerifyToken:
     def set_up():
         """
         Sets up and returns the configuration dictionary from environment variables.
-        
+
         :return: A dictionary containing configuration values.
         """
         return {
@@ -38,7 +38,7 @@ class VerifyToken:
     def verify(self):
         """
         Verifies the JWT token.
-        
+
         :return: The payload of the verified token or an error dictionary if verification fails.
         """
         try:
@@ -59,7 +59,7 @@ class VerifyToken:
 def create_file_hash(file):
     """
     Generates a unique identifier based on the SHA-256 hash of the file's content.
-    
+
     :param file: A file-like object containing the content to be hashed.
     :return: The SHA-256 hash of the file's content as a string.
     """
@@ -119,9 +119,9 @@ def upload_to_s3(file, photo_name):
         if file.size > MAX_FILE_SIZE or file.content_type != JPEG_MIME_TYPE:
             upload_stream = optimize_image(file)
 
-        s3.Bucket(S3_BUCKET_NAME).upload_fileobj(upload_stream, photo_name)
+        s3.Bucket(settings.s3_bucket_name).upload_fileobj(upload_stream, photo_name)
 
-        photo_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
+        photo_url = f"https://{settings.s3_bucket_name}.s3.amazonaws.com/{photo_name}"
         return photo_url
 
     finally:
@@ -136,4 +136,4 @@ def delete_from_s3(photo_name):
 
     :param photo_name: The name of the photo object to be deleted from the S3 bucket.
     """
-    s3.Object(S3_BUCKET_NAME, photo_name).delete()
+    s3.Object(settings.s3_bucket_name, photo_name).delete()
