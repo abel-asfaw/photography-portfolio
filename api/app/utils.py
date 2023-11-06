@@ -2,14 +2,21 @@ from hashlib import sha256
 from io import BytesIO
 from PIL import Image
 import jwt
+import boto3
 
 from app.config import settings
-from app.s3_service import s3
 
 
 MAX_FILE_SIZE = 2000000
 JPEG_MIME_TYPE = "image/jpeg"
 JPEG_EXTENSION = ".jpg"
+
+S3_RESOURCE = boto3.resource(
+    "s3",
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    region_name=settings.AWS_REGION,
+)
 
 class VerifyToken:
     """Handles token verification using PyJWT."""
@@ -103,7 +110,7 @@ def upload_to_s3(file, photo_name):
         if file.size > MAX_FILE_SIZE or file.content_type != JPEG_MIME_TYPE:
             upload_stream = optimize_image(file)
 
-        s3.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(upload_stream, photo_name)
+        S3_RESOURCE.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(upload_stream, photo_name)
 
         photo_url = f"https://{settings.S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
         return photo_url
@@ -120,4 +127,4 @@ def delete_from_s3(photo_name):
 
     :param photo_name: The name of the photo object to be deleted from the S3 bucket.
     """
-    s3.Object(settings.S3_BUCKET_NAME, photo_name).delete()
+    S3_RESOURCE.Object(settings.S3_BUCKET_NAME, photo_name).delete()
