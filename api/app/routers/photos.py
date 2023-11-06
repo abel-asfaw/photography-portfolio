@@ -5,6 +5,8 @@ from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from loguru import logger
 
+from app import models, schemas
+from app.database import get_db
 from app.utils import (
     VerifyToken,
     create_file_hash,
@@ -12,8 +14,6 @@ from app.utils import (
     get_file_name,
     upload_to_s3,
 )
-from app.database import get_db
-from app import models, schemas
 
 
 token_auth_scheme = HTTPBearer()
@@ -22,7 +22,7 @@ router = APIRouter()
 
 
 @router.get("", response_model=List[schemas.Photo])
-def get_photos(db: Session = Depends(get_db)):
+def get_photos(db: Annotated[Session, Depends(get_db)]):
     """
     Fetches all photo entries from the database.
 
@@ -44,7 +44,7 @@ def get_photos(db: Session = Depends(get_db)):
 def add_photo(
     file: UploadFile,
     token: Annotated[str, Depends(token_auth_scheme)],
-    db: Session = Depends(get_db),
+    db: Annotated[Session, Depends(get_db)],
 ):
     """
     Uploads a photo to an S3 bucket and records its details in the database. The photo's name
@@ -90,7 +90,7 @@ def add_photo(
 def delete_photo(
     photo_id: str,
     token: Annotated[str, Depends(token_auth_scheme)],
-    db: Session = Depends(get_db),
+    db: Annotated[Session, Depends(get_db)],
 ):
     """
     Deletes a photo's entry from the database using its unique identifier (SHA-256 hash).

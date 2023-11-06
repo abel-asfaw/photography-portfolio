@@ -19,8 +19,6 @@ S3_RESOURCE = boto3.resource(
 )
 
 class VerifyToken:
-    """Handles token verification using PyJWT."""
-
     def __init__(self, token):
         self.token = token
         self.jwks_url = f'https://{settings.DOMAIN}/.well-known/jwks.json'

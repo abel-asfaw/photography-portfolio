@@ -6,8 +6,6 @@ from app.database import Base
 
 
 class Photos(Base):
-    """Class representing a photos db table"""
-
     __tablename__ = "photos"
 
     id = Column(String(64), primary_key=True, nullable=False)
