@@ -4,14 +4,13 @@ from PIL import Image
 from decouple import config
 import jwt
 
-from .s3_service import s3
+from app.s3_service import s3
 
 
 MAX_FILE_SIZE = 2000000
 JPEG_MIME_TYPE = "image/jpeg"
 JPEG_EXTENSION = ".jpg"
 S3_BUCKET_NAME = config("S3_BUCKET_NAME")
-
 
 class VerifyToken:
     """Handles token verification using PyJWT."""
