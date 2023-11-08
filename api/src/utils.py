@@ -4,8 +4,8 @@ from PIL import Image
 import jwt
 import boto3
 
-from app.config import settings
-from app.exceptions import handle_s3_exceptions
+from src.config import settings
+from src.exceptions import handle_s3_exceptions
 
 
 MAX_FILE_SIZE = 2000000

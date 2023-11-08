@@ -5,10 +5,10 @@ from loguru import logger
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
-from app import models, schemas
-from app.database import get_db
-from app.exceptions import handle_db_exceptions
-from app.utils import (
+from src import models, schemas
+from src.database import get_db
+from src.exceptions import handle_db_exceptions
+from src.utils import (
     VerifyToken,
     create_file_hash,
     delete_from_s3,

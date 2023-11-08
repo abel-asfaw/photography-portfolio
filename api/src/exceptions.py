@@ -1,8 +1,9 @@
 from contextlib import contextmanager
+from botocore.exceptions import ClientError, BotoCoreError
 from fastapi import HTTPException, status
+from jwt.exceptions import ExpiredSignatureError, InvalidKeyError, InvalidAlgorithmError
 from loguru import logger
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
-from botocore.exceptions import ClientError, BotoCoreError
 
 
 @contextmanager
@@ -36,7 +37,7 @@ def handle_db_exceptions():
         ) from e
 
     except Exception as e:
-        logger.error(f"Unexpected error occurred: {e}")
+        logger.error(f"Unexpected error occurred during database operation: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unexpected error occurred",

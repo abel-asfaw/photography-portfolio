@@ -2,7 +2,7 @@ from sqlalchemy import Column, String
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
 
-from app.database import Base
+from src.database import Base
 
 
 class Photos(Base):
