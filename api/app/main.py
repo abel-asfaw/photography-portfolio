@@ -18,5 +18,5 @@ app.include_router(photos.router, prefix="/photos", tags=["Photos"])
 
 
 @app.get("/healthcheck", include_in_schema=False)
-async def healthcheck() -> dict[str, str]:
+def healthcheck():
     return {"status": "ok"}

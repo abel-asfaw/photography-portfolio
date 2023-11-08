@@ -11,4 +11,6 @@ class Photos(Base):
     id = Column(String(64), primary_key=True, nullable=False)
     name = Column(String(16), nullable=False, unique=True)
     url = Column(String(64), nullable=False, unique=True)
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
