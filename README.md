@@ -16,8 +16,8 @@ https://github.com/abel-asfaw/photography-portfolio/assets/50559072/6e6de8a2-d10
   - [ ] Add unit tests.
 
 - [ ] **Backend Enhancements**:
-  - [ ] Switch from using traditional SQL to an ORM to add a layer of abstraction.
-  - [ ] Raise specific exceptions instead of generic ones.
+  - [x] Switch from using traditional SQL to an ORM.
+  - [x] Raise specific exceptions instead of generic ones.
   - [ ] Add unit tests.
   - [ ] Implement rate limiter to protect API (stretch goal).
 
