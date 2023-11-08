@@ -62,3 +62,36 @@ def handle_s3_exceptions():
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Low-level error occurred in S3 service",
         ) from e
+
+    except Exception as e:
+        logger.error(f"Unexpected error occurred in S3 service: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unexpected error occurred",
+        ) from e
+
+
+@contextmanager
+def handle_token_exceptions():
+    detail = "Invalid token"
+    try:
+        yield
+
+    except ExpiredSignatureError as e:
+        logger.error(f"Token is expired: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=detail
+        ) from e
+
+    except (InvalidKeyError, InvalidAlgorithmError) as e:
+        logger.error(f"Token has invalid key or algorithm: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=detail
+        ) from e
+
+    except Exception as e:
+        # General catch-all for any other exception
+        logger.error(f"Unexpected error occured while handling token: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail
+        ) from e

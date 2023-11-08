@@ -5,7 +5,7 @@ import jwt
 import boto3
 
 from src.config import settings
-from src.exceptions import handle_s3_exceptions
+from src.exceptions import handle_s3_exceptions, handle_token_exceptions
 
 
 MAX_FILE_SIZE = 2000000
@@ -32,7 +32,7 @@ class VerifyToken:
 
         :return: The payload of the verified token or an error dictionary if verification fails.
         """
-        try:
+        with handle_token_exceptions():
             signing_key = self.jwks_client.get_signing_key_from_jwt(self.token).key
             payload = jwt.decode(
                 self.token,
@@ -42,9 +42,6 @@ class VerifyToken:
                 issuer=settings.ISSUER,
             )
             return payload
-
-        except Exception as e:
-            return {"error": {"message": str(e)}}
 
 
 def create_file_hash(file):
