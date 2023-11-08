@@ -5,6 +5,7 @@ import jwt
 import boto3
 
 from app.config import settings
+from app.exceptions import handle_s3_exceptions
 
 
 MAX_FILE_SIZE = 2000000
@@ -18,10 +19,11 @@ S3_RESOURCE = boto3.resource(
     region_name=settings.AWS_REGION,
 )
 
+
 class VerifyToken:
     def __init__(self, token):
         self.token = token
-        self.jwks_url = f'https://{settings.DOMAIN}/.well-known/jwks.json'
+        self.jwks_url = f"https://{settings.DOMAIN}/.well-known/jwks.json"
         self.jwks_client = jwt.PyJWKClient(self.jwks_url)
 
     def verify(self):
@@ -108,7 +110,10 @@ def upload_to_s3(file, photo_name):
         if file.size > MAX_FILE_SIZE or file.content_type != JPEG_MIME_TYPE:
             upload_stream = optimize_image(file)
 
-        S3_RESOURCE.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(upload_stream, photo_name)
+        with handle_s3_exceptions():
+            S3_RESOURCE.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(
+                upload_stream, photo_name
+            )
 
         photo_url = f"https://{settings.S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
         return photo_url
@@ -125,4 +130,5 @@ def delete_from_s3(photo_name):
 
     :param photo_name: The name of the photo object to be deleted from the S3 bucket.
     """
-    S3_RESOURCE.Object(settings.S3_BUCKET_NAME, photo_name).delete()
+    with handle_s3_exceptions():
+        S3_RESOURCE.Object(settings.S3_BUCKET_NAME, photo_name).delete()
