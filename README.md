@@ -1,9 +1,9 @@
 # Photography Portfolio
-This is a dynamic web app that lets me securely upload and display my photos. I used Vite.js and React for the frontend, which includes features like photo management.
+This is a full-stack web application that lets me securely upload and display my photos.
 
-The app is integrated with an Amazon S3 bucket for storage, which holds all the uploaded images. When photos are deleted, they are removed from both the database and the S3 bucket. For managing image metadata, I use PostgreSQL.
+I used React for the frontend, which includes features like photo management. On the backend, FastAPI handles tasks like image upload, data retrieval, and photo deletion. The app is integrated with an Amazon S3 bucket for image storage. And for managing image data I use PostgreSQL.
 
-On the backend, FastAPI handles tasks like image uploads, data retrieval, and deletions. I've also set up Auth0 on the frontend for user login and the backend to secure endpoints. This means both photo upload and deletion are behind authentication, making sure only authorized actions happen.
+I've also set up Auth0 on the frontend for user login and the backend to secure endpoints. This means both photo upload and deletion are behind authentication, making sure only authorized actions happen.
 
 Lastly, the whole application is containerized using Docker. This helps with consistent deployments and makes scaling easier in the future.
 
