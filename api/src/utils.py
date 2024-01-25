@@ -1,14 +1,17 @@
 from hashlib import sha256
 from io import BytesIO
+from typing import Any, Dict
+from fastapi import UploadFile
 from PIL import Image
-import jwt
 import boto3
+import jwt
 
 from src.config import settings
 from src.exceptions import handle_s3_exceptions, handle_token_exceptions
 
 
-MAX_FILE_SIZE = 2000000
+MAX_FILE_SIZE = 2_000_000
+PHOTO_NAME_LEN = 10
 JPEG_MIME_TYPE = "image/jpeg"
 JPEG_EXTENSION = ".jpg"
 
@@ -21,12 +24,12 @@ S3_RESOURCE = boto3.resource(
 
 
 class VerifyToken:
-    def __init__(self, token):
+    def __init__(self, token: str) -> None:
         self.token = token
         self.jwks_url = f"https://{settings.DOMAIN}/.well-known/jwks.json"
         self.jwks_client = jwt.PyJWKClient(self.jwks_url)
 
-    def verify(self):
+    def verify(self) -> Dict[str, Any]:
         """
         Verifies the JWT token.
 
@@ -44,7 +47,7 @@ class VerifyToken:
             return payload
 
 
-def create_file_hash(file):
+def create_file_hash(file: UploadFile) -> str:
     """
     Generates a unique identifier based on the SHA-256 hash of the file's content.
 
@@ -58,7 +61,7 @@ def create_file_hash(file):
     return hasher.hexdigest()
 
 
-def optimize_image(file):
+def optimize_image(file: UploadFile) -> BytesIO:
     """
     Compresses an image and returns it as a bytes buffer.
 
@@ -84,17 +87,17 @@ def optimize_image(file):
             image.close()
 
 
-def get_file_name(photo_id):
+def get_file_name(photo_id: str) -> str:
     """
     Generates a file name based on the provided photo_id
 
     :param photo_id: A unique identifier of a photo.
     :return: The generated file name with a ".jpg" extension.
     """
-    return photo_id[:10] + JPEG_EXTENSION
+    return photo_id[:PHOTO_NAME_LEN] + JPEG_EXTENSION
 
 
-def upload_to_s3(file, photo_name):
+def upload_to_s3(file: UploadFile, photo_name: str) -> str:
     """
     Uploads a file to S3, compressing and converting to JPEG if needed based on size and format.
 
@@ -117,7 +120,7 @@ def upload_to_s3(file, photo_name):
         file.file.close()
 
 
-def delete_from_s3(photo_name):
+def delete_from_s3(photo_name: str) -> None:
     """
     Deletes a specific photo object from an S3 bucket based on its name.
 
