@@ -79,7 +79,6 @@ def optimize_image(file):
         )
         buffer.seek(0)
         return buffer
-
     finally:
         if "image" in locals():
             image.close()
@@ -111,10 +110,7 @@ def upload_to_s3(file, photo_name):
             S3_RESOURCE.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(
                 upload_stream, photo_name
             )
-
-        photo_url = f"https://{settings.S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
-        return photo_url
-
+        return f"https://{settings.S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
     finally:
         if file.file is not upload_stream:
             upload_stream.close()
