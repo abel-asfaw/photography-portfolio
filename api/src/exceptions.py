@@ -8,10 +8,6 @@ from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 
 @contextmanager
 def handle_db_exceptions():
-    """
-    A context manager to centralize exception handling for database operations.
-    Catches and raises HTTPException for any database-related errors.
-    """
     try:
         yield
 
