@@ -5,9 +5,10 @@ from loguru import logger
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
-from src import models, schemas
 from src.database import get_db
 from src.exceptions import handle_db_exceptions
+from src.models import Photos
+from src.schemas import Photo
 from src.utils import (
     VerifyToken,
     create_file_hash,
@@ -22,24 +23,24 @@ token_auth_scheme = HTTPBearer()
 router = APIRouter()
 
 
-@router.get("", response_model=List[schemas.Photo])
-def get_photos(db: Session = Depends(get_db)):
+@router.get("", response_model=List[Photo])
+def get_photos(db: Session = Depends(get_db)) -> List[Photos]:
     """
     Fetches all photo entries from the database.
 
     :return: A list of Photo objects, each representing the metadata of a photo.
     """
     with handle_db_exceptions():
-        photos = db.query(models.Photos).order_by(desc(models.Photos.created_at)).all()
+        photos = db.query(Photos).order_by(desc(Photos.created_at)).all()
         return photos
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=schemas.Photo)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=Photo)
 def add_photo(
     file: UploadFile,
     token: str = Depends(token_auth_scheme),
     db: Session = Depends(get_db),
-):
+) -> Photos:
     """
     Uploads a photo to an S3 bucket and records its details in the database. The photo's name
     is derived from the SHA-256 hash of its content, ensuring a unique identifier for each photo.
@@ -60,7 +61,7 @@ def add_photo(
     photo_name = get_file_name(photo_id)
     photo_url = upload_to_s3(file, photo_name)
     with handle_db_exceptions():
-        photo = models.Photos(id=photo_id, name=photo_name, url=photo_url)
+        photo = Photos(id=photo_id, name=photo_name, url=photo_url)
         db.add(photo)
         db.commit()
         db.refresh(photo)
@@ -72,7 +73,7 @@ def delete_photo(
     photo_id: str,
     token: str = Depends(token_auth_scheme),
     db: Session = Depends(get_db),
-):
+) -> None:
     """
     Deletes a photo's entry from the database using its unique identifier (SHA-256 hash).
 
@@ -86,7 +87,7 @@ def delete_photo(
             detail="Invalid token",
         )
 
-    photo = db.query(models.Photos).filter(models.Photos.id == photo_id)
+    photo = db.query(Photos).filter(Photos.id == photo_id)
     if not photo.first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
