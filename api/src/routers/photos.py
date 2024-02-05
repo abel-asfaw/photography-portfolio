@@ -1,7 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, UploadFile, HTTPException, status
-from fastapi.security import HTTPBearer
-from loguru import logger
+from fastapi import APIRouter, UploadFile, Depends, Security, HTTPException, status
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
@@ -17,8 +15,6 @@ from src.utils import (
     upload_to_s3,
 )
 
-
-token_auth_scheme = HTTPBearer()
 
 router = APIRouter()
 
@@ -38,7 +34,7 @@ def get_photos(db: Session = Depends(get_db)) -> List[Photos]:
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Photo)
 def add_photo(
     file: UploadFile,
-    token: str = Depends(token_auth_scheme),
+    _: None = Security(VerifyToken()),
     db: Session = Depends(get_db),
 ) -> Photos:
     """
@@ -49,14 +45,6 @@ def add_photo(
     :return: A Photo instance with the photo's unique ID (hash-based), generated name,
             and the corresponding URL in the S3 bucket.
     """
-    result = VerifyToken(token.credentials).verify()
-    if result.get("error"):
-        logger.error(f'Token verification failed: {result["error"]["message"]}')
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
-
     photo_id = create_file_hash(file.file)
     photo_name = get_file_name(photo_id)
     photo_url = upload_to_s3(file, photo_name)
@@ -71,7 +59,7 @@ def add_photo(
 @router.delete("/{photo_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_photo(
     photo_id: str,
-    token: str = Depends(token_auth_scheme),
+    _: None = Security(VerifyToken()),
     db: Session = Depends(get_db),
 ) -> None:
     """
@@ -79,14 +67,6 @@ def delete_photo(
 
     :param photo_id: The unique identifier (SHA-256 hash) of the photo to be deleted.
     """
-    result = VerifyToken(token.credentials).verify()
-    if result.get("error"):
-        logger.error(f'Token verification failed: {result["error"]["message"]}')
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
-
     photo = db.query(Photos).filter(Photos.id == photo_id)
     if not photo.first():
         raise HTTPException(

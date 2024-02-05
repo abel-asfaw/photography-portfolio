@@ -1,7 +1,7 @@
 from hashlib import sha256
 from io import BytesIO
-from typing import Any, Dict
-from fastapi import UploadFile
+from fastapi import Depends, UploadFile
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from PIL import Image
 import boto3
 import jwt
@@ -24,27 +24,27 @@ S3_RESOURCE = boto3.resource(
 
 
 class VerifyToken:
-    def __init__(self, token: str) -> None:
-        self.token = token
-        self.jwks_url = f"https://{settings.DOMAIN}/.well-known/jwks.json"
-        self.jwks_client = jwt.PyJWKClient(self.jwks_url)
+    def __init__(self):
+        jwks_url = f"https://{settings.DOMAIN}/.well-known/jwks.json"
+        self.jwks_client = jwt.PyJWKClient(jwks_url)
 
-    def verify(self) -> Dict[str, Any]:
+    def __call__(
+        self, token: HTTPAuthorizationCredentials = Depends(HTTPBearer())
+    ) -> None:
         """
         Verifies the JWT token.
-
-        :return: The payload of the verified token or an error dictionary if verification fails.
         """
         with handle_token_exceptions():
-            signing_key = self.jwks_client.get_signing_key_from_jwt(self.token).key
-            payload = jwt.decode(
-                self.token,
+            signing_key = self.jwks_client.get_signing_key_from_jwt(
+                token.credentials
+            ).key
+            jwt.decode(
+                token.credentials,
                 signing_key,
                 algorithms=settings.ALGORITHMS,
                 audience=settings.API_AUDIENCE,
                 issuer=settings.ISSUER,
             )
-            return payload
 
 
 def create_file_hash(file: UploadFile) -> str:
