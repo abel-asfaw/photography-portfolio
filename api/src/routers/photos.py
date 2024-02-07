@@ -24,7 +24,7 @@ def get_photos(db: Session = Depends(get_db)) -> List[Photos]:
     """
     Fetches all photo entries from the database.
 
-    :return: A list of Photo objects, each representing the metadata of a photo.
+    :return: A list of Photo objects.
     """
     with handle_db_exceptions():
         photos = db.query(Photos).order_by(desc(Photos.created_at)).all()
@@ -38,12 +38,11 @@ def add_photo(
     db: Session = Depends(get_db),
 ) -> Photos:
     """
-    Uploads a photo to an S3 bucket and records its details in the database. The photo's name
-    is derived from the SHA-256 hash of its content, ensuring a unique identifier for each photo.
+    Uploads a photo to an S3 bucket and records its details in the database.
 
-    :param file: The photo to be uploaded, encapsulated in an UploadFile object
-    :return: A Photo instance with the photo's unique ID (hash-based), generated name,
-            and the corresponding URL in the S3 bucket.
+    :param file: The photo to be uploaded.
+    :return: A Photo instance with the photo's unique id, generated name,
+            and the corresponding url in the S3 bucket.
     """
     photo_id = create_file_hash(file.file)
     photo_name = get_file_name(photo_id)
@@ -63,9 +62,9 @@ def delete_photo(
     db: Session = Depends(get_db),
 ) -> None:
     """
-    Deletes a photo's entry from the database using its unique identifier (SHA-256 hash).
+    Deletes a photo's entry from the database using its unique id.
 
-    :param photo_id: The unique identifier (SHA-256 hash) of the photo to be deleted.
+    :param photo_id: A unique identifier of a photo.
     """
     photo = db.query(Photos).filter(Photos.id == photo_id)
     if not photo.first():

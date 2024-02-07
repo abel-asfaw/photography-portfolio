@@ -38,7 +38,7 @@ class VerifyToken:
             signing_key = self.jwks_client.get_signing_key_from_jwt(
                 token.credentials
             ).key
-            jwt.decode(
+            _ = jwt.decode(
                 token.credentials,
                 signing_key,
                 algorithms=settings.ALGORITHMS,
@@ -49,10 +49,10 @@ class VerifyToken:
 
 def create_file_hash(file: UploadFile) -> str:
     """
-    Generates a unique identifier based on the SHA-256 hash of the file's content.
+    Generates a unique id based on the SHA-256 hash of the file's content.
 
-    :param file: A file-like object containing the content to be hashed.
-    :return: The SHA-256 hash of the file's content as a string.
+    :param file: A file to be hashed.
+    :return: The SHA-256 hash of the file as a string.
     """
     hasher = sha256()
     file_content = file.read()
@@ -65,7 +65,7 @@ def optimize_image(file: UploadFile) -> BytesIO:
     """
     Compresses an image and returns it as a bytes buffer.
 
-    :param file: The file to be compressed.
+    :param file: A file to be compressed.
     :return: Buffered IO containing the compressed image.
     """
     try:
@@ -99,10 +99,11 @@ def get_file_name(photo_id: str) -> str:
 
 def upload_to_s3(file: UploadFile, photo_name: str) -> str:
     """
-    Uploads a file to S3, compressing and converting to JPEG if needed based on size and format.
+    Uploads a photo to to S3, compressing and converting to JPEG if needed
+    based on size and format.
 
-    :param file: The photo to be uploaded, encapsulated in an UploadFile object.
-    :param photo_name: The desired name (usually hash-based) for the photo in the S3 bucket.
+    :param file: A file to be uploaded to S3.
+    :param photo_name: The name for the photo.
     """
     try:
         upload_stream = file.file
@@ -124,7 +125,7 @@ def delete_from_s3(photo_name: str) -> None:
     """
     Deletes a specific photo object from an S3 bucket based on its name.
 
-    :param photo_name: The name of the photo object to be deleted from the S3 bucket.
+    :param photo_name: The name of the photo to be deleted from the S3 bucket.
     """
     with handle_s3_exceptions():
         S3_RESOURCE.Object(settings.S3_BUCKET_NAME, photo_name).delete()
