@@ -1,10 +1,8 @@
 from typing import List
-from fastapi import APIRouter, UploadFile, Depends, Security, HTTPException, status
+from fastapi import APIRouter, UploadFile, Security, HTTPException, status
 from sqlalchemy import desc
-from sqlalchemy.orm import Session
 
 from src.database import get_db
-from src.exceptions import handle_db_exceptions
 from src.models import Photos
 from src.schemas import Photo
 from src.utils import (
@@ -20,13 +18,13 @@ router = APIRouter()
 
 
 @router.get("", response_model=List[Photo])
-def get_photos(db: Session = Depends(get_db)) -> List[Photos]:
+def get_photos() -> List[Photo]:
     """
     Fetches all photo entries from the database.
 
     :return: A list of Photo objects.
     """
-    with handle_db_exceptions():
+    with get_db() as db:
         photos = db.query(Photos).order_by(desc(Photos.created_at)).all()
         return photos
 
@@ -35,8 +33,7 @@ def get_photos(db: Session = Depends(get_db)) -> List[Photos]:
 def add_photo(
     file: UploadFile,
     _: None = Security(VerifyToken()),
-    db: Session = Depends(get_db),
-) -> Photos:
+) -> Photo:
     """
     Uploads a photo to an S3 bucket and records its details in the database.
 
@@ -47,7 +44,7 @@ def add_photo(
     photo_id = create_file_hash(file.file)
     photo_name = get_file_name(photo_id)
     photo_url = upload_to_s3(file, photo_name)
-    with handle_db_exceptions():
+    with get_db() as db:
         photo = Photos(id=photo_id, name=photo_name, url=photo_url)
         db.add(photo)
         db.commit()
@@ -59,21 +56,19 @@ def add_photo(
 def delete_photo(
     photo_id: str,
     _: None = Security(VerifyToken()),
-    db: Session = Depends(get_db),
 ) -> None:
     """
     Deletes a photo's entry from the database using its unique id.
 
     :param photo_id: A unique identifier of a photo.
     """
-    photo = db.query(Photos).filter(Photos.id == photo_id)
-    if not photo.first():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Photo does not exist",
-        )
-
-    with handle_db_exceptions():
+    with get_db() as db:
+        photo = db.query(Photos).filter(Photos.id == photo_id)
+        if not photo.first():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Photo does not exist",
+            )
         photo.delete(synchronize_session=False)
         db.commit()
 

@@ -1,13 +1,15 @@
 from hashlib import sha256
 from io import BytesIO
-from fastapi import Depends, UploadFile
+from fastapi import Depends, UploadFile, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jwt.exceptions import ExpiredSignatureError, InvalidKeyError, InvalidAlgorithmError
+from loguru import logger
 from PIL import Image
 import boto3
 import jwt
 
 from src.config import settings
-from src.exceptions import handle_s3_exceptions, handle_token_exceptions
+from src.exceptions import s3_exception_handler
 
 
 MAX_FILE_SIZE = 2_000_000
@@ -24,6 +26,10 @@ S3_RESOURCE = boto3.resource(
 
 
 class VerifyToken:
+    """
+    Verifies the JWT token.
+    """
+
     def __init__(self):
         jwks_url = f"https://{settings.DOMAIN}/.well-known/jwks.json"
         self.jwks_client = jwt.PyJWKClient(jwks_url)
@@ -31,10 +37,8 @@ class VerifyToken:
     def __call__(
         self, token: HTTPAuthorizationCredentials = Depends(HTTPBearer())
     ) -> None:
-        """
-        Verifies the JWT token.
-        """
-        with handle_token_exceptions():
+        error_detail = "Invalid token"
+        try:
             signing_key = self.jwks_client.get_signing_key_from_jwt(
                 token.credentials
             ).key
@@ -45,6 +49,21 @@ class VerifyToken:
                 audience=settings.API_AUDIENCE,
                 issuer=settings.ISSUER,
             )
+        except ExpiredSignatureError as e:
+            logger.error(f"Token is expired: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail=error_detail
+            ) from e
+        except (InvalidKeyError, InvalidAlgorithmError) as e:
+            logger.error(f"Token has invalid key or algorithm: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail=error_detail
+            ) from e
+        except Exception as e:
+            logger.error(f"Unexpected error occured while handling token: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error_detail
+            ) from e
 
 
 def create_file_hash(file: UploadFile) -> str:
@@ -110,7 +129,7 @@ def upload_to_s3(file: UploadFile, photo_name: str) -> str:
         if file.size > MAX_FILE_SIZE or file.content_type != JPEG_MIME_TYPE:
             upload_stream = optimize_image(file)
 
-        with handle_s3_exceptions():
+        with s3_exception_handler():
             S3_RESOURCE.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(
                 upload_stream, photo_name
             )
@@ -127,5 +146,5 @@ def delete_from_s3(photo_name: str) -> None:
 
     :param photo_name: The name of the photo to be deleted from the S3 bucket.
     """
-    with handle_s3_exceptions():
+    with s3_exception_handler():
         S3_RESOURCE.Object(settings.S3_BUCKET_NAME, photo_name).delete()
