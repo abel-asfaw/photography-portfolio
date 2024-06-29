@@ -14,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(photos.router, prefix="/photos", tags=["Photos"])
+app.include_router(photos.router)
 
 
 @app.get("/healthcheck", include_in_schema=False)

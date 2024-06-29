@@ -14,7 +14,7 @@ from src.utils import (
 )
 
 
-router = APIRouter()
+router = APIRouter(prefix="/photos", tags=["Photos"])
 
 
 @router.get("", response_model=List[Photo])

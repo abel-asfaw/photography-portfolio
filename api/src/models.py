@@ -6,6 +6,10 @@ from src.database import Base
 
 
 class Photos(Base):
+    """
+    Represents the photos table in the database.
+    """
+
     __tablename__ = "photos"
 
     id = Column(String(64), primary_key=True, nullable=False)
