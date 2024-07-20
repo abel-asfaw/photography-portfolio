@@ -2,17 +2,34 @@ import { createContext, useCallback, useState } from 'react';
 import { uploadPhoto, fetchPhotos, deletePhotoById } from '../api/PhotosAPI';
 import { useAuth0 } from '@auth0/auth0-react';
 
-const PhotosContext = createContext({
+interface Photo {
+    id: string;
+    url: string;
+}
+
+interface PhotosContextType {
+    photos: Photo[];
+    showSpinner: boolean;
+    fetchPhotosAndSync: () => void;
+    uploadPhotoAndSync: (file: File) => void;
+    deletePhotoAndSync: (id: string) => void;
+}
+
+interface PhotosProviderProps {
+    children: React.ReactNode;
+}
+
+const PhotosContext = createContext<PhotosContextType>({
     photos: [],
     showSpinner: false,
-    fetchPhotosAndSync: async () => {},
-    uploadPhotoAndSync: async () => {},
-    deletePhotoAndSync: async () => {},
+    fetchPhotosAndSync: () => {},
+    uploadPhotoAndSync: () => {},
+    deletePhotoAndSync: () => {},
 });
 
-function PhotosProvider({ children }) {
-    const [photos, setPhotos] = useState([]);
-    const [showSpinner, setShowSpinner] = useState(false);
+function PhotosProvider({ children }: PhotosProviderProps) {
+    const [photos, setPhotos] = useState<Photo[]>([]);
+    const [showSpinner, setShowSpinner] = useState<boolean>(false);
     const { getAccessTokenSilently } = useAuth0();
 
     const fetchPhotosAndSync = useCallback(async () => {
@@ -24,7 +41,7 @@ function PhotosProvider({ children }) {
         }
     }, []);
 
-    const uploadPhotoAndSync = async file => {
+    const uploadPhotoAndSync = async (file: File) => {
         const token = await getAccessTokenSilently();
         setShowSpinner(true);
         try {
@@ -37,7 +54,7 @@ function PhotosProvider({ children }) {
         }
     };
 
-    const deletePhotoAndSync = async id => {
+    const deletePhotoAndSync = async (id: string) => {
         const token = await getAccessTokenSilently();
         const originalPhotos = [...photos];
         try {

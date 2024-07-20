@@ -1,15 +1,22 @@
 import classNames from 'classnames';
 
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    circular?: boolean;
+    primary?: boolean;
+    success?: boolean;
+    danger?: boolean;
+    className?: string;
+}
+
 export default function Button({
     circular,
     primary,
     success,
     danger,
-    onButtonClick,
     className,
     children,
-    ...rest
-}) {
+    ...props
+}: ButtonProps) {
     const classes = classNames(
         'flex text-sm items-center justify-center duration-300',
         {
@@ -23,12 +30,7 @@ export default function Button({
     );
 
     return (
-        <button
-            type="button"
-            onClick={onButtonClick}
-            className={classes}
-            {...rest}
-        >
+        <button type="button" className={classes} {...props}>
             {children}
         </button>
     );

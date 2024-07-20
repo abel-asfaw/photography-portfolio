@@ -8,7 +8,7 @@ export default function SessionBar() {
 
     return (
         <div className="flex justify-end border-b border-zinc-800 p-4">
-            <Button danger onButtonClick={logout}>
+            <Button danger onClick={() => logout()}>
                 <IoIosExit size={24} />
             </Button>
         </div>

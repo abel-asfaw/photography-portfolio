@@ -8,7 +8,7 @@ const fetchPhotos = async () => {
     return response.data;
 };
 
-const uploadPhoto = async (file, token) => {
+const uploadPhoto = async (file: File, token: string) => {
     const formData = new FormData();
     formData.append('file', file, file.name);
     const response = await axios.post(API_BASE_URL, formData, {
@@ -20,7 +20,7 @@ const uploadPhoto = async (file, token) => {
     return response.data;
 };
 
-const deletePhotoById = async (photoId, token) => {
+const deletePhotoById = async (photoId: string, token: string) => {
     await axios.delete(`${API_BASE_URL}/${photoId}`, {
         headers: {
             Authorization: `Bearer ${token}`,

@@ -1,6 +1,10 @@
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 
-export default function AuthGuard({ component }) {
+interface AuthGuardProps {
+    component: React.ComponentType;
+}
+
+export default function AuthGuard({ component }: AuthGuardProps) {
     const Component = withAuthenticationRequired(component);
 
     return <Component />;

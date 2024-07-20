@@ -4,7 +4,17 @@ import { MdClose } from 'react-icons/md';
 import usePhotosContext from '../hooks/usePhotosContext';
 import Button from './Button';
 
-export default function PhotoView({ photoId, photoUrl, canDelete }) {
+interface PhotoViewProps {
+    photoId: string;
+    photoUrl: string;
+    canDelete: boolean;
+}
+
+export default function PhotoView({
+    photoId,
+    photoUrl,
+    canDelete,
+}: PhotoViewProps) {
     const { deletePhotoAndSync } = usePhotosContext();
     const [isDeleted, setIsDeleted] = useState(false);
 
