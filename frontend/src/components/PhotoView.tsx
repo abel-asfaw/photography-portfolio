@@ -30,8 +30,13 @@ export default function PhotoView({
             className="group relative h-auto w-96"
             animate={isDeleted ? { opacity: 0 } : { opacity: 1 }}
         >
-            <div className="relative transform-gpu overflow-hidden rounded-2xl duration-700 hover:scale-110">
-                <img src={photoUrl} className="h-auto w-full" loading="lazy" />
+            <div className="relative transform-gpu overflow-hidden rounded-xl duration-700 hover:scale-110">
+                <img
+                    src={photoUrl}
+                    srcSet={photoUrl}
+                    className="h-auto w-full"
+                    loading="lazy"
+                />
                 {canDelete && (
                     <Button
                         primary
@@ -39,7 +44,7 @@ export default function PhotoView({
                         onClick={handleDelete}
                         className="absolute right-2 top-2 opacity-0 shadow-sm shadow-zinc-700 group-hover:opacity-100"
                     >
-                        <MdClose size={12} color="black" />
+                        <MdClose size={14} color="black" />
                     </Button>
                 )}
             </div>
