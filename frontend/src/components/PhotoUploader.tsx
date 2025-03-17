@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { CgSpinner } from 'react-icons/cg';
 
-import usePhotosContext from '../hooks/usePhotosContext';
+import usePhotosContext from '@/src/hooks/usePhotosContext';
 import Button from './Button';
 import FileInput from './FileInput';
 

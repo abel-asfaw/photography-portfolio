@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { MdClose } from 'react-icons/md';
-import usePhotosContext from '../hooks/usePhotosContext';
+import usePhotosContext from '@/src/hooks/usePhotosContext';
 import Button from './Button';
 
 interface PhotoViewProps {

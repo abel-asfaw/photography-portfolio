@@ -1,11 +1,7 @@
-import { createContext, useCallback, useState } from 'react';
-import { uploadPhoto, fetchPhotos, deletePhotoById } from '../api/PhotosAPI';
+import { createContext, useCallback, useMemo, useState } from 'react';
+import { uploadPhoto, fetchPhotos, deletePhotoById } from '@/src/api/PhotosAPI';
 import { useAuth0 } from '@auth0/auth0-react';
-
-interface Photo {
-    id: string;
-    url: string;
-}
+import { Photo } from '@/src/global/types';
 
 interface PhotosContextType {
     photos: Photo[];
@@ -19,7 +15,7 @@ interface PhotosProviderProps {
     children: React.ReactNode;
 }
 
-const PhotosContext = createContext<PhotosContextType>({
+export const PhotosContext = createContext<PhotosContextType>({
     photos: [],
     showSpinner: false,
     fetchPhotosAndSync: () => {},
@@ -35,9 +31,12 @@ function PhotosProvider({ children }: PhotosProviderProps) {
     const fetchPhotosAndSync = useCallback(async () => {
         try {
             const photos = await fetchPhotos();
+            if (!photos) {
+                throw new Error('Failed to fetch photos');
+            }
             setPhotos(photos);
         } catch (err) {
-            console.error('Error fetching photos:', err);
+            console.error(err);
         }
     }, []);
 
@@ -46,9 +45,12 @@ function PhotosProvider({ children }: PhotosProviderProps) {
         setShowSpinner(true);
         try {
             const newPhoto = await uploadPhoto(file, token);
+            if (!newPhoto) {
+                throw new Error('Failed to upload photo');
+            }
             setPhotos([newPhoto, ...photos]);
         } catch (err) {
-            console.error('Error uploading photo:', err);
+            console.error(err);
         } finally {
             setShowSpinner(false);
         }
@@ -57,8 +59,9 @@ function PhotosProvider({ children }: PhotosProviderProps) {
     const deletePhotoAndSync = async (id: string) => {
         const token = await getAccessTokenSilently();
         const originalPhotos = [...photos];
+        const filteredPhotos = photos.filter(photo => photo.id !== id);
         try {
-            setPhotos(photos.filter(photo => photo.id !== id));
+            setPhotos(filteredPhotos);
             await deletePhotoById(id, token);
         } catch (err) {
             console.error('Error deleting photo:', err);
@@ -66,20 +69,22 @@ function PhotosProvider({ children }: PhotosProviderProps) {
         }
     };
 
-    const photoOperations = {
-        photos,
-        showSpinner,
-        fetchPhotosAndSync,
-        uploadPhotoAndSync,
-        deletePhotoAndSync,
-    };
+    const value = useMemo(
+        () => ({
+            photos,
+            showSpinner,
+            fetchPhotosAndSync,
+            uploadPhotoAndSync,
+            deletePhotoAndSync,
+        }),
+        [photos, showSpinner],
+    );
 
     return (
-        <PhotosContext.Provider value={photoOperations}>
+        <PhotosContext.Provider value={value}>
             {children}
         </PhotosContext.Provider>
     );
 }
 
-export { PhotosProvider };
-export default PhotosContext;
+export default PhotosProvider;
