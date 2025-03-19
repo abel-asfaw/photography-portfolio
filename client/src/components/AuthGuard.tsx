@@ -5,7 +5,12 @@ interface AuthGuardProps {
 }
 
 export default function AuthGuard({ component }: AuthGuardProps) {
-    const Component = withAuthenticationRequired(component);
+    const Component = withAuthenticationRequired(component, {
+        onRedirecting: () => <div>Logging in...</div>,
+        loginOptions: {
+            appState: { returnTo: '/admin' },
+        },
+    });
 
     return <Component />;
 }

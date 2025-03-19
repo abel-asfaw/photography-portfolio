@@ -7,6 +7,7 @@ interface PhotoListProps {
 
 export default function PhotoList({ isAuthenticated = false }: PhotoListProps) {
     const photos = usePhotosStore(state => state.photos);
+    const isLoading = usePhotosStore(state => state.isLoading);
 
     const renderedPhotos = photos.map(({ id, url }) => (
         <PhotoView
@@ -19,7 +20,11 @@ export default function PhotoList({ isAuthenticated = false }: PhotoListProps) {
 
     return (
         <div className="flex flex-wrap items-center justify-center gap-20 p-10 text-white sm:p-20">
-            {renderedPhotos.length ? renderedPhotos : 'No photos to display...'}
+            {isLoading
+                ? 'Loading...'
+                : renderedPhotos.length
+                ? renderedPhotos
+                : 'No photos to display...'}
         </div>
     );
 }
