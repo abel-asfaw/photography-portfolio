@@ -26,12 +26,12 @@ services:
       - internal_network
     platform: linux/amd64
 
-  frontend:
+  client:
     build:
-      context: frontend/
+      context: client/
       dockerfile: Dockerfile
     volumes:
-      - ./frontend:/usr/app:delegated
+      - ./client:/usr/app:delegated
       - /usr/app/node_modules
     restart: always
     depends_on:
@@ -47,7 +47,7 @@ services:
     volumes: 
       - ./default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - frontend
+      - client
       - api
     networks:
       - internal_network

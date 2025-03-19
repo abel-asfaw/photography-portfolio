@@ -31,4 +31,4 @@ const deletePhotoById = async (photoId: string, token: string) => {
     });
 };
 
-export { uploadPhoto, fetchPhotos, deletePhotoById };
+export { fetchPhotos, uploadPhoto, deletePhotoById };
