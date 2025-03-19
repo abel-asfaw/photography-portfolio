@@ -3,7 +3,7 @@ FROM node:20-alpine
 WORKDIR /usr/app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 COPY ./ ./
 
 # This CMD is for development only!
