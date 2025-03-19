@@ -8,7 +8,10 @@ app = FastAPI(root_path="/api", debug=True)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://photography.abelasfaw.com"],
+    allow_origins=[
+        "https://photography.abelasfaw.com",
+        "https://photography-portfolio-o88f.onrender.com",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
