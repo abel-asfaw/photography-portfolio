@@ -1,7 +1,8 @@
 import { useAuth0 } from '@auth0/auth0-react';
 
 import { IoIosExit } from 'react-icons/io';
-import Button from './Button';
+
+import Button from '@/src/components/Button';
 
 export default function SessionBar() {
     const { logout } = useAuth0();

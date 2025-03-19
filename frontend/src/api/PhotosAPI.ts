@@ -1,9 +1,12 @@
 import axios from 'axios';
+import { Photo } from '@/src/global/types';
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/photos`;
+const client = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+});
 
 const fetchPhotos = async () => {
-    const response = await axios.get(API_BASE_URL);
+    const response = await client.get<Photo[]>('/photos');
 
     return response.data;
 };
@@ -11,7 +14,7 @@ const fetchPhotos = async () => {
 const uploadPhoto = async (file: File, token: string) => {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    const response = await axios.post(API_BASE_URL, formData, {
+    const response = await client.post<Photo>('/photos', formData, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -21,7 +24,7 @@ const uploadPhoto = async (file: File, token: string) => {
 };
 
 const deletePhotoById = async (photoId: string, token: string) => {
-    await axios.delete(`${API_BASE_URL}/${photoId}`, {
+    await client.delete(`/${photoId}`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },

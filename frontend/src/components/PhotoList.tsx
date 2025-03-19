@@ -1,12 +1,12 @@
-import usePhotosContext from '../hooks/usePhotosContext';
-import PhotoView from './PhotoView';
+import PhotoView from '@/src/components/PhotoView';
+import { usePhotosStore } from '@/src/store/photosStore';
 
 interface PhotoListProps {
     isAuthenticated?: boolean;
 }
 
 export default function PhotoList({ isAuthenticated = false }: PhotoListProps) {
-    const { photos } = usePhotosContext();
+    const photos = usePhotosStore(state => state.photos);
 
     const renderedPhotos = photos.map(({ id, url }) => (
         <PhotoView
