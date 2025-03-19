@@ -44,3 +44,4 @@ SQLAlchemy==2.0.23
 starlette==0.27.0
 tomlkit==0.12.3
 urllib3==1.26.18
+uvicorn==0.34.0
