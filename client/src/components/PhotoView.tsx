@@ -38,12 +38,13 @@ export default function PhotoView({
             className="group relative h-auto w-96"
             animate={isDeleted ? { opacity: 0 } : { opacity: 1 }}
         >
-            <div className="relative transform-gpu overflow-hidden rounded-xl duration-700 hover:scale-110">
+            <div className="relative transform-gpu overflow-hidden rounded-xl duration-700 will-change-transform hover:scale-110">
                 <img
                     src={photoUrl}
                     srcSet={photoUrl}
                     className="h-auto w-full"
                     loading="lazy"
+                    crossOrigin="anonymous"
                 />
                 {canDelete && (
                     <Button
