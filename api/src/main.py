@@ -10,7 +10,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://photography.abelasfaw.com",
-        "https://photography-portfolio-o88f.onrender.com",
+        "https://photography-client.onrender.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
