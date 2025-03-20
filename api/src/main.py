@@ -11,6 +11,7 @@ app.add_middleware(
     allow_origins=[
         "https://photography.abelasfaw.com",
         "https://photography-client.onrender.com",
+        "http://localhost:3005",
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -34,7 +34,7 @@ class VerifyToken:
         jwks_url = f"https://{settings.DOMAIN}/.well-known/jwks.json"
         self.jwks_client = jwt.PyJWKClient(jwks_url)
 
-    def __call__(
+    def verify(
         self, token: HTTPAuthorizationCredentials = Depends(HTTPBearer())
     ) -> None:
         error_detail = "Invalid token"

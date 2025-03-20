@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import APIRouter, UploadFile, Security, HTTPException, status
 from sqlalchemy import desc
 
@@ -16,9 +15,11 @@ from src.utils import (
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
+auth = VerifyToken()
 
-@router.get("", response_model=List[Photo])
-def get_photos() -> List[Photo]:
+
+@router.get("", response_model=list[Photo])
+def get_photos() -> list[Photo]:
     """
     Fetches all photo entries from the database.
 
@@ -32,7 +33,7 @@ def get_photos() -> List[Photo]:
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Photo)
 def add_photo(
     file: UploadFile,
-    _: None = Security(VerifyToken()),
+    _: None = Security(auth.verify),
 ) -> Photo:
     """
     Uploads a photo to an S3 bucket and records its details in the database.
@@ -55,7 +56,7 @@ def add_photo(
 @router.delete("/{photo_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_photo(
     photo_id: str,
-    _: None = Security(VerifyToken()),
+    _: None = Security(auth.verify),
 ) -> None:
     """
     Deletes a photo's entry from the database using its unique id.
