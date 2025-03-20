@@ -7,9 +7,13 @@ import Button from '@/src/components/Button';
 export default function SessionBar() {
     const { logout } = useAuth0();
 
+    const handleLogout = async () => {
+        await logout({ logoutParams: { returnTo: window.location.origin } });
+    };
+
     return (
         <div className="flex justify-end border-b border-zinc-800 p-4">
-            <Button danger onClick={() => logout()}>
+            <Button danger onClick={handleLogout}>
                 <IoIosExit size={24} />
             </Button>
         </div>
