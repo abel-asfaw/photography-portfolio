@@ -24,7 +24,7 @@ const uploadPhoto = async (file: File, token: string) => {
 };
 
 const deletePhotoById = async (photoId: string, token: string) => {
-    await client.delete(`/${photoId}`, {
+    await client.delete(`/photos/${photoId}`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
