@@ -62,7 +62,8 @@ class VerifyToken:
         except Exception as e:
             logger.error(f"Unexpected error occured while handling token: {e}")
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error_detail
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Unexpected token handling error",
             ) from e
 
 
@@ -126,7 +127,7 @@ def upload_to_s3(file: UploadFile, photo_name: str) -> str:
     """
     try:
         upload_stream = file.file
-        if file.size > MAX_FILE_SIZE or file.content_type != JPEG_MIME_TYPE:
+        if file.size > MAX_FILE_SIZE:
             upload_stream = optimize_image(file)
 
         with s3_exception_handler():
