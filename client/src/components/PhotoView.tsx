@@ -34,6 +34,8 @@ export default function PhotoView({
         }, 400);
     };
 
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
     return (
         <motion.div
             className="group relative h-auto w-96"
@@ -45,7 +47,7 @@ export default function PhotoView({
                     srcSet={photoUrl}
                     className="h-auto w-full"
                     loading="lazy"
-                    crossOrigin="anonymous"
+                    {...(!isSafari && { crossOrigin: 'anonymous' })}
                 />
                 {canDelete && (
                     <Button
