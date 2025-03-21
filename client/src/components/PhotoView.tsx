@@ -2,9 +2,10 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { MdClose } from 'react-icons/md';
 
-import Button from '@/src/components/Button';
-import { deletePhotoById } from '@/src/api/PhotosAPI';
 import { useAuth0 } from '@auth0/auth0-react';
+
+import { deletePhotoById } from '@/src/api/PhotosAPI';
+import Button from '@/src/components/Button';
 import { usePhotosStore } from '@/src/store/photosStore';
 
 interface PhotoViewProps {

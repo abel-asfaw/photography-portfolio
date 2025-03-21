@@ -1,4 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react';
+
 import PhotoList from '@/src/components/PhotoList';
 import PhotoUploader from '@/src/components/PhotoUploader';
 import SessionBar from '@/src/components/SessionBar';

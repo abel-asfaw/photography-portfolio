@@ -4,11 +4,11 @@ import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { CgSpinner } from 'react-icons/cg';
 
 import { useAuth0 } from '@auth0/auth0-react';
-import { usePhotosStore } from '@/src/store/photosStore';
 
+import { uploadPhoto } from '@/src/api/PhotosAPI';
 import Button from '@/src/components/Button';
 import FileInput from '@/src/components/FileInput';
-import { uploadPhoto } from '@/src/api/PhotosAPI';
+import { usePhotosStore } from '@/src/store/photosStore';
 
 export default function PhotoUploader() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
