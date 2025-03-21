@@ -21,6 +21,6 @@ app.add_middleware(
 app.include_router(photos.router)
 
 
-@app.get("/healthcheck", include_in_schema=False)
+@app.get("/healthz", include_in_schema=False)
 def healthcheck():
     return {"status": "ok"}
