@@ -12,11 +12,10 @@ import { usePhotosStore } from '@/src/store/photosStore';
 
 export default function PhotoUploader() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [showSpinner, setShowSpinner] = useState<boolean>(false);
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const showSpinner = usePhotosStore(state => state.showSpinner);
     const addPhoto = usePhotosStore(state => state.addPhoto);
-    const setShowSpinner = usePhotosStore(state => state.setShowSpinner);
     const { getAccessTokenSilently } = useAuth0();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
