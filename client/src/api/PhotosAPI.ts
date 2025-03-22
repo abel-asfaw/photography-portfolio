@@ -11,7 +11,7 @@ const fetchPhotos = async () => {
         const response = await client.get<Photo[]>('/photos');
         return response.data;
     } catch {
-        console.error('Failed to retrieve photos.');
+        alert('Failed to retrieve photos. Please try again.');
     }
 };
 
@@ -26,7 +26,7 @@ const uploadPhoto = async (file: File, token: string) => {
         });
         return response.data;
     } catch {
-        console.error('Failed to upload photo.');
+        alert('Failed to upload photo. Please try again.');
     }
 };
 
@@ -39,7 +39,7 @@ const deletePhotoById = async (photoId: string, token: string) => {
         });
         return response.status;
     } catch {
-        console.error('Failed to delete photo.');
+        alert('Failed to delete photo. Please try again. ');
     }
 };
 

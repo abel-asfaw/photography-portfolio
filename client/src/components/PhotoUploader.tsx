@@ -32,7 +32,7 @@ export default function PhotoUploader() {
 
             setShowSpinner(true);
             const newPhoto = await uploadPhoto(selectedFile, accessToken);
-            addPhoto(newPhoto);
+            if (newPhoto) addPhoto(newPhoto);
 
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
