@@ -1,3 +1,4 @@
+import { HttpStatusCode } from 'axios';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { MdClose } from 'react-icons/md';
@@ -28,9 +29,13 @@ export default function PhotoView({
     const handleDelete = async () => {
         const accessToken = await getAccessTokenSilently();
         setIsDeleted(true);
-        setTimeout(() => {
-            removePhoto(photoId);
-            deletePhotoById(photoId, accessToken);
+        setTimeout(async () => {
+            const deleteStatus = await deletePhotoById(photoId, accessToken);
+            if (deleteStatus && deleteStatus === HttpStatusCode.NoContent) {
+                removePhoto(photoId);
+            } else {
+                setIsDeleted(false);
+            }
         }, 400);
     };
 
