@@ -5,7 +5,7 @@ interface AuthGuardProps {
 }
 
 export default function AuthGuard({ component }: AuthGuardProps) {
-    const Component = withAuthenticationRequired(component);
+    const ProtectedComponent = withAuthenticationRequired(component);
 
-    return <Component />;
+    return <ProtectedComponent />;
 }

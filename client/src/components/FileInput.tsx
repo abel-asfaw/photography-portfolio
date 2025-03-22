@@ -8,7 +8,7 @@ interface FileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export default function FileInput({
     fileInputRef,
     className,
-    ...props
+    ...delegated
 }: FileInputProps) {
     const classes = classNames(
         'h-10 rounded-md bg-zinc-800 text-sm text-gray-400 file:mr-2 file:h-10 file:cursor-pointer',
@@ -18,6 +18,11 @@ export default function FileInput({
     );
 
     return (
-        <input ref={fileInputRef} type="file" className={classes} {...props} />
+        <input
+            ref={fileInputRef}
+            type="file"
+            className={classes}
+            {...delegated}
+        />
     );
 }

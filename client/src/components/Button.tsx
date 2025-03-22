@@ -15,7 +15,7 @@ export default function Button({
     danger,
     className,
     children,
-    ...props
+    ...delegated
 }: ButtonProps) {
     const classes = classNames(
         'flex text-sm items-center justify-center duration-300',
@@ -30,7 +30,7 @@ export default function Button({
     );
 
     return (
-        <button type="button" className={classes} {...props}>
+        <button type="button" className={classes} {...delegated}>
             {children}
         </button>
     );

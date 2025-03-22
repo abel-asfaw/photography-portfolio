@@ -17,7 +17,7 @@ export default function PhotoList({ isAuthenticated = false }: PhotoListProps) {
     const { data, isLoading, isError } = useQuery({
         queryKey: ['photos'],
         queryFn: fetchPhotos,
-        staleTime: 1000 * 60 * 60,
+        staleTime: 1000 * 60 * 60, // 1 hour
     });
 
     useEffect(() => {
