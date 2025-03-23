@@ -5,8 +5,8 @@ import { CgSpinner } from 'react-icons/cg';
 
 import Button from '@/src/components/Button';
 import FileInput from '@/src/components/FileInput';
+import { usePhotosAPI } from '@/src/hooks/usePhotosAPI';
 import { usePhotosStore } from '@/src/store/photosStore';
-import { usePhotosAPI } from '../hooks/usePhotosAPI';
 
 export default function PhotoUploader() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);

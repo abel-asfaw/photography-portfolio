@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import PhotoView from '@/src/components/PhotoView';
+import { usePhotosAPI } from '@/src/hooks/usePhotosAPI';
 import { usePhotosStore } from '@/src/store/photosStore';
-import { usePhotosAPI } from '../hooks/usePhotosAPI';
 
 interface PhotoListProps {
     isAuthenticated?: boolean;
