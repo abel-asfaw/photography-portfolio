@@ -11,48 +11,44 @@ const axiosClient = axios.create({
 export function usePhotosAPI() {
     const { getAccessTokenSilently } = useAuth0();
 
+    const getAuthHeaders = async () => ({
+        Authorization: `Bearer ${await getAccessTokenSilently()}`,
+    });
+
     const fetchPhotos = async () => {
         try {
             const response = await axiosClient.get<Photo[]>('/photos');
             return response.data;
         } catch {
-            alert('Failed to retrieve photos. Please try again.');
+            console.error('Failed to retrieve photos. Please try again.');
         }
     };
 
     const uploadPhoto = async (file: File) => {
-        const formData = new FormData();
-        formData.append('file', file, file.name);
         try {
-            const token = await getAccessTokenSilently();
-            console.log(token);
+            const formData = new FormData();
+            formData.append('file', file, file.name);
             const response = await axiosClient.post<Photo>(
                 '/photos',
                 formData,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: await getAuthHeaders(),
                 },
             );
             return response.data;
         } catch {
-            alert('Failed to upload photo. Please try again.');
+            console.error('Failed to upload photo. Please try again.');
         }
     };
 
     const deletePhotoById = async (photoId: string) => {
         try {
-            const token = await getAccessTokenSilently();
-            console.log(token);
             const response = await axiosClient.delete(`/photos/${photoId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: await getAuthHeaders(),
             });
             return response.status;
         } catch {
-            alert('Failed to delete photo. Please try again. ');
+            console.error('Failed to delete photo. Please try again. ');
         }
     };
 
