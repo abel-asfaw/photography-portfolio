@@ -3,10 +3,8 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { MdClose } from 'react-icons/md';
 
-import { useAuth0 } from '@auth0/auth0-react';
-
-import { deletePhotoById } from '@/src/api/PhotosAPI';
 import Button from '@/src/components/Button';
+import { usePhotosAPI } from '@/src/hooks/usePhotosAPI';
 import { usePhotosStore } from '@/src/store/photosStore';
 
 interface PhotoViewProps {
@@ -22,15 +20,14 @@ export default function PhotoView({
 }: PhotoViewProps) {
     const [isDeleted, setIsDeleted] = useState(false);
 
+    const { deletePhotoById } = usePhotosAPI();
+
     const removePhoto = usePhotosStore(state => state.removePhoto);
 
-    const { getAccessTokenSilently } = useAuth0();
-
     const handleDelete = async () => {
-        const accessToken = await getAccessTokenSilently();
         setIsDeleted(true);
         setTimeout(async () => {
-            const deleteStatus = await deletePhotoById(photoId, accessToken);
+            const deleteStatus = await deletePhotoById(photoId);
             if (deleteStatus && deleteStatus === HttpStatusCode.NoContent) {
                 removePhoto(photoId);
             } else {

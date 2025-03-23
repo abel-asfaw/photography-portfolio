@@ -3,12 +3,10 @@ import { useRef, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { CgSpinner } from 'react-icons/cg';
 
-import { useAuth0 } from '@auth0/auth0-react';
-
-import { uploadPhoto } from '@/src/api/PhotosAPI';
 import Button from '@/src/components/Button';
 import FileInput from '@/src/components/FileInput';
 import { usePhotosStore } from '@/src/store/photosStore';
+import { usePhotosAPI } from '../hooks/usePhotosAPI';
 
 export default function PhotoUploader() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -16,7 +14,7 @@ export default function PhotoUploader() {
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const addPhoto = usePhotosStore(state => state.addPhoto);
-    const { getAccessTokenSilently } = useAuth0();
+    const { uploadPhoto } = usePhotosAPI();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.length) return;
@@ -27,12 +25,11 @@ export default function PhotoUploader() {
     const handleFileUpload = async () => {
         if (!selectedFile) return;
         try {
-            const accessToken = await getAccessTokenSilently();
-
             setShowSpinner(true);
-            const newPhoto = await uploadPhoto(selectedFile, accessToken);
-            if (newPhoto) addPhoto(newPhoto);
-
+            const newPhoto = await uploadPhoto(selectedFile);
+            if (newPhoto) {
+                addPhoto(newPhoto);
+            }
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
             }
