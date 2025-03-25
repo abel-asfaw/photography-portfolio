@@ -38,7 +38,7 @@ export default function PhotoList({ isAuthenticated = false }: PhotoListProps) {
     ));
 
     return (
-        <div className="flex flex-wrap items-center justify-center gap-20 p-10 text-white sm:p-20">
+        <div className="flex flex-grow flex-wrap items-center justify-center gap-20 p-10 text-neutral-200 sm:p-20">
             {isLoading
                 ? 'Loading...'
                 : isError
