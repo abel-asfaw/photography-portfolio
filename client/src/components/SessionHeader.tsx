@@ -4,7 +4,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 import Button from '@/src/components/Button';
 
-export default function SessionBar() {
+export default function SessionHeader() {
     const { logout } = useAuth0();
 
     const handleLogout = async () => {
