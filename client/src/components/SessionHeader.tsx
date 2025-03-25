@@ -13,7 +13,7 @@ export default function SessionHeader() {
 
     return (
         <div className="flex justify-end border-b border-zinc-800 p-4">
-            <Button danger onClick={handleLogout}>
+            <Button className="text-white" danger onClick={handleLogout}>
                 <IoIosExit size={24} />
             </Button>
         </div>

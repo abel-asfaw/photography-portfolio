@@ -46,7 +46,7 @@ export default function PhotoUploader() {
         return <Icon size={24} className={showSpinner ? 'animate-spin' : ''} />;
     };
 
-    const buttonClasses = classNames('bg-green-600', {
+    const buttonClasses = classNames('bg-green-600 text-white', {
         'cursor-not-allowed': !selectedFile,
         'opacity-50': !selectedFile,
         'hover:bg-green-700': !!selectedFile,

@@ -8,10 +8,10 @@ export default function Admin() {
     const { isAuthenticated } = useAuth0();
 
     return (
-        <div className="text-white">
+        <>
             <SessionHeader />
             <PhotoUploader />
             <PhotoList isAuthenticated={isAuthenticated} />
-        </div>
+        </>
     );
 }
