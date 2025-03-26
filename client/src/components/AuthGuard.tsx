@@ -5,7 +5,13 @@ interface AuthGuardProps {
 }
 
 export default function AuthGuard({ component }: AuthGuardProps) {
-    const ProtectedComponent = withAuthenticationRequired(component);
+    const ProtectedComponent = withAuthenticationRequired(component, {
+        onRedirecting: () => (
+            <div className="flex flex-grow items-center justify-center text-neutral-200 ">
+                Loading...
+            </div>
+        ),
+    });
 
     return <ProtectedComponent />;
 }
