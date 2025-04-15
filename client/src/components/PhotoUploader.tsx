@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import { useRef, useState } from 'react';
-import { AiOutlineCloudUpload } from 'react-icons/ai';
-import { CgSpinner } from 'react-icons/cg';
+import { Loader, UploadCloud } from 'react-feather';
 
 import Button from '@/src/components/Button';
 import FileInput from '@/src/components/FileInput';
@@ -10,7 +9,7 @@ import { usePhotosStore } from '@/src/store/photosStore';
 
 export default function PhotoUploader() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [showSpinner, setShowSpinner] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const addPhoto = usePhotosStore(state => state.addPhoto);
@@ -25,7 +24,7 @@ export default function PhotoUploader() {
     const handleFileUpload = async () => {
         if (!selectedFile) return;
         try {
-            setShowSpinner(true);
+            setIsLoading(true);
             const newPhoto = await uploadPhoto(selectedFile);
             if (newPhoto) {
                 addPhoto(newPhoto);
@@ -37,13 +36,8 @@ export default function PhotoUploader() {
         } catch (error) {
             console.error('File upload failed:', error);
         } finally {
-            setShowSpinner(false);
+            setIsLoading(false);
         }
-    };
-
-    const displayUploadIcon = () => {
-        const Icon = showSpinner ? CgSpinner : AiOutlineCloudUpload;
-        return <Icon size={24} className={showSpinner ? 'animate-spin' : ''} />;
     };
 
     const buttonClasses = classNames('bg-green-600 text-white', {
@@ -51,6 +45,8 @@ export default function PhotoUploader() {
         'opacity-50': !selectedFile,
         'hover:bg-green-700': !!selectedFile,
     });
+
+    const UploadIcon = isLoading ? Loader : UploadCloud;
 
     return (
         <div className="flex flex-wrap items-center justify-center gap-4 px-10 pt-10">
@@ -65,7 +61,7 @@ export default function PhotoUploader() {
                 disabled={!selectedFile}
                 onClick={handleFileUpload}
             >
-                {displayUploadIcon()}
+                <UploadIcon className={isLoading ? 'animate-spin' : ''} />
             </Button>
         </div>
     );

@@ -1,4 +1,4 @@
-import { IoIosExit } from 'react-icons/io';
+import { LogOut } from 'react-feather';
 
 import { useAuth0 } from '@auth0/auth0-react';
 
@@ -14,7 +14,7 @@ export default function SessionHeader() {
     return (
         <div className="flex justify-end border-b border-zinc-800 p-4">
             <Button className="text-white" danger onClick={handleLogout}>
-                <IoIosExit size={24} />
+                <LogOut size={16} />
             </Button>
         </div>
     );

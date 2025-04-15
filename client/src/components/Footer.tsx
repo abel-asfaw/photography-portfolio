@@ -1,7 +1,16 @@
+import { GitHub } from 'react-feather';
+
 export default function Footer() {
     return (
-        <footer className="p-8 text-center text-neutral-500">
-            &copy; 2025 Abel Asfaw
+        <footer className="flex justify-center p-8 text-neutral-500">
+            <a
+                className="duration-300 ease-in hover:text-white"
+                href="https://github.com/abel-asfaw/photography-portfolio"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <GitHub size={28} />
+            </a>
         </footer>
     );
 }

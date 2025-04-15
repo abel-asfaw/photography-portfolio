@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { MdClose } from 'react-icons/md';
+import { X } from 'react-feather';
 
 import Button from '@/src/components/Button';
 import { usePhotosAPI } from '@/src/hooks/usePhotosAPI';
@@ -58,7 +58,7 @@ export default function PhotoView({
                         onClick={handleDelete}
                         className="absolute right-2 top-2 opacity-0 shadow-sm shadow-zinc-700 group-hover:opacity-100"
                     >
-                        <MdClose size={14} color="black" />
+                        <X size={12} color="black" />
                     </Button>
                 )}
             </div>
