@@ -1,6 +1,6 @@
 # Photography Portfolio
 
-Deployed at: https://photography.abelasfaw.com/
+Deployed at https://photography.abelasfaw.com/
 
 ## The Details
 This is a full-stack web app that lets me upload and display my photos.
