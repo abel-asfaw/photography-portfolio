@@ -2,9 +2,9 @@ import { LogOut } from 'react-feather';
 
 import { useAuth0 } from '@auth0/auth0-react';
 
-import Button from '@/src/components/Button';
+import { Button } from '@/src/components/Button';
 
-export default function SessionHeader() {
+export function SessionHeader() {
     const { logout } = useAuth0();
 
     const handleLogout = async () => {
@@ -12,7 +12,7 @@ export default function SessionHeader() {
     };
 
     return (
-        <div className="flex justify-end border-b border-zinc-800 p-4">
+        <div className="flex justify-end border-b border-zinc-800 p-3">
             <Button className="text-white" danger onClick={handleLogout}>
                 <LogOut size={16} />
             </Button>

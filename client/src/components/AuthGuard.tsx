@@ -4,7 +4,7 @@ interface AuthGuardProps {
     component: React.ComponentType;
 }
 
-export default function AuthGuard({ component }: AuthGuardProps) {
+export function AuthGuard({ component }: AuthGuardProps) {
     const ProtectedComponent = withAuthenticationRequired(component, {
         onRedirecting: () => (
             <div className="flex flex-grow items-center justify-center text-neutral-200 ">

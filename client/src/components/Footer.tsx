@@ -1,6 +1,6 @@
 import { GitHub } from 'react-feather';
 
-export default function Footer() {
+export function Footer() {
     return (
         <footer className="flex justify-center p-8 text-neutral-500">
             <a

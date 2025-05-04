@@ -5,7 +5,7 @@ interface FileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     className?: string;
 }
 
-export default function FileInput({
+export function FileInput({
     fileInputRef,
     className,
     ...delegated

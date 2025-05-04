@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
 
-import PhotoView from '@/src/components/PhotoView';
+import { PhotoView } from '@/src/components/PhotoView';
 import { usePhotosAPI } from '@/src/hooks/usePhotosAPI';
 import { usePhotosStore } from '@/src/store/photosStore';
 
@@ -10,7 +10,7 @@ interface PhotoListProps {
     isAuthenticated?: boolean;
 }
 
-export default function PhotoList({ isAuthenticated = false }: PhotoListProps) {
+export function PhotoList({ isAuthenticated = false }: PhotoListProps) {
     const { fetchPhotos } = usePhotosAPI();
 
     const photos = usePhotosStore(state => state.photos);

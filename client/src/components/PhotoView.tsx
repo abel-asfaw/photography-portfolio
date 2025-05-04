@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { X } from 'react-feather';
 
-import Button from '@/src/components/Button';
+import { Button } from '@/src/components/Button';
 import { usePhotosAPI } from '@/src/hooks/usePhotosAPI';
 import { usePhotosStore } from '@/src/store/photosStore';
 
@@ -13,11 +13,7 @@ interface PhotoViewProps {
     canDelete: boolean;
 }
 
-export default function PhotoView({
-    photoId,
-    photoUrl,
-    canDelete,
-}: PhotoViewProps) {
+export function PhotoView({ photoId, photoUrl, canDelete }: PhotoViewProps) {
     const [isDeleted, setIsDeleted] = useState(false);
 
     const { deletePhotoById } = usePhotosAPI();

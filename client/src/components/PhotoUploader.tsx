@@ -2,12 +2,12 @@ import classNames from 'classnames';
 import { useRef, useState } from 'react';
 import { Loader, UploadCloud } from 'react-feather';
 
-import Button from '@/src/components/Button';
-import FileInput from '@/src/components/FileInput';
+import { Button } from '@/src/components/Button';
+import { FileInput } from '@/src/components/FileInput';
 import { usePhotosAPI } from '@/src/hooks/usePhotosAPI';
 import { usePhotosStore } from '@/src/store/photosStore';
 
-export default function PhotoUploader() {
+export function PhotoUploader() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
