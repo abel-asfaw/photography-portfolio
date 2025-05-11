@@ -1,11 +1,9 @@
-import { HttpStatusCode } from 'axios';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { X } from 'react-feather';
 
 import { Button } from '@/src/components/Button';
-import { usePhotosAPI } from '@/src/hooks/usePhotosAPI';
-import { usePhotosStore } from '@/src/store/photosStore';
+import { useDeletePhotoMutation } from '../hooks/photos.query';
 
 interface PhotoViewProps {
   photoId: string;
@@ -16,23 +14,14 @@ interface PhotoViewProps {
 export function PhotoView({ photoId, photoUrl, canDelete }: PhotoViewProps) {
   const [isDeleted, setIsDeleted] = useState(false);
 
-  const { deletePhotoById } = usePhotosAPI();
-
-  const removePhoto = usePhotosStore(state => state.removePhoto);
+  const { mutateAsync: deleteMutateAsync } = useDeletePhotoMutation();
 
   const handleDelete = async () => {
     setIsDeleted(true);
     setTimeout(async () => {
-      const deleteStatus = await deletePhotoById(photoId);
-      if (deleteStatus && deleteStatus === HttpStatusCode.NoContent) {
-        removePhoto(photoId);
-      } else {
-        setIsDeleted(false);
-      }
-    }, 400);
+      await deleteMutateAsync(photoId);
+    }, 300);
   };
-
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
   return (
     <motion.div
@@ -45,7 +34,6 @@ export function PhotoView({ photoId, photoUrl, canDelete }: PhotoViewProps) {
           srcSet={photoUrl}
           className="h-auto w-full"
           loading="lazy"
-          {...(!isSafari && { crossOrigin: 'anonymous' })}
         />
         {canDelete && (
           <Button

@@ -7,7 +7,7 @@ import { AuthGuard } from '@/src/components/AuthGuard';
 import { Footer } from '@/src/components/Footer';
 import { PhotoList } from '@/src/components/PhotoList';
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 export default function App() {
   return (
