@@ -10,18 +10,15 @@ import { PhotoList } from '@/src/components/PhotoList';
 const queryClient = new QueryClient();
 
 export default function App() {
-    return (
-        <div className="flex min-h-screen flex-col">
-            <QueryClientProvider client={queryClient}>
-                <Routes>
-                    <Route index path="/" element={<PhotoList />} />
-                    <Route
-                        path="/admin"
-                        element={<AuthGuard component={Admin} />}
-                    />
-                </Routes>
-                <Footer />
-            </QueryClientProvider>
-        </div>
-    );
+  return (
+    <div className="flex min-h-screen flex-col">
+      <QueryClientProvider client={queryClient}>
+        <Routes>
+          <Route index path="/" element={<PhotoList />} />
+          <Route path="/admin" element={<AuthGuard component={Admin} />} />
+        </Routes>
+        <Footer />
+      </QueryClientProvider>
+    </div>
+  );
 }

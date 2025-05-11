@@ -5,13 +5,13 @@ import { PhotoUploader } from '@/src/components/PhotoUploader';
 import { SessionHeader } from '@/src/components/SessionHeader';
 
 export function Admin() {
-    const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0();
 
-    return (
-        <>
-            <SessionHeader />
-            <PhotoUploader />
-            <PhotoList isAuthenticated={isAuthenticated} />
-        </>
-    );
+  return (
+    <>
+      <SessionHeader />
+      <PhotoUploader />
+      <PhotoList isAuthenticated={isAuthenticated} />
+    </>
+  );
 }
