@@ -13,7 +13,6 @@ export const useFetchPhotosQuery = () =>
 export const useUploadPhotoMutation = () =>
   useMutation({
     mutationFn: (file: File) => uploadPhoto(file),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['photos'] }),
   });
 
 export const useDeletePhotoMutation = () =>

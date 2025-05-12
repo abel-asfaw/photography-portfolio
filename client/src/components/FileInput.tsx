@@ -18,6 +18,12 @@ export function FileInput({
   );
 
   return (
-    <input ref={fileInputRef} type="file" className={classes} {...delegated} />
+    <input
+      ref={fileInputRef}
+      type="file"
+      multiple
+      className={classes}
+      {...delegated}
+    />
   );
 }
