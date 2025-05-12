@@ -6,8 +6,8 @@ import { BrowserRouter } from 'react-router-dom';
 
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 
+import { authToken } from '@/src/api/authToken';
 import App from '@/src/App';
-import { authToken } from './api/apiClient';
 
 const providerConfig = {
   domain: import.meta.env.VITE_AUTH0_DOMAIN,
@@ -28,7 +28,6 @@ const AuthInject = () => {
 
   return null;
 };
-<AuthInject />;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
