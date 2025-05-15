@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import classNames from 'classnames';
 import { useState } from 'react';
 import { X } from 'react-feather';
 
@@ -23,11 +23,12 @@ export function PhotoView({ photoId, photoUrl, canDelete }: PhotoViewProps) {
     }, 300);
   };
 
+  const classes = classNames('group relative h-auto w-96 duration-500', {
+    'opacity-0': isDeleted,
+  });
+
   return (
-    <motion.div
-      className="group relative h-auto w-96"
-      animate={isDeleted ? { opacity: 0 } : { opacity: 1 }}
-    >
+    <div className={classes}>
       <div className="relative transform-gpu overflow-hidden rounded-xl duration-700 will-change-transform hover:scale-110">
         <img
           src={photoUrl}
@@ -46,6 +47,6 @@ export function PhotoView({ photoId, photoUrl, canDelete }: PhotoViewProps) {
           </Button>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
