@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { X } from 'react-feather';
 
 import { Button } from '@/src/components/Button';
-import { useDeletePhotoMutation } from '../hooks/photos.query';
+import { useDeletePhoto } from '../hooks/photos.query';
 
 interface PhotoViewProps {
   photoId: string;
@@ -14,12 +14,12 @@ interface PhotoViewProps {
 export function PhotoView({ photoId, photoUrl, canDelete }: PhotoViewProps) {
   const [isDeleted, setIsDeleted] = useState(false);
 
-  const { mutateAsync: deleteMutateAsync } = useDeletePhotoMutation();
+  const { mutateAsync: deletePhoto } = useDeletePhoto();
 
   const handleDelete = async () => {
     setIsDeleted(true);
     setTimeout(async () => {
-      await deleteMutateAsync(photoId);
+      await deletePhoto(photoId);
     }, 300);
   };
 
