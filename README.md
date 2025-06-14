@@ -19,16 +19,3 @@ Lastly, the each application (FE and BE) is containerized using Docker and I use
 ## Video demo
 
 https://github.com/abel-asfaw/photography-portfolio/assets/50559072/6e6de8a2-d10f-409d-aa82-b14fc5e8fbf2
-
-## Todos
-- [ ] **Frontend Enhancements**:
-  - [ ] Add unit tests.
-
-- [ ] **Backend Enhancements**:
-  - [x] Switch from using traditional SQL to an ORM.
-  - [x] Raise specific exceptions instead of generic ones.
-  - [ ] Add unit tests.
-  - [ ] Implement rate limiter to protect API (stretch goal).
-
-- [x] **Deployment**:
-  - [x] Deploy each service (api, frontend, database) to an appropriate cloud platform.
