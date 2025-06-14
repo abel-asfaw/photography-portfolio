@@ -7,11 +7,11 @@ import { useDeletePhoto } from '../hooks/photos.query';
 
 interface PhotoViewProps {
   photoId: string;
-  photoUrl: string;
+  photoName: string;
   canDelete: boolean;
 }
 
-export function PhotoView({ photoId, photoUrl, canDelete }: PhotoViewProps) {
+export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
   const [isDeleted, setIsDeleted] = useState(false);
 
   const { mutateAsync: deletePhoto } = useDeletePhoto();
@@ -27,15 +27,12 @@ export function PhotoView({ photoId, photoUrl, canDelete }: PhotoViewProps) {
     'opacity-0': isDeleted,
   });
 
+  const url = `${import.meta.env.VITE_IMAGE_KIT_URL}/${photoName}`;
+
   return (
     <div className={classes}>
       <div className="relative transform-gpu overflow-hidden rounded-xl duration-700 will-change-transform hover:scale-110">
-        <img
-          src={photoUrl}
-          srcSet={photoUrl}
-          className="h-auto w-full"
-          loading="lazy"
-        />
+        <img src={url} srcSet={url} className="h-auto w-full" loading="lazy" />
         {canDelete && (
           <Button
             primary

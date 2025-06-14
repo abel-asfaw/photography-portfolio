@@ -35,11 +35,11 @@ export function PhotoList({ isAuthenticated = false }: PhotoListProps) {
   return (
     <PhotosListWrapper>
       {photos.length > 0
-        ? photos.map(({ id, url }) => (
+        ? photos.map(({ id, name }) => (
             <PhotoView
               key={id}
+              photoName={name}
               photoId={id}
-              photoUrl={url}
               canDelete={isAuthenticated}
             />
           ))
