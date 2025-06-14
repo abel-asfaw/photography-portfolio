@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 interface FileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   className?: string;
 }
 
