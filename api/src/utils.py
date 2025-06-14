@@ -1,10 +1,9 @@
 from hashlib import sha256
-from io import BytesIO
+from typing import BinaryIO
 from fastapi import Depends, UploadFile, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt.exceptions import ExpiredSignatureError, InvalidKeyError, InvalidAlgorithmError
 from loguru import logger
-from PIL import Image
 import boto3
 import jwt
 
@@ -45,7 +44,7 @@ class VerifyToken:
             _ = jwt.decode(
                 token.credentials,
                 signing_key,
-                algorithms=settings.ALGORITHMS,
+                algorithms=[settings.ALGORITHMS],
                 audience=settings.API_AUDIENCE,
                 issuer=settings.ISSUER,
             )
@@ -67,7 +66,7 @@ class VerifyToken:
             ) from e
 
 
-def create_file_hash(file: UploadFile) -> str:
+def create_file_hash(file: BinaryIO) -> str:
     """
     Generates a unique id based on the SHA-256 hash of the file's content.
 
@@ -79,32 +78,6 @@ def create_file_hash(file: UploadFile) -> str:
     hasher.update(file_content)
     file.seek(0)
     return hasher.hexdigest()
-
-
-def optimize_image(file: UploadFile) -> BytesIO:
-    """
-    Compresses an image and returns it as a bytes buffer.
-
-    :param file: A file to be compressed.
-    :return: Buffered IO containing the compressed image.
-    """
-    try:
-        image = Image.open(file.file)
-        if image.mode in ("RGBA", "P"):
-            image = image.convert("RGB")
-
-        buffer = BytesIO()
-        image.save(
-            buffer,
-            "JPEG",
-            quality=(70 if file.size > MAX_FILE_SIZE else "keep"),
-            optimize=True,
-        )
-        buffer.seek(0)
-        return buffer
-    finally:
-        if "image" in locals():
-            image.close()
 
 
 def get_file_name(photo_id: str) -> str:
@@ -126,18 +99,12 @@ def upload_to_s3(file: UploadFile, photo_name: str) -> str:
     :param photo_name: The name for the photo.
     """
     try:
-        upload_stream = file.file
-        if file.size > MAX_FILE_SIZE:
-            upload_stream = optimize_image(file)
-
         with s3_exception_handler():
             S3_RESOURCE.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(
-                upload_stream, photo_name
+                file.file, photo_name
             )
-        return f"https://{settings.S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
+            return f"https://{settings.S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
     finally:
-        if file.file is not upload_stream:
-            upload_stream.close()
         file.file.close()
 
 

@@ -1,3 +1,4 @@
+from typing import Any
 from fastapi import APIRouter, UploadFile, Security, HTTPException, status
 from sqlalchemy import desc
 
@@ -19,7 +20,7 @@ auth = VerifyToken()
 
 
 @router.get("", response_model=list[Photo])
-def get_photos() -> list[Photo]:
+def get_photos() -> list[Any]:
     """
     Fetches all photo entries from the database.
 
@@ -34,7 +35,7 @@ def get_photos() -> list[Photo]:
 def add_photo(
     file: UploadFile,
     _: None = Security(auth.verify),
-) -> Photo:
+) -> Any:
     """
     Uploads a photo to an S3 bucket and records its details in the database.
 
