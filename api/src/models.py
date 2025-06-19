@@ -1,6 +1,6 @@
-from sqlalchemy import Column, String
-from sqlalchemy.sql.sqltypes import TIMESTAMP
-from sqlalchemy.sql.expression import text
+from datetime import datetime
+from sqlalchemy import String, TIMESTAMP, text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from src.database import Base
 
@@ -12,9 +12,9 @@ class Photos(Base):
 
     __tablename__ = "photos"
 
-    id = Column(String(64), primary_key=True, nullable=False)
-    name = Column(String(16), nullable=False, unique=True)
-    url = Column(String(64), nullable=False, unique=True)
-    created_at = Column(
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(16), nullable=False, unique=True)
+    url: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
