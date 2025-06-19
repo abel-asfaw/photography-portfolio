@@ -7,9 +7,7 @@ from src.models import Photos
 from src.schemas import Photo
 from src.utils import (
     VerifyToken,
-    create_file_hash,
     delete_from_s3,
-    get_file_name,
     upload_to_s3,
 )
 
@@ -43,11 +41,16 @@ def add_photo(
     :return: A Photo instance with the photo's unique id, generated name,
             and the corresponding url in the S3 bucket.
     """
-    photo_id = create_file_hash(file.file)
-    photo_name = get_file_name(photo_id)
+    photo_name = file.filename
+    if photo_name is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File does not have a filename",
+        )
+
     photo_url = upload_to_s3(file, photo_name)
     with get_db() as db:
-        photo = Photos(id=photo_id, name=photo_name, url=photo_url)
+        photo = Photos(name=photo_name, url=photo_url)
         db.add(photo)
         db.commit()
         db.refresh(photo)
@@ -66,12 +69,12 @@ def delete_photo(
     """
     with get_db() as db:
         photo = db.query(Photos).filter(Photos.id == photo_id)
-        if not photo.first():
+        photo_obj = photo.first()
+        if not photo_obj:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Photo does not exist",
             )
+        delete_from_s3(photo_obj.name)
         photo.delete(synchronize_session=False)
         db.commit()
-
-    delete_from_s3(get_file_name(photo_id))

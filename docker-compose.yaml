@@ -1,6 +1,6 @@
 services:
   database:
-    image: postgres:15
+    image: postgres:17
     restart: always
     environment:
       POSTGRES_USER: $DB_USER
@@ -10,6 +10,8 @@ services:
       - db_data_volume:/var/lib/postgresql/data
     networks:
       - internal_network
+    ports:
+      - "5432:5432"
 
   api:
     build:
