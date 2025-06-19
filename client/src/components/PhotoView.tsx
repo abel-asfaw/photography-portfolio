@@ -2,6 +2,8 @@ import classNames from 'classnames';
 import { useState } from 'react';
 import { X } from 'react-feather';
 
+import { Image, ImageKitProvider } from '@imagekit/react';
+
 import { Button } from '@/src/components/Button';
 import { useDeletePhoto } from '../hooks/photos.query';
 
@@ -20,25 +22,27 @@ export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
     setIsDeleted(true);
     setTimeout(async () => {
       await deletePhoto(photoId);
-    }, 300);
+    }, 200);
   };
 
   const classes = classNames('group relative h-auto w-96 duration-500', {
     'opacity-0': isDeleted,
   });
 
-  const url = `${import.meta.env.VITE_IMAGE_KIT_URL}/${photoName}`;
-
   return (
     <div className={classes}>
-      <div className="relative transform-gpu overflow-hidden rounded-xl duration-700 will-change-transform hover:scale-110">
-        <img src={url} srcSet={url} className="h-auto w-full" loading="lazy" />
+      <div className="relative transform-gpu overflow-hidden rounded-xl backdrop-blur-2xl duration-700 will-change-transform hover:scale-110">
+        <Image
+          urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
+          src={`/${photoName}`}
+          loading="lazy"
+        />
         {canDelete && (
           <Button
             primary
             circular
             onClick={handleDelete}
-            className="absolute right-2 top-2 opacity-0 shadow-sm shadow-zinc-700 group-hover:opacity-100"
+            className="absolute top-2 right-2 opacity-0 shadow-sm shadow-zinc-700 group-hover:opacity-100"
           >
             <X size={12} color="black" />
           </Button>
