@@ -5,6 +5,7 @@ export function Footer() {
     <footer className="flex justify-center p-8 text-neutral-500">
       <a
         className="duration-300 ease-in hover:text-white"
+        aria-label="GitHub portfolio project link"
         href="https://github.com/abel-asfaw/photography-portfolio"
         target="_blank"
         rel="noopener noreferrer"

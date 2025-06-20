@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { useState } from 'react';
 import { X } from 'react-feather';
 
-import { Image, ImageKitProvider } from '@imagekit/react';
+import { Image } from '@imagekit/react';
 
 import { Button } from '@/src/components/Button';
 import { useDeletePhoto } from '../hooks/photos.query';
