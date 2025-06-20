@@ -36,6 +36,8 @@ export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
           src={`/${photoName}`}
           loading="lazy"
+          height={600}
+          width={600}
         />
         {canDelete && (
           <Button
