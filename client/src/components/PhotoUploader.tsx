@@ -8,9 +8,10 @@ import { useUploadPhotos } from '../hooks/photos.query';
 
 export function PhotoUploader() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { isPending, isSuccess, mutateAsync: uploadPhotos } = useUploadPhotos();
+  const { isPending, mutateAsync: uploadPhotos } = useUploadPhotos();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
@@ -21,17 +22,15 @@ export function PhotoUploader() {
   const handleFileUpload = async () => {
     if (!selectedFiles) return;
 
-    await uploadPhotos(selectedFiles);
-  };
+    const uploadedFiles = await uploadPhotos(selectedFiles);
 
-  useEffect(() => {
-    if (isSuccess) {
+    if (uploadedFiles.length > 0) {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
       setSelectedFiles(null);
     }
-  }, [isSuccess]);
+  };
 
   const buttonClasses = classNames('bg-green-600 text-white', {
     'cursor-not-allowed': !selectedFiles,
