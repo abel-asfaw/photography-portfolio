@@ -14,6 +14,7 @@ interface PhotoViewProps {
 }
 
 export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
+  const [isHovered, setIsHovered] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
 
   const { mutateAsync: deletePhoto } = useDeletePhoto();
@@ -30,7 +31,11 @@ export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
   });
 
   return (
-    <div className={classes}>
+    <div
+      className={classes}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="relative transform-gpu overflow-hidden rounded-xl backdrop-blur-2xl duration-700 will-change-transform hover:scale-110">
         <Image
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
@@ -39,16 +44,16 @@ export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
           height={600}
           width={600}
         />
-        {canDelete && (
+        {canDelete && isHovered ? (
           <Button
             primary
             circular
             onClick={handleDelete}
-            className="absolute top-2 right-2 opacity-0 shadow-sm shadow-zinc-700 group-hover:opacity-100"
+            className="absolute top-2 right-2 shadow-sm shadow-zinc-700"
           >
             <X size={12} color="black" />
           </Button>
-        )}
+        ) : null}
       </div>
     </div>
   );

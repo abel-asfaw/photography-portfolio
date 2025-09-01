@@ -1,13 +1,11 @@
+import { PropsWithChildren } from 'react';
+
 import { PhotoView } from '@/src/components/PhotoView';
 import { useFetchPhotos } from '@/src/hooks/photos.query';
 
-interface PhotosListWrapperProps {
-  children: React.ReactNode;
-}
-
-function PhotosListWrapper({ children }: PhotosListWrapperProps) {
+function PhotosListWrapper({ children }: PropsWithChildren) {
   return (
-    <div className="flex flex-grow flex-wrap items-center justify-center gap-16 px-10 pb-2 pt-10 text-neutral-200 sm:px-20 sm:pb-12 sm:pt-20">
+    <div className="flex flex-grow flex-wrap items-center justify-center gap-16 px-10 pt-10 pb-2 text-neutral-200 sm:px-20 sm:pt-20 sm:pb-12">
       {children}
     </div>
   );
@@ -26,8 +24,8 @@ export function PhotoList({ isAuthenticated = false }: PhotoListProps) {
         {isLoading
           ? 'Loading...'
           : isError
-          ? 'Failed to load photos. Please try again.'
-          : ''}
+            ? 'Failed to load photos. Please try again.'
+            : ''}
       </PhotosListWrapper>
     );
   }
