@@ -5,7 +5,7 @@ import { useFetchPhotos } from '@/src/hooks/photos.query';
 
 function PhotosListWrapper({ children }: PropsWithChildren) {
   return (
-    <div className="flex flex-grow flex-wrap items-center justify-center gap-16 px-10 pt-10 pb-2 text-neutral-200 sm:px-20 sm:pt-20 sm:pb-12">
+    <div className="flex flex-grow flex-wrap items-center justify-center gap-12 px-10 pt-10 pb-2 text-neutral-200 sm:gap-16 sm:px-20 sm:pt-20 sm:pb-12">
       {children}
     </div>
   );
