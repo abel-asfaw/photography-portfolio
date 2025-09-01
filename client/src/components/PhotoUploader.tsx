@@ -2,16 +2,15 @@ import classNames from 'classnames';
 import { useEffect, useRef, useState } from 'react';
 import { Loader, UploadCloud } from 'react-feather';
 
-import { queryClient } from '@/src/App';
 import { Button } from '@/src/components/Button';
 import { FileInput } from '@/src/components/FileInput';
-import { useUploadPhoto } from '../hooks/photos.query';
+import { useUploadPhotos } from '../hooks/photos.query';
 
 export function PhotoUploader() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { isPending, isSuccess, mutateAsync: uploadPhoto } = useUploadPhoto();
+  const { isPending, isSuccess, mutateAsync: uploadPhotos } = useUploadPhotos();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
@@ -22,10 +21,7 @@ export function PhotoUploader() {
   const handleFileUpload = async () => {
     if (!selectedFiles) return;
 
-    await Promise.all(
-      [...(selectedFiles ?? [])].map(file => uploadPhoto(file)),
-    );
-    queryClient.invalidateQueries({ queryKey: ['photos'] });
+    await uploadPhotos(selectedFiles);
   };
 
   useEffect(() => {

@@ -13,6 +13,10 @@ export const uploadPhoto = async (file: File) => {
   return response.data;
 };
 
+export const uploadPhotos = async (files: FileList) => {
+  return Promise.all(Array.from(files).map(file => uploadPhoto(file)));
+};
+
 export const deletePhotoById = async (photoId: string) => {
   const response = await apiClient.delete(`/photos/${photoId}`);
   return response.status;

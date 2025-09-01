@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { deletePhotoById, fetchPhotos, uploadPhoto } from '../api/photos.api';
+import { deletePhotoById, fetchPhotos, uploadPhotos } from '../api/photos.api';
 import { queryClient } from '../App';
 
 export const useFetchPhotos = () =>
@@ -10,9 +10,10 @@ export const useFetchPhotos = () =>
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
-export const useUploadPhoto = () =>
+export const useUploadPhotos = () =>
   useMutation({
-    mutationFn: (file: File) => uploadPhoto(file),
+    mutationFn: (files: FileList) => uploadPhotos(files),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['photos'] }),
   });
 
 export const useDeletePhoto = () =>
