@@ -35,7 +35,7 @@ export function PhotoUploader() {
   const buttonClasses = classNames('bg-green-600 text-white', {
     'cursor-not-allowed': !selectedFiles,
     'opacity-50': !selectedFiles,
-    'hover:bg-green-700': !!selectedFiles,
+    'hover:bg-green-700 hover:cursor-pointer': !!selectedFiles,
   });
 
   const UploadIcon = isPending ? Loader : UploadCloud;

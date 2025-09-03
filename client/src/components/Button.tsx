@@ -18,7 +18,7 @@ export function Button({
   ...delegated
 }: ButtonProps) {
   const classes = classNames(
-    'flex text-sm items-center justify-center duration-300 hover:cursor-pointer',
+    'flex text-sm items-center justify-center duration-300',
     {
       'h-10 w-10 rounded-full p-3': circular,
       'h-10 rounded-md px-4 py-2': !circular,

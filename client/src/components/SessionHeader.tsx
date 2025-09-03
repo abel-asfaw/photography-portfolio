@@ -13,7 +13,11 @@ export function SessionHeader() {
 
   return (
     <div className="flex justify-end border-b border-zinc-800 p-3">
-      <Button className="text-white" danger onClick={handleLogout}>
+      <Button
+        className="text-white hover:cursor-pointer"
+        danger
+        onClick={handleLogout}
+      >
         <LogOut size={16} />
       </Button>
     </div>

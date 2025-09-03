@@ -49,7 +49,7 @@ export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
             primary
             circular
             onClick={handleDelete}
-            className="absolute top-2 right-2 shadow-sm shadow-zinc-700"
+            className="absolute top-2 right-2 shadow-sm shadow-zinc-700 hover:cursor-pointer"
           >
             <X size={12} color="black" />
           </Button>
