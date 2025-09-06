@@ -41,7 +41,7 @@ export function PhotoUploader() {
   const UploadIcon = isPending ? Loader : UploadCloud;
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 px-10 pt-10">
+    <div className="flex flex-wrap items-center justify-center gap-4 pt-10">
       <FileInput
         fileInputRef={fileInputRef}
         onChange={handleInputChange}
