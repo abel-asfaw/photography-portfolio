@@ -9,7 +9,7 @@ I used React + TypeScript for the frontend. On the backend, FastAPI handles phot
 
 I've also set up Auth0 on the frontend for user login and the backend to secure endpoints. This means both photo upload and deletion are behind authentication and only authorized actions can happen.
 
-Lastly, the FE and BE is containerized using Docker and I use docker compose to make local development easy.
+The entire stack is running on the same host and is logically separated by containers to make local development easy. `docker-compose up` will spin up everything on `localhost:3005`.
 
 ## Why This Project?
 1. I don't have social media and I wanted to make it easy for anyone to view my photos without all the social media noise.
