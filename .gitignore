@@ -1,0 +1,22 @@
+# Global
+*.DS_Store
+.env
+
+# api specific ignores
+__pycache__/
+api/.config
+api/*.py[cod]
+api/bin/
+api/include/
+api/lib/
+api/pyvenv.cfg
+api/*.log
+api/server-env/*
+
+
+# client specific ignores
+client/node_modules/
+client/dist/
+client/.eslintrc*
+client/*.log
+client/*.pem
