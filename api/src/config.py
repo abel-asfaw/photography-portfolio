@@ -1,22 +1,26 @@
-from pydantic_settings import BaseSettings
-from pydantic.fields import _Unset
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    DB_NAME: str = _Unset
-    DB_PASS: str = _Unset
-    DB_USER: str = _Unset
-    DB_HOST: str = _Unset
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    AWS_ACCESS_KEY_ID: str = _Unset
-    AWS_SECRET_ACCESS_KEY: str = _Unset
-    AWS_REGION: str = _Unset
-    S3_BUCKET_NAME: str = _Unset
+    ROOT_PATH: str = ""
+    DEBUG: bool = True
 
-    DOMAIN: str = _Unset
-    API_AUDIENCE: str = _Unset
-    ISSUER: str = _Unset
-    ALGORITHMS: str = _Unset
+    DB_NAME: str
+    DB_PASS: str
+    DB_USER: str
+    DB_HOST: str
+
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
+    AWS_REGION: str
+    S3_BUCKET_NAME: str
+
+    DOMAIN: str
+    API_AUDIENCE: str
+    ISSUER: str
+    ALGORITHMS: str
 
 
-settings = Settings()
+settings = Settings()  # type: ignore

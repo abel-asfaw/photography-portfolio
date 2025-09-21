@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.config import settings
 from src.routers import photos
 
 
-app = FastAPI(root_path="/api", debug=True)
+app = FastAPI(root_path=settings.ROOT_PATH, debug=settings.DEBUG)
 
 app.add_middleware(
     CORSMiddleware,
