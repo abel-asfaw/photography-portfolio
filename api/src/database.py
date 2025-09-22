@@ -3,8 +3,7 @@ from fastapi import HTTPException, status
 from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 from src.config import settings
 
