@@ -24,7 +24,7 @@ export function PhotoOverlay({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex cursor-pointer items-center justify-center"
       onClick={onClose}
     >
       <motion.div
