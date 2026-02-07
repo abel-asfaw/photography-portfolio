@@ -23,20 +23,17 @@ export function PhotoOverlay({
   }, [onClose]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex cursor-pointer items-center justify-center"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       <motion.div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 cursor-pointer bg-black/80 backdrop-blur-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        onClick={onClose}
       />
       <motion.div
         layoutId={`photo-${photoId}`}
         className="relative z-10 max-h-[90vh] max-w-[90vw] overflow-hidden rounded-xl"
-        onClick={e => e.stopPropagation()}
       >
         <Image
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
