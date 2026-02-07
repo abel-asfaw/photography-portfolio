@@ -53,7 +53,7 @@ export function PhotoView({
           stiffness: 150,
           damping: 20,
         }}
-        onClick={() => onSelect(photoId, photoName)}
+        onTap={() => onSelect(photoId, photoName)}
       >
         <Image
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
