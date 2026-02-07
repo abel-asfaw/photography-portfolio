@@ -1,5 +1,6 @@
 import classNames from 'classnames';
-import { useState } from 'react';
+import { motion } from 'motion/react';
+import { MouseEvent, useState } from 'react';
 import { X } from 'react-feather';
 
 import { Image } from '@imagekit/react';
@@ -11,15 +12,22 @@ interface PhotoViewProps {
   photoId: string;
   photoName: string;
   canDelete: boolean;
+  onSelect: (photoId: string, photoName: string) => void;
 }
 
-export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
+export function PhotoView({
+  photoId,
+  photoName,
+  canDelete,
+  onSelect,
+}: PhotoViewProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
 
   const { mutateAsync: deletePhoto } = useDeletePhoto();
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     setIsDeleted(true);
     setTimeout(async () => {
       await deletePhoto(photoId);
@@ -36,7 +44,17 @@ export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative transform-gpu overflow-hidden rounded-xl backdrop-blur-2xl duration-700 will-change-transform hover:scale-110">
+      <motion.div
+        layoutId={`photo-${photoId}`}
+        className="relative transform-gpu overflow-hidden rounded-xl backdrop-blur-2xl will-change-transform hover:cursor-pointer"
+        whileHover={{ scale: 1.1 }}
+        transition={{
+          type: 'spring',
+          stiffness: 150,
+          damping: 20,
+        }}
+        onClick={() => onSelect(photoId, photoName)}
+      >
         <Image
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
           src={`/${photoName}`}
@@ -54,7 +72,7 @@ export function PhotoView({ photoId, photoName, canDelete }: PhotoViewProps) {
             <X size={12} color="black" />
           </Button>
         ) : null}
-      </div>
+      </motion.div>
     </div>
   );
 }
