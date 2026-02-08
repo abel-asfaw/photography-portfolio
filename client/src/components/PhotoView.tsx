@@ -34,9 +34,12 @@ export function PhotoView({
     }, 200);
   };
 
-  const classes = classNames('group relative h-auto w-96 duration-500', {
-    'opacity-0': isDeleted,
-  });
+  const classes = classNames(
+    'group relative h-auto sm:w-72 w-96 duration-500',
+    {
+      'opacity-0': isDeleted,
+    },
+  );
 
   return (
     <div
