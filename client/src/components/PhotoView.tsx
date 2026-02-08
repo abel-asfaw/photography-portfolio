@@ -49,7 +49,7 @@ export function PhotoView({
     >
       <motion.div
         layoutId={`photo-${photoId}`}
-        className="relative transform-gpu overflow-hidden rounded-xl backdrop-blur-2xl will-change-transform hover:cursor-pointer"
+        className="relative transform-gpu overflow-hidden rounded-xl will-change-transform hover:cursor-pointer"
         whileHover={{ scale: 1.1 }}
         transition={{
           type: 'spring',
@@ -70,6 +70,7 @@ export function PhotoView({
             primary
             circular
             onClick={handleDelete}
+            onPointerDownCapture={e => e.stopPropagation()}
             className="absolute top-2 right-2 shadow-sm shadow-zinc-700 hover:cursor-pointer"
           >
             <X size={12} color="black" />
