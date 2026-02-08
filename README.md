@@ -15,7 +15,3 @@ The entire stack is running on the same host and is logically separated by conta
 1. I don't have social media and I wanted to make it easy for anyone to view my photos without all the social media noise.
 2. I wanted a place where I could control how my photos are presented and show them in a layout/style that I like.
 3. No likes, comments or followers, just pure visuals.
-
-## Video demo
-
-https://github.com/abel-asfaw/photography-portfolio/assets/50559072/6e6de8a2-d10f-409d-aa82-b14fc5e8fbf2
