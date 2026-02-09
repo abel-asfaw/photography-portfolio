@@ -46,7 +46,7 @@ services:
   nginx-proxy:
     image: nginx:alpine
     restart: always
-    volumes: 
+    volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - client
