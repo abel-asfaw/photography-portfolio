@@ -7,7 +7,7 @@ interface AuthGuardProps {
 export function AuthGuard({ component }: AuthGuardProps) {
   const ProtectedComponent = withAuthenticationRequired(component, {
     onRedirecting: () => (
-      <div className="flex flex-grow items-center justify-center text-neutral-200 ">
+      <div className="flex grow items-center justify-center text-neutral-200">
         Loading...
       </div>
     ),

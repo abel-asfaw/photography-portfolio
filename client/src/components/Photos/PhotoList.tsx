@@ -1,8 +1,8 @@
 import { AnimatePresence } from 'motion/react';
 import { PropsWithChildren, useState } from 'react';
 
-import { PhotoOverlay } from '@/src/components/PhotoOverlay';
-import { PhotoView } from '@/src/components/PhotoView';
+import { PhotoOverlay } from './PhotoOverlay';
+import { PhotoView } from './PhotoView';
 import { useFetchPhotos } from '@/src/api/services/photos.query';
 
 function PhotosListWrapper({ children }: PropsWithChildren) {

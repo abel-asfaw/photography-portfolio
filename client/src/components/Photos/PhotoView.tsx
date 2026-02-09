@@ -5,7 +5,7 @@ import { X } from 'react-feather';
 
 import { Image } from '@imagekit/react';
 
-import { Button } from '@/src/components/Button';
+import { Button } from '@/src/components/ui';
 import { useDeletePhoto } from '@/src/api/services/photos.query';
 
 interface PhotoViewProps {

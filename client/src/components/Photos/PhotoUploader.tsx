@@ -1,9 +1,8 @@
 import classNames from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Loader, UploadCloud } from 'react-feather';
 
-import { Button } from '@/src/components/Button';
-import { FileInput } from '@/src/components/FileInput';
+import { Button, FileInput } from '@/src/components/ui';
 import { useUploadPhotos } from '@/src/api/services/photos.query';
 
 export function PhotoUploader() {
