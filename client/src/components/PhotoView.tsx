@@ -6,7 +6,7 @@ import { X } from 'react-feather';
 import { Image } from '@imagekit/react';
 
 import { Button } from '@/src/components/Button';
-import { useDeletePhoto } from '../hooks/photos.query';
+import { useDeletePhoto } from '@/src/api/services/photos.query';
 
 interface PhotoViewProps {
   photoId: string;

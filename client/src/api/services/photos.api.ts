@@ -1,5 +1,5 @@
-import { Photo } from '../global/types';
-import { apiClient } from './apiClient';
+import { Photo } from '../../global/types';
+import { apiClient } from '../apiClient';
 
 export const fetchPhotos = async () => {
   const response = await apiClient.get<Photo[]>('/photos');

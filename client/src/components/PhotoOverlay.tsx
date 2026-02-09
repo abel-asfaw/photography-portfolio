@@ -33,7 +33,7 @@ export function PhotoOverlay({
       />
       <motion.div
         layoutId={`photo-${photoId}`}
-        className="relative z-10 max-h-[90vh] max-w-[90vw] overflow-hidden rounded-xl"
+        className="relative z-10 max-h-full max-w-[90vw] overflow-hidden rounded-xl"
       >
         <Image
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}

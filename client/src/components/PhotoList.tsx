@@ -3,7 +3,7 @@ import { PropsWithChildren, useState } from 'react';
 
 import { PhotoOverlay } from '@/src/components/PhotoOverlay';
 import { PhotoView } from '@/src/components/PhotoView';
-import { useFetchPhotos } from '@/src/hooks/photos.query';
+import { useFetchPhotos } from '@/src/api/services/photos.query';
 
 function PhotosListWrapper({ children }: PropsWithChildren) {
   return (

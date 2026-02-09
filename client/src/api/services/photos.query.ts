@@ -1,7 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { deletePhotoById, fetchPhotos, uploadPhotos } from '../api/photos.api';
-import { queryClient } from '../App';
+import {
+  deletePhotoById,
+  fetchPhotos,
+  uploadPhotos,
+} from '@/src/api/services/photos.api';
+import { queryClient } from '../../App';
 
 export const useFetchPhotos = () =>
   useQuery({

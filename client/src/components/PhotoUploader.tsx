@@ -4,7 +4,7 @@ import { Loader, UploadCloud } from 'react-feather';
 
 import { Button } from '@/src/components/Button';
 import { FileInput } from '@/src/components/FileInput';
-import { useUploadPhotos } from '../hooks/photos.query';
+import { useUploadPhotos } from '@/src/api/services/photos.query';
 
 export function PhotoUploader() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
