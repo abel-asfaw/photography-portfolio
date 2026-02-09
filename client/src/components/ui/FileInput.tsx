@@ -21,6 +21,7 @@ export function FileInput({
     <input
       ref={fileInputRef}
       type="file"
+      accept="image/*"
       multiple
       className={classes}
       {...delegated}
