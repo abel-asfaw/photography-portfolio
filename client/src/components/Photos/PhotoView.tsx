@@ -27,7 +27,6 @@ export function PhotoView({
   const { mutateAsync: deletePhoto } = useDeletePhoto();
 
   const handleDelete = async (e: MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
     setIsDeleted(true);
     setTimeout(async () => {
       await deletePhoto(photoId);
@@ -69,8 +68,8 @@ export function PhotoView({
           <Button
             primary
             circular
-            onClick={handleDelete}
             onPointerDownCapture={e => e.stopPropagation()}
+            onClick={handleDelete}
             className="absolute top-2 right-2 shadow-sm shadow-zinc-700 hover:cursor-pointer"
           >
             <X size={12} color="black" />
