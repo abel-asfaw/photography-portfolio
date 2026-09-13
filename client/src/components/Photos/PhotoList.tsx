@@ -138,6 +138,7 @@ export function PhotoList({ isAuthenticated = false }: PhotoListProps) {
                 photoName={name}
                 photoId={id}
                 canDelete={false}
+                isSelected={selectedPhoto?.id === id}
                 onSelect={(photoId, photoName) =>
                   setSelectedPhoto({ id: photoId, name: photoName })
                 }

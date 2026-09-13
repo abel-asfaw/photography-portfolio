@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { motion } from 'motion/react';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 
 import { Image } from '@imagekit/react';
@@ -14,6 +14,7 @@ interface PhotoViewProps {
   canDelete: boolean;
   onSelect: (photoId: string, photoName: string) => void;
   disableLayoutId?: boolean;
+  isSelected?: boolean;
 }
 
 export function PhotoView({
@@ -22,9 +23,17 @@ export function PhotoView({
   canDelete,
   onSelect,
   disableLayoutId = false,
+  isSelected = false,
 }: PhotoViewProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
+  // Keep the tile above its siblings while it flies to/from the overlay.
+  // Raised on select; lowered only once the return layout animation ends.
+  const [isRaised, setIsRaised] = useState(false);
+
+  useEffect(() => {
+    if (isSelected) setIsRaised(true);
+  }, [isSelected]);
 
   const { mutateAsync: deletePhoto } = useDeletePhoto();
 
@@ -39,6 +48,7 @@ export function PhotoView({
     'group relative h-auto sm:w-72 w-96 duration-500',
     {
       'opacity-0': isDeleted,
+      'z-40': isRaised,
     },
   );
 
@@ -57,6 +67,9 @@ export function PhotoView({
           damping: 20,
         }}
         onTap={() => !disableLayoutId && onSelect(photoId, photoName)}
+        onLayoutAnimationComplete={() => {
+          if (!isSelected) setIsRaised(false);
+        }}
       >
         <Image
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
