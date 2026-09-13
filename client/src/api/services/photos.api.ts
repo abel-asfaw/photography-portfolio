@@ -26,3 +26,7 @@ export const uploadPhotos = async (files: FileList) => {
 export const deletePhotoById = async (photoId: string) => {
   await apiClient.delete(`/photos/${photoId}`);
 };
+
+export const reorderPhotos = async (photoIds: string[]) => {
+  await apiClient.put('/photos/reorder', { photo_ids: photoIds });
+};

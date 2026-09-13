@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   deletePhotoById,
   fetchPhotos,
+  reorderPhotos,
   uploadPhotos,
 } from '@/src/api/services/photos.api';
 import { queryClient } from '../../App';
@@ -24,4 +25,12 @@ export const useDeletePhoto = () =>
   useMutation({
     mutationFn: (photoId: string) => deletePhotoById(photoId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['photos'] }),
+  });
+
+export const useReorderPhotos = () =>
+  useMutation({
+    mutationFn: (photoIds: string[]) => reorderPhotos(photoIds),
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos'] });
+    },
   });

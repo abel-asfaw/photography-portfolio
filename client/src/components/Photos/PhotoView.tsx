@@ -13,6 +13,7 @@ interface PhotoViewProps {
   photoName: string;
   canDelete: boolean;
   onSelect: (photoId: string, photoName: string) => void;
+  disableLayoutId?: boolean;
 }
 
 export function PhotoView({
@@ -20,6 +21,7 @@ export function PhotoView({
   photoName,
   canDelete,
   onSelect,
+  disableLayoutId = false,
 }: PhotoViewProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
@@ -42,20 +44,19 @@ export function PhotoView({
 
   return (
     <div
-      className={classes}
+      className={classNames(classes, 'hover:scale-[1.1]')}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
-        layoutId={`photo-${photoId}`}
+        layoutId={disableLayoutId ? undefined : `photo-${photoId}`}
         className="relative transform-gpu overflow-hidden rounded-xl will-change-transform hover:cursor-pointer"
-        whileHover={{ scale: 1.1 }}
         transition={{
           type: 'spring',
           stiffness: 150,
           damping: 20,
         }}
-        onTap={() => onSelect(photoId, photoName)}
+        onTap={() => !disableLayoutId && onSelect(photoId, photoName)}
       >
         <Image
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
@@ -63,6 +64,7 @@ export function PhotoView({
           loading="eager"
           height={600}
           width={600}
+          sizes="600px"
         />
         {canDelete && isHovered ? (
           <Button
