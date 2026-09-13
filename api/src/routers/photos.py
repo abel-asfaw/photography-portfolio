@@ -1,16 +1,15 @@
 from typing import Any
 from fastapi import APIRouter, UploadFile, Security, HTTPException, status
-from sqlalchemy import desc
+from sqlalchemy import func
 
 from src.database import get_db
 from src.models import Photos
-from src.schemas import Photo
+from src.schemas import Photo, ReorderRequest
 from src.utils import (
     VerifyToken,
     delete_from_s3,
     upload_to_s3,
 )
-
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
@@ -25,7 +24,7 @@ def get_photos() -> list[Any]:
     :return: A list of Photo objects.
     """
     with get_db() as db:
-        photos = db.query(Photos).order_by(desc(Photos.created_at)).all()
+        photos = db.query(Photos).order_by(Photos.sort_order).all()
         return photos
 
 
@@ -50,11 +49,40 @@ def add_photo(
 
     photo_url = upload_to_s3(file, photo_name)
     with get_db() as db:
-        photo = Photos(name=photo_name, url=photo_url)
+        min_order = db.query(func.min(Photos.sort_order)).scalar()
+        new_order = (min_order - 1) if min_order is not None else 0
+
+        photo = Photos(name=photo_name, url=photo_url, sort_order=new_order)
         db.add(photo)
         db.commit()
         db.refresh(photo)
         return photo
+
+
+@router.put("/reorder", status_code=status.HTTP_200_OK)
+def reorder_photos(
+    body: ReorderRequest,
+    _: None = Security(auth.verify),
+) -> None:
+    """
+    Reorders photos based on the provided list of photo IDs.
+    Each photo's sort_order is set to its index in the list.
+    """
+    with get_db() as db:
+        photo_ids = [str(pid) for pid in body.photo_ids]
+
+        existing = db.query(Photos).filter(Photos.id.in_(photo_ids)).all()
+        if len(existing) != len(photo_ids):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="One or more photo IDs do not exist",
+            )
+
+        id_to_photo = {str(p.id): p for p in existing}
+        for index, pid in enumerate(photo_ids):
+            id_to_photo[pid].sort_order = index
+
+        db.commit()
 
 
 @router.delete("/{photo_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import UUID, TIMESTAMP, Text, text
+from sqlalchemy import Integer, UUID, TIMESTAMP, Text, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.database import Base
@@ -17,6 +17,9 @@ class Photos(Base):
     )
     name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     url: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    sort_order: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default=text("0")
+    )
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )

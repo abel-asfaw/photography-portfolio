@@ -11,3 +11,7 @@ class Photo(BaseModel):
     id: UUID4
     name: str
     url: str
+
+
+class ReorderRequest(BaseModel):
+    photo_ids: list[UUID4]
