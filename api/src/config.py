@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    ROOT_PATH: str = ""
+    ROOT_PATH: str = "/api"
     DEBUG: bool = True
 
     DB_NAME: str
