@@ -21,8 +21,13 @@ docker-compose up --build  # Rebuild containers and start
 cd client
 npm install
 npm run dev       # Vite dev server with HMR
-npm run build     # TypeScript check + Vite production build
+npm run build     # Typecheck + Vite production build
 npm run preview   # Preview production build
+npm run typecheck # tsc (TypeScript 7) over src and the Vite/Vitest configs
+npm run test      # Vitest
+npm run lint      # oxlint (lint:fix to auto-fix)
+npm run format    # oxfmt (format:check to verify only)
+npm run check     # typecheck + lint + format:check
 ```
 
 ### Backend (api/)
@@ -42,12 +47,17 @@ pytest tests/test_main.py     # Run a specific test file
 pytest tests/test_main.py -k "test_name"  # Run a single test
 ```
 
-### Formatting (frontend)
+### Linting and formatting (frontend)
+
+The client uses oxlint (`client/.oxlintrc.json`, type-aware rules enabled) and oxfmt (`client/.oxfmtrc.json`, which also sorts imports and Tailwind classes). ESLint and Prettier are not used.
 
 ```bash
 cd client
-npx prettier --write .
+npm run lint
+npm run format
 ```
+
+A lefthook pre-commit hook (`lefthook.yml` at the repo root) runs oxlint and `oxfmt --check` on staged client files. It is installed automatically by `npm install` in `client/`.
 
 ## Architecture
 
@@ -74,12 +84,13 @@ Auth is enforced via FastAPI `Security()` dependency using `VerifyToken`.
 - **api/authToken.ts** - Singleton managing the `getAccessTokenSilently` function from Auth0
 - **api/services/photos.api.ts** - API call functions (fetch, upload, delete)
 - **api/services/photos.query.ts** - React Query hooks (`useFetchPhotos`, `useUploadPhotos`, `useDeletePhoto`) with 1-hour stale time
-- **api/schema/photos.schema.ts** - Schema definitions for API responses
-- **components/** - React components; `AuthGuard` wraps protected routes, `Admin` is the authenticated management page
+- **api/schemas/photos.schema.ts** - Zod schemas for API responses
+- **api/queryClient.ts** - The shared React Query client
+- **components/** - React components; `withAuthGuard` wraps protected route components, `Admin` is the authenticated management page
 
 Routes: `/` (public gallery), `/admin` (protected, requires Auth0 login).
 
-Import alias: `@/*` maps to `src/*`.
+Import alias: `@/*` maps to the `client/` root, so imports look like `@/src/components/ui`.
 
 ### Database
 
