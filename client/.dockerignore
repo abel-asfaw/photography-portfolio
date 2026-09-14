@@ -11,7 +11,8 @@ dist
 Dockerfile
 .dockerignore
 .DS_Store
-.prettierrc*
+.oxfmtrc*
+.oxlintrc*
 .npmrc
 .yarnrc
 *.pem
