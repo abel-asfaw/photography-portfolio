@@ -19,3 +19,6 @@ client/node_modules/
 client/dist/
 client/*.log
 client/*.pem
+
+# git hooks
+lefthook-local.yml

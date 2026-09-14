@@ -1,0 +1,11 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: oxlint
+      root: "client/"
+      glob: "*.{ts,tsx,js,jsx}"
+      run: npx oxlint {staged_files}
+    - name: oxfmt
+      root: "client/"
+      glob: "*.{ts,tsx,js,jsx,json,css,md}"
+      run: npx oxfmt --check {staged_files}
