@@ -17,6 +17,5 @@ api/server-env/*
 # client specific ignores
 client/node_modules/
 client/dist/
-client/.eslintrc*
 client/*.log
 client/*.pem
