@@ -1,6 +1,5 @@
-import { LogOut } from 'react-feather';
-
 import { useAuth0 } from '@auth0/auth0-react';
+import { LogOut } from 'react-feather';
 
 import { Button } from '@/src/components/ui';
 

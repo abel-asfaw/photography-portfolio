@@ -2,8 +2,8 @@ import classNames from 'classnames';
 import { useRef, useState } from 'react';
 import { Loader, UploadCloud } from 'react-feather';
 
-import { Button, FileInput } from '@/src/components/ui';
 import { useUploadPhotos } from '@/src/api/services/photos.query';
+import { Button, FileInput } from '@/src/components/ui';
 
 export function PhotoUploader() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
@@ -34,7 +34,7 @@ export function PhotoUploader() {
   const buttonClasses = classNames('bg-green-600 text-white', {
     'cursor-not-allowed': !selectedFiles,
     'opacity-50': !selectedFiles,
-    'hover:bg-green-700 hover:cursor-pointer': !!selectedFiles,
+    'hover:cursor-pointer hover:bg-green-700': !!selectedFiles,
   });
 
   const UploadIcon = isPending ? Loader : UploadCloud;

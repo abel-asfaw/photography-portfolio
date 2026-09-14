@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
-import { motion } from 'motion/react';
-
 import { Image } from '@imagekit/react';
+import { motion } from 'motion/react';
+import { useEffect } from 'react';
 
 interface PhotoOverlayProps {
   photoId: string;

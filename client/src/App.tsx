@@ -1,10 +1,9 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Route, Routes } from 'react-router-dom';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
 import { Admin, AuthGuard } from '@/src/components/Admin';
-import { Footer } from '@/src/components/ui';
 import { PhotoList } from '@/src/components/Photos';
+import { Footer } from '@/src/components/ui';
 
 export const queryClient = new QueryClient();
 

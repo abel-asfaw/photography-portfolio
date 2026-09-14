@@ -1,10 +1,8 @@
 import '@/src/index.css';
-
+import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-
-import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 
 import { authToken } from '@/src/api/authToken';
 import App from '@/src/App';

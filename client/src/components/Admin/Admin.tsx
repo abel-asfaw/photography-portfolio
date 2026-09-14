@@ -1,7 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react';
 
-import { PhotoList, PhotoUploader } from '@/src/components/Photos';
 import { SessionHeader } from '@/src/components/Admin';
+import { PhotoList, PhotoUploader } from '@/src/components/Photos';
 
 export function Admin() {
   const { isAuthenticated } = useAuth0();

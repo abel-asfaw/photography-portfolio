@@ -1,12 +1,11 @@
+import { Image } from '@imagekit/react';
 import classNames from 'classnames';
 import { motion } from 'motion/react';
 import { MouseEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 
-import { Image } from '@imagekit/react';
-
-import { Button } from '@/src/components/ui';
 import { useDeletePhoto } from '@/src/api/services/photos.query';
+import { Button } from '@/src/components/ui';
 
 interface PhotoViewProps {
   photoId: string;
@@ -45,7 +44,7 @@ export function PhotoView({
   };
 
   const classes = classNames(
-    'group relative h-auto sm:w-72 w-96 duration-500',
+    'group relative h-auto w-96 duration-500 sm:w-72',
     {
       'opacity-0': isDeleted,
       'z-40': isRaised,

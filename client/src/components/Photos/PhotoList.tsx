@@ -16,14 +16,15 @@ import {
 import { AnimatePresence } from 'motion/react';
 import { PropsWithChildren, useEffect, useState } from 'react';
 
-import { PhotoOverlay } from './PhotoOverlay';
-import { PhotoView } from './PhotoView';
-import { SortablePhotoView } from './SortablePhotoView';
 import { Photo } from '@/src/api/schemas/photos.schema';
 import {
   useFetchPhotos,
   useReorderPhotos,
 } from '@/src/api/services/photos.query';
+
+import { PhotoOverlay } from './PhotoOverlay';
+import { PhotoView } from './PhotoView';
+import { SortablePhotoView } from './SortablePhotoView';
 
 function PhotosListWrapper({ children }: PropsWithChildren) {
   return (
