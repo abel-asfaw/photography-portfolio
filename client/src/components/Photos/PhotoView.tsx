@@ -1,7 +1,7 @@
 import { Image } from '@imagekit/react';
 import classNames from 'classnames';
 import { motion } from 'motion/react';
-import { MouseEvent, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { X } from 'react-feather';
 
 import { useDeletePhoto } from '@/src/api/services/photos.query';
@@ -29,14 +29,11 @@ export function PhotoView({
   // Keep the tile above its siblings while it flies to/from the overlay.
   // Raised on select; lowered only once the return layout animation ends.
   const [isRaised, setIsRaised] = useState(false);
-
-  useEffect(() => {
-    if (isSelected) setIsRaised(true);
-  }, [isSelected]);
+  if (isSelected && !isRaised) setIsRaised(true);
 
   const { mutateAsync: deletePhoto } = useDeletePhoto();
 
-  const handleDelete = async (e: MouseEvent<HTMLButtonElement>) => {
+  const handleDelete = async () => {
     setIsDeleted(true);
     setTimeout(async () => {
       await deletePhoto(photoId);

@@ -14,7 +14,7 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { AnimatePresence } from 'motion/react';
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 
 import { Photo } from '@/src/api/schemas/photos.schema';
 import {
@@ -42,14 +42,19 @@ export function PhotoList({ isAuthenticated = false }: PhotoListProps) {
   const { data: photos, isLoading, isError } = useFetchPhotos();
   const { mutate: reorder } = useReorderPhotos();
   const [localPhotos, setLocalPhotos] = useState<Photo[]>(photos ?? []);
+  const [syncedPhotos, setSyncedPhotos] = useState(photos);
   const [selectedPhoto, setSelectedPhoto] = useState<{
     id: string;
     name: string;
   } | null>(null);
 
-  useEffect(() => {
-    if (photos) setLocalPhotos(photos);
-  }, [photos]);
+  // Re-seed the optimistic local order whenever the server list changes.
+  // Done during render rather than in an effect so there is no extra
+  // commit showing stale order in between.
+  if (photos && photos !== syncedPhotos) {
+    setSyncedPhotos(photos);
+    setLocalPhotos(photos);
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

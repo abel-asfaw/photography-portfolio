@@ -1,11 +1,12 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Route, Routes } from 'react-router-dom';
 
-import { Admin, AuthGuard } from '@/src/components/Admin';
+import { queryClient } from '@/src/api/queryClient';
+import { Admin, withAuthGuard } from '@/src/components/Admin';
 import { PhotoList } from '@/src/components/Photos';
 import { Footer } from '@/src/components/ui';
 
-export const queryClient = new QueryClient();
+const ProtectedAdmin = withAuthGuard(Admin);
 
 export default function App() {
   return (
@@ -13,7 +14,7 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <Routes>
           <Route index path="/" element={<PhotoList />} />
-          <Route path="/admin" element={<AuthGuard component={Admin} />} />
+          <Route path="/admin" element={<ProtectedAdmin />} />
         </Routes>
         <Footer />
       </QueryClientProvider>

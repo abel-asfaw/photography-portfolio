@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   deletePhotoById,
@@ -7,8 +7,6 @@ import {
   uploadPhotos,
 } from '@/src/api/services/photos.api';
 
-import { queryClient } from '../../App';
-
 export const useFetchPhotos = () =>
   useQuery({
     queryKey: ['photos'],
@@ -16,22 +14,28 @@ export const useFetchPhotos = () =>
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
-export const useUploadPhotos = () =>
-  useMutation({
+export const useUploadPhotos = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: (files: FileList) => uploadPhotos(files),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['photos'] }),
   });
+};
 
-export const useDeletePhoto = () =>
-  useMutation({
+export const useDeletePhoto = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: (photoId: string) => deletePhotoById(photoId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['photos'] }),
   });
+};
 
-export const useReorderPhotos = () =>
-  useMutation({
+export const useReorderPhotos = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: (photoIds: string[]) => reorderPhotos(photoIds),
     onError: () => {
-      queryClient.invalidateQueries({ queryKey: ['photos'] });
+      void queryClient.invalidateQueries({ queryKey: ['photos'] });
     },
   });
+};

@@ -59,6 +59,12 @@
       "env": {
         "node": true
       }
+    },
+    {
+      "files": ["src/main.tsx"],
+      "rules": {
+        "react/only-export-components": "off"
+      }
     }
   ],
   "ignorePatterns": ["dist", "node_modules", "public"]
