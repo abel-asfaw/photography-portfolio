@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsgo && vite build",
+    "build": "npm run typecheck && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc && tsc -p tsconfig.node.json"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
@@ -37,7 +38,6 @@
     "@types/node": "^24.0.1",
     "@types/react": "^19.2.13",
     "@types/react-dom": "^19.2.3",
-    "@typescript/native-preview": "^7.0.0-dev.20260421.2",
     "@vitejs/plugin-react": "^4.5.2",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.29.0",
@@ -47,8 +47,7 @@
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.12",
     "tailwindcss": "^4.1.10",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3",
+    "typescript": "^7.0.2",
     "vite": "^6.3.5",
     "vitest": "^4.0.18"
   }
