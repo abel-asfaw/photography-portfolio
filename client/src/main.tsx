@@ -23,12 +23,23 @@ const providerConfig: Auth0ProviderOptions = {
 };
 
 const AuthInject = () => {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
 
   useEffect(() => {
     authToken.setAuthGetter(getAccessTokenSilently);
     return () => authToken.setAuthGetter(undefined);
   }, [getAccessTokenSilently]);
+
+  useEffect(() => {
+    authToken.setLoginRedirect(() =>
+      loginWithRedirect({
+        appState: {
+          returnTo: `${window.location.pathname}${window.location.search}`,
+        },
+      }),
+    );
+    return () => authToken.setLoginRedirect(undefined);
+  }, [loginWithRedirect]);
 
   return null;
 };

@@ -1,25 +1,23 @@
-import { GetTokenSilentlyOptions } from '@auth0/auth0-react';
-import { GetTokenSilentlyVerboseResponse } from '@auth0/auth0-spa-js';
+import type { Auth0ContextInterface } from '@auth0/auth0-react';
 
-interface GetTokenInterface {
-  (
-    options: GetTokenSilentlyOptions & { detailedResponse: true },
-  ): Promise<GetTokenSilentlyVerboseResponse>;
-  (options?: GetTokenSilentlyOptions): Promise<string>;
-  (
-    options: GetTokenSilentlyOptions,
-  ): Promise<GetTokenSilentlyVerboseResponse | string>;
-}
+type GetToken = Auth0ContextInterface['getAccessTokenSilently'];
+type LoginRedirect = () => Promise<void>;
 
 interface AuthTokenInterface {
-  getToken: GetTokenInterface | undefined;
-  setAuthGetter(getToken: GetTokenInterface): void;
+  getToken: GetToken | undefined;
+  redirectToLogin: LoginRedirect | undefined;
+  setAuthGetter(getToken: GetToken | undefined): void;
+  setLoginRedirect(redirectToLogin: LoginRedirect | undefined): void;
 }
 
 class AuthToken implements AuthTokenInterface {
-  getToken: GetTokenInterface | undefined;
-  setAuthGetter(getToken: GetTokenInterface | undefined) {
+  getToken: GetToken | undefined;
+  redirectToLogin: LoginRedirect | undefined;
+  setAuthGetter(getToken: GetToken | undefined) {
     this.getToken = getToken;
+  }
+  setLoginRedirect(redirectToLogin: LoginRedirect | undefined) {
+    this.redirectToLogin = redirectToLogin;
   }
 }
 
