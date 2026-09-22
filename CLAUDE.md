@@ -19,16 +19,18 @@ docker-compose up --build  # Rebuild containers and start
 
 ```bash
 cd client
-npm install
-npm run dev       # Vite dev server with HMR
-npm run build     # Typecheck + Vite production build
-npm run preview   # Preview production build
-npm run typecheck # tsc (TypeScript 7) over src and the Vite/Vitest configs
-npm run test      # Vitest
-npm run lint      # oxlint (lint:fix to auto-fix)
-npm run format    # oxfmt (format:check to verify only)
-npm run check     # typecheck + lint + format:check
+bun install
+bun run dev       # Vite dev server with HMR
+bun run build     # Typecheck + Vite production build
+bun run preview   # Preview production build
+bun run typecheck # tsc (TypeScript 7) over src and the Vite/Vitest configs
+bun run test      # Vitest
+bun run lint      # oxlint (lint:fix to auto-fix)
+bun run format    # oxfmt (format:check to verify only)
+bun run check     # typecheck + lint + format:check
 ```
+
+The client uses Bun as its package manager (`bun.lock`; there is no `package-lock.json`). Tests run on Vitest via `bun run test`. Plain `bun test` runs Bun's own test runner and is not the project's test command. The client Docker image is `oven/bun:1.4.2-alpine`, pinned to match the `packageManager` version in `package.json`; bump both together.
 
 ### Backend (api/)
 
@@ -53,11 +55,11 @@ The client uses oxlint (`client/.oxlintrc.json`, type-aware rules enabled) and o
 
 ```bash
 cd client
-npm run lint
-npm run format
+bun run lint
+bun run format
 ```
 
-A lefthook pre-commit hook (`lefthook.yml` at the repo root) runs oxlint and `oxfmt --check` on staged client files. It is installed automatically by `npm install` in `client/`.
+A lefthook pre-commit hook (`lefthook.yml` at the repo root) runs oxlint and `oxfmt --check` on staged client files. It is installed automatically by `bun install` in `client/`.
 
 ## Architecture
 

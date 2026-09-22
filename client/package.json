@@ -1,11 +1,11 @@
 {
-  "name": "photography-react",
+  "name": "photography-portfolio",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run typecheck && vite build",
+    "build": "bun run typecheck && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc && tsc -p tsconfig.node.json",
@@ -13,7 +13,7 @@
     "format:check": "oxfmt --check",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "check": "npm run typecheck && npm run lint && npm run format:check"
+    "check": "bun run typecheck && bun run lint && bun run format:check"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.26.0",
@@ -52,5 +52,6 @@
     "typescript": "^7.0.2",
     "vite": "^6.3.5",
     "vitest": "^4.0.18"
-  }
+  },
+  "packageManager": "bun@1.4.2"
 }

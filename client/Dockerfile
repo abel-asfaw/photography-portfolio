@@ -1,13 +1,14 @@
-FROM node:24-alpine
+FROM oven/bun:1.4.2-alpine
 
 WORKDIR /usr/app
 
 # No git checkout in the image, so skip lefthook's hook installation.
 ENV LEFTHOOK=0
 
-COPY package*.json ./
-RUN npm ci
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+
 COPY ./ ./
 
-# This CMD is for development only!
-CMD [ "npm", "run", "dev", "--", "--host" ]
+# --bun forces Vite to run on Bun even though its shebang says node.
+CMD [ "bun", "--bun", "run", "dev", "--host" ]
