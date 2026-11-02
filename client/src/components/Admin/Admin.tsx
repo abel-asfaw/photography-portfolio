@@ -1,11 +1,10 @@
-import { useAuth0 } from '@auth0/auth0-react';
-
+import { useSession } from '@/src/api/supabase';
 import { PhotoList, PhotoUploader } from '@/src/components/Photos';
 
 import { SessionHeader } from './SessionHeader';
 
 export function Admin() {
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = useSession(state => !!state.session);
 
   return (
     <>

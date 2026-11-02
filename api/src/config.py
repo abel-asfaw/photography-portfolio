@@ -17,10 +17,8 @@ class Settings(BaseSettings):
     AWS_REGION: str
     S3_BUCKET_NAME: str
 
-    DOMAIN: str
-    API_AUDIENCE: str
-    ISSUER: str
-    ALGORITHMS: str
+    SUPABASE_URL: str
+    ADMIN_USER_ID: str
 
 
 settings = Settings()  # type: ignore

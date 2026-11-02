@@ -7,7 +7,7 @@ This is a full-stack web app that lets me upload and display my photos.
 
 I used React + TypeScript for the frontend. On the backend, FastAPI handles photo upload, retrieval, and deletion. The app is integrated with an Amazon S3 bucket for photo storage. And for storing and managing image metadata I use PostgreSQL.
 
-I've also set up Auth0 for login @ https://photography.abelasfaw.com/admin and both photo upload and deletion are secured via token-based access.
+I've also set up Supabase Auth for login @ https://photography.abelasfaw.com/admin and both photo upload and deletion are secured via token-based access.
 
 The entire stack is running on the same host and is logically separated by containers to make local development easy. `docker-compose up` will spin up everything on `localhost:3005`.
 
