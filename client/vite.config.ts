@@ -1,12 +1,17 @@
 import { resolve } from 'path';
 
-import tailwindcss from '@tailwindcss/vite';
+import stylex from '@stylexjs/unplugin/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  // StyleX must run before react() to keep Fast Refresh working.
+  plugins: [
+    // StyleX resolves .stylex.ts imports itself, so it needs the alias too.
+    stylex({ aliases: { '@/*': [resolve(__dirname, '*')] } }),
+    react(),
+  ],
   server: {
     host: '0.0.0.0',
     port: 3000,

@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -35,20 +36,34 @@ describe('Button', () => {
     expect(handleClick).not.toHaveBeenCalled();
   });
 
-  it('applies variant classes', () => {
-    const { rerender } = render(<Button primary>Primary</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-gray-50');
+  // StyleX class names are generated hashes, so check that each variant
+  // yields its own class list rather than asserting specific names.
+  it('applies distinct variant styling', () => {
+    const { rerender } = render(<Button>Button</Button>);
+    const classNames = [screen.getByRole('button').className];
 
-    rerender(<Button danger>Danger</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-red-700');
+    for (const variant of ['primary', 'danger', 'success', 'circular']) {
+      rerender(<Button {...{ [variant]: true }}>Button</Button>);
+      classNames.push(screen.getByRole('button').className);
+    }
 
-    rerender(<Button success>Success</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-green-600');
+    expect(new Set(classNames).size).toBe(classNames.length);
   });
 
-  it('applies circular styling', () => {
-    render(<Button circular>X</Button>);
+  it('applies xstyle overrides', () => {
+    const { rerender } = render(<Button primary>Button</Button>);
+    const base = screen.getByRole('button').className;
 
-    expect(screen.getByRole('button')).toHaveClass('rounded-full');
+    rerender(
+      <Button primary xstyle={overrides.danger}>
+        Button
+      </Button>,
+    );
+
+    expect(screen.getByRole('button').className).not.toBe(base);
   });
+});
+
+const overrides = stylex.create({
+  danger: { backgroundColor: 'red' },
 });

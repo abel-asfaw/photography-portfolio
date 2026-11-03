@@ -1,11 +1,18 @@
-import classNames from 'classnames';
+import * as stylex from '@stylexjs/stylex';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+import { colors, radii } from '@/src/styles/tokens.stylex';
+
+// className is omitted: StyleX owns it, so pass overrides via xstyle.
+interface ButtonProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'className'
+> {
   circular?: boolean;
   primary?: boolean;
   success?: boolean;
   danger?: boolean;
-  className?: string;
+  /** StyleX overrides, applied after the variant styles. */
+  xstyle?: stylex.StyleXStyles;
 }
 
 export function Button({
@@ -13,25 +20,55 @@ export function Button({
   primary,
   success,
   danger,
-  className,
+  xstyle,
   children,
   ...delegated
 }: ButtonProps) {
-  const classes = classNames(
-    'flex items-center justify-center text-sm duration-300',
-    {
-      'h-10 w-10 rounded-full p-3': circular,
-      'h-10 rounded-md px-4 py-2': !circular,
-      'bg-gray-50 hover:bg-gray-300': primary,
-      'bg-green-600 hover:bg-green-700': success,
-      'bg-red-700 hover:bg-red-800': danger,
-    },
-    className,
-  );
-
   return (
-    <button type="button" className={classes} {...delegated}>
+    <button
+      type="button"
+      {...delegated}
+      {...stylex.props(
+        styles.base,
+        circular ? styles.circular : styles.pill,
+        primary && styles.primary,
+        success && styles.success,
+        danger && styles.danger,
+        xstyle,
+      )}
+    >
       {children}
     </button>
   );
 }
+
+const styles = stylex.create({
+  base: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '2.5rem',
+    fontSize: '0.875rem',
+    lineHeight: 'calc(1.25 / 0.875)',
+    transitionDuration: '300ms',
+  },
+  circular: {
+    width: '2.5rem',
+    padding: '0.75rem',
+    borderRadius: '9999px',
+  },
+  pill: {
+    paddingBlock: '0.5rem',
+    paddingInline: '1rem',
+    borderRadius: radii.md,
+  },
+  primary: {
+    backgroundColor: { default: colors.light, ':hover': colors.lightHover },
+  },
+  success: {
+    backgroundColor: { default: colors.success, ':hover': colors.successHover },
+  },
+  danger: {
+    backgroundColor: { default: colors.danger, ':hover': colors.dangerHover },
+  },
+});

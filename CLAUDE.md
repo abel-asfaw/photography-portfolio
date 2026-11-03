@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Photography portfolio web app: React + TypeScript frontend, FastAPI backend, PostgreSQL database, AWS S3 for photo storage, Supabase Auth for the admin login, and ImageKit for image optimization. All services run via Docker Compose behind an Nginx reverse proxy.
+Photography portfolio web app: React + TypeScript frontend styled with StyleX, FastAPI backend, PostgreSQL database, AWS S3 for photo storage, Supabase Auth for the admin login, and ImageKit for image optimization. All services run via Docker Compose behind an Nginx reverse proxy.
 
 ## Development Commands
 
@@ -69,7 +69,7 @@ docker run --rm -v "$PWD":/io -w /io ghcr.io/astral-sh/ruff:0.17.3 check .  # Wi
 
 ### Linting and formatting (frontend)
 
-The client uses oxlint (`client/.oxlintrc.json`, type-aware rules enabled) and oxfmt (`client/.oxfmtrc.json`, which also sorts imports and Tailwind classes). ESLint and Prettier are not used.
+The client uses oxlint (`client/.oxlintrc.json`, type-aware rules enabled) and oxfmt (`client/.oxfmtrc.json`, which also sorts imports). ESLint and Prettier are not used.
 
 ```bash
 cd client
@@ -110,6 +110,11 @@ Admin routes declare `dependencies=[Depends(require_admin)]`. Tests override `ge
 - **components/** - React components; `withAuthGuard` wraps protected route components and shows `LoginForm` (email + password) when signed out. `PhotoList` is the public read-only gallery; `PhotoManager` is the admin editor (uploader plus drag-to-reorder and delete via `EditablePhotoView`, which keeps a local copy of the order so dragging stays smooth). `PhotoGrid` owns the loading, error and empty states for both. Only `PhotoList` and `PhotoManager` are exported from `components/Photos`. `Admin` is `SessionHeader` + `PhotoManager`
 
 Routes: `/` (public gallery), `/admin` (protected, requires Supabase login).
+
+- **styles/tokens.stylex.ts** - StyleX design tokens (`colors`, `radii` vars, `breakpoints` consts)
+- **index.css** - A minimal global reset; everything else is StyleX
+
+Styling uses StyleX: each component ends with a `stylex.create` block and spreads `stylex.props(...)` onto elements (no `className` strings). `Button` takes an `xstyle` prop for caller overrides, merged last; `className` is omitted from component prop types since StyleX owns it. StyleX is compiled by `@stylexjs/unplugin` in both `vite.config.ts` and `vitest.config.ts` (`stylex.create` throws if uncompiled); both pass the `@/*` alias to it so `.stylex.ts` imports resolve. The Vitest config drops the plugin's dev-server hook, whose polling timer otherwise keeps Vitest from exiting. Class names are generated hashes, so tests compare class lists rather than asserting names.
 
 Import alias: `@/*` maps to the `client/` root, so imports look like `@/src/components/ui`.
 

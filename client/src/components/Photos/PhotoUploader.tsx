@@ -1,9 +1,10 @@
-import classNames from 'classnames';
+import * as stylex from '@stylexjs/stylex';
 import { useRef, useState } from 'react';
 import { Loader, UploadCloud } from 'react-feather';
 
 import { useUploadPhotos } from '@/src/api/services/photos.query';
 import { Button, FileInput } from '@/src/components/ui';
+import { colors } from '@/src/styles/tokens.stylex';
 
 export function PhotoUploader() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
@@ -31,16 +32,11 @@ export function PhotoUploader() {
     }
   };
 
-  const buttonClasses = classNames('bg-green-600 text-white', {
-    'cursor-not-allowed': !selectedFiles,
-    'opacity-50': !selectedFiles,
-    'hover:cursor-pointer hover:bg-green-700': !!selectedFiles,
-  });
-
+  const canUpload = !!selectedFiles && !isPending;
   const UploadIcon = isPending ? Loader : UploadCloud;
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 pt-10">
+    <div {...stylex.props(styles.uploader)}>
       <FileInput
         fileInputRef={fileInputRef}
         onChange={handleInputChange}
@@ -48,12 +44,45 @@ export function PhotoUploader() {
         aria-label="Upload photo"
       />
       <Button
-        className={buttonClasses}
-        disabled={!selectedFiles}
+        xstyle={[styles.upload, canUpload ? styles.enabled : styles.disabled]}
+        disabled={!canUpload}
         onClick={handleFileUpload}
       >
-        <UploadIcon className={isPending ? 'animate-spin' : ''} />
+        <UploadIcon {...stylex.props(isPending && styles.spin)} />
       </Button>
     </div>
   );
 }
+
+const spin = stylex.keyframes({
+  to: { transform: 'rotate(360deg)' },
+});
+
+const styles = stylex.create({
+  uploader: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '1rem',
+    paddingTop: '2.5rem',
+  },
+  upload: {
+    color: colors.white,
+  },
+  enabled: {
+    backgroundColor: { default: colors.success, ':hover': colors.successHover },
+    cursor: 'pointer',
+  },
+  disabled: {
+    backgroundColor: colors.success,
+    cursor: 'not-allowed',
+    opacity: 0.5,
+  },
+  spin: {
+    animationName: spin,
+    animationDuration: '1s',
+    animationTimingFunction: 'linear',
+    animationIterationCount: 'infinite',
+  },
+});

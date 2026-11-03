@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Route, Routes } from 'react-router-dom';
 
@@ -10,7 +11,7 @@ const ProtectedAdmin = withAuthGuard(Admin);
 
 export default function App() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div {...stylex.props(styles.app)}>
       <QueryClientProvider client={queryClient}>
         <Routes>
           <Route index path="/" element={<PhotoList />} />
@@ -21,3 +22,11 @@ export default function App() {
     </div>
   );
 }
+
+const styles = stylex.create({
+  app: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
+  },
+});

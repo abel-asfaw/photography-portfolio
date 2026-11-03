@@ -1,30 +1,50 @@
-import classNames from 'classnames';
+import * as stylex from '@stylexjs/stylex';
 
-interface FileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+import { breakpoints, colors, radii } from '@/src/styles/tokens.stylex';
+
+// className is omitted: StyleX owns it.
+interface FileInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'className'
+> {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
-  className?: string;
 }
 
-export function FileInput({
-  fileInputRef,
-  className,
-  ...delegated
-}: FileInputProps) {
-  const classes = classNames(
-    'h-10 max-w-60 rounded-md bg-zinc-800 text-sm text-gray-400 file:mr-2 file:h-10 file:cursor-pointer sm:max-w-72',
-    'file:rounded-md file:rounded-r-none file:border-0 file:bg-sky-500 file:p-2',
-    'file:text-sm file:font-medium file:text-white file:duration-200 hover:file:bg-sky-600',
-    className,
-  );
-
+export function FileInput({ fileInputRef, ...delegated }: FileInputProps) {
   return (
     <input
       ref={fileInputRef}
       type="file"
       accept="image/*"
       multiple
-      className={classes}
       {...delegated}
+      {...stylex.props(styles.input)}
     />
   );
 }
+
+const styles = stylex.create({
+  input: {
+    height: '2.5rem',
+    maxWidth: { default: '15rem', [breakpoints.sm]: '18rem' },
+    borderRadius: radii.md,
+    backgroundColor: colors.surface,
+    color: colors.textDim,
+    fontSize: '0.875rem',
+    lineHeight: 'calc(1.25 / 0.875)',
+    '::file-selector-button': {
+      height: '2.5rem',
+      marginRight: '0.5rem',
+      padding: '0.5rem',
+      borderRadius: radii.md,
+      borderTopRightRadius: 0,
+      borderBottomRightRadius: 0,
+      backgroundColor: { default: colors.accent, ':hover': colors.accentHover },
+      color: colors.white,
+      fontSize: '0.875rem',
+      fontWeight: 500,
+      cursor: 'pointer',
+      transitionDuration: '200ms',
+    },
+  },
+});

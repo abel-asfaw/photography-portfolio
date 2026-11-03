@@ -1,5 +1,58 @@
-@import 'tailwindcss';
+/* Minimal reset; component styles live in StyleX. */
+
+*,
+::before,
+::after,
+::backdrop,
+::file-selector-button {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+}
+
+html {
+  line-height: 1.5;
+  font-family:
+    ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
   background-color: rgb(10, 10, 10);
+}
+
+img,
+svg {
+  display: block;
+}
+
+/* The overlay's auto sizing depends on images never exceeding their box. */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+::file-selector-button {
+  font: inherit;
+  color: inherit;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+/* Firefox dims placeholders and outlines required fields as invalid. */
+::placeholder {
+  opacity: 1;
+}
+
+:-moz-ui-invalid {
+  box-shadow: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
 }

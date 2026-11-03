@@ -4,6 +4,7 @@ import {
   AnimateLayoutChanges,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import * as stylex from '@stylexjs/stylex';
 
 import { useDeletePhoto } from '@/src/api/services/photos.query';
 
@@ -43,8 +44,8 @@ export function EditablePhotoView({
   return (
     <div
       ref={setNodeRef}
+      {...stylex.props(styles.sortable)}
       style={style}
-      className="flex items-center justify-center"
       {...attributes}
       {...listeners}
     >
@@ -56,3 +57,11 @@ export function EditablePhotoView({
     </div>
   );
 }
+
+const styles = stylex.create({
+  sortable: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

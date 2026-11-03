@@ -1,10 +1,11 @@
 import { Image } from '@imagekit/react';
-import classNames from 'classnames';
+import * as stylex from '@stylexjs/stylex';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { X } from 'react-feather';
 
 import { Button } from '@/src/components/ui';
+import { breakpoints } from '@/src/styles/tokens.stylex';
 
 interface PhotoViewProps {
   photoId: string;
@@ -25,8 +26,11 @@ export function PhotoView({
 }: PhotoViewProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
-  // Keep the tile above its siblings while it flies to/from the overlay.
-  // Raised on select; lowered only once the return layout animation ends.
+  // Keep the tile above the overlay (z-50) while it flies back from it, or
+  // the overlay's backdrop-blur blurs it. Tracked from select so the raise
+  // starts on deselect; lowered only once the return animation ends. Not
+  // raised while selected: the tile is hidden then, but its wrapper would
+  // still catch clicks meant for the backdrop.
   const [isRaised, setIsRaised] = useState(false);
   if (isSelected && !isRaised) setIsRaised(true);
 
@@ -44,23 +48,25 @@ export function PhotoView({
     }, 200);
   };
 
-  const classes = classNames(
-    'group relative h-auto w-96 duration-500 sm:w-72',
-    {
-      'opacity-0': isDeleted,
-      'z-40': isRaised,
-    },
-  );
-
   return (
     <div
-      className={classNames(classes, 'hover:scale-[1.1]')}
+      {...stylex.props(
+        styles.tile,
+        isDeleted && styles.deleted,
+        isRaised && !isSelected && styles.raised,
+      )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
         layoutId={onSelect ? `photo-${photoId}` : undefined}
-        className="relative transform-gpu overflow-hidden rounded-xl will-change-transform hover:cursor-pointer"
+        {...stylex.props(styles.photo)}
+        // Set inline (not via rounded-xl) so Motion can correct the radius
+        // for scale distortion during the layout animation.
+        style={{ borderRadius: 12 }}
+        // Hide the other copy instead of crossfading, so only the copy
+        // above the backdrop is visible in flight.
+        layoutCrossfade={false}
         transition={{
           type: 'spring',
           stiffness: 150,
@@ -86,7 +92,7 @@ export function PhotoView({
             aria-label="Delete photo"
             onPointerDownCapture={e => e.stopPropagation()}
             onClick={handleDelete}
-            className="absolute top-2 right-2 shadow-sm shadow-zinc-700 hover:cursor-pointer"
+            xstyle={styles.deleteButton}
           >
             <X size={12} color="black" />
           </Button>
@@ -95,3 +101,34 @@ export function PhotoView({
     </div>
   );
 }
+
+const styles = stylex.create({
+  tile: {
+    position: 'relative',
+    width: { default: '24rem', [breakpoints.sm]: '18rem' },
+    scale: { default: null, ':hover': 1.1 },
+    // Transition only opacity and scale; an implicit `all` would also
+    // tween z-index, leaving the tile under the backdrop for a moment.
+    transitionProperty: 'opacity, scale',
+    transitionDuration: '500ms',
+    transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+  deleted: {
+    opacity: 0,
+  },
+  raised: {
+    zIndex: 60,
+  },
+  photo: {
+    position: 'relative',
+    overflow: 'hidden',
+    cursor: 'pointer',
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: '0.5rem',
+    right: '0.5rem',
+    cursor: 'pointer',
+    boxShadow: '0 1px 3px 0 #3f3f46, 0 1px 2px -1px #3f3f46',
+  },
+});

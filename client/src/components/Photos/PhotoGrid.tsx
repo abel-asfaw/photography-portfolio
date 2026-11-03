@@ -1,7 +1,8 @@
-import classNames from 'classnames';
+import * as stylex from '@stylexjs/stylex';
 import { PropsWithChildren } from 'react';
 
 import { Photo } from '@/src/api/schemas/photos.schema';
+import { breakpoints, colors } from '@/src/styles/tokens.stylex';
 
 interface PhotoGridProps extends PropsWithChildren {
   photos: Photo[] | undefined;
@@ -30,10 +31,27 @@ export function PhotoGrid({
   children,
   ...status
 }: PhotoGridProps) {
-  const classes = classNames(
-    'flex grow flex-wrap justify-center gap-12 px-10 pt-10 pb-2 text-neutral-200 sm:gap-16 sm:px-20 sm:pt-20 sm:pb-12',
-    stretch ? 'items-stretch' : 'items-center',
+  return (
+    <div {...stylex.props(styles.grid, stretch && styles.stretch)}>
+      {statusMessage(status) ?? children}
+    </div>
   );
-
-  return <div className={classes}>{statusMessage(status) ?? children}</div>;
 }
+
+const styles = stylex.create({
+  grid: {
+    display: 'flex',
+    flexGrow: 1,
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: { default: '3rem', [breakpoints.sm]: '4rem' },
+    paddingInline: { default: '2.5rem', [breakpoints.sm]: '5rem' },
+    paddingTop: { default: '2.5rem', [breakpoints.sm]: '5rem' },
+    paddingBottom: { default: '0.5rem', [breakpoints.sm]: '3rem' },
+    color: colors.textLight,
+  },
+  stretch: {
+    alignItems: 'stretch',
+  },
+});

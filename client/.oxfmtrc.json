@@ -6,10 +6,6 @@
   "singleQuote": true,
   "trailingComma": "all",
   "arrowParens": "avoid",
-  "sortTailwindcss": {
-    "stylesheet": "./src/index.css",
-    "functions": ["classNames"]
-  },
   "sortImports": {
     "internalPattern": ["@/"]
   },

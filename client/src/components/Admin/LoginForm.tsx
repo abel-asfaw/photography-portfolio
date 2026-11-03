@@ -1,11 +1,10 @@
+import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 import { Loader, LogIn } from 'react-feather';
 
 import { supabase } from '@/src/api/supabase';
 import { Button } from '@/src/components/ui';
-
-const inputClasses =
-  'h-10 rounded-md bg-zinc-800 px-3 text-sm text-neutral-200 placeholder:text-gray-500 focus:ring-2 focus:ring-sky-500 focus:outline-none';
+import { colors, radii } from '@/src/styles/tokens.stylex';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -30,18 +29,15 @@ export function LoginForm() {
   const SubmitIcon = isPending ? Loader : LogIn;
 
   return (
-    <div className="flex grow items-center justify-center p-4">
-      <form
-        className="flex w-full max-w-xs flex-col gap-3"
-        onSubmit={handleSubmit}
-      >
+    <div {...stylex.props(styles.container)}>
+      <form {...stylex.props(styles.form)} onSubmit={handleSubmit}>
         <input
           type="email"
           aria-label="Email"
           placeholder="Email"
           autoComplete="username"
           required
-          className={inputClasses}
+          {...stylex.props(styles.input)}
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
@@ -51,20 +47,16 @@ export function LoginForm() {
           placeholder="Password"
           autoComplete="current-password"
           required
-          className={inputClasses}
+          {...stylex.props(styles.input)}
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
         {error && (
-          <p role="alert" className="text-sm text-red-500">
+          <p role="alert" {...stylex.props(styles.error)}>
             {error}
           </p>
         )}
-        <Button
-          type="submit"
-          className="gap-2 bg-sky-500 text-white hover:cursor-pointer hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isPending}
-        >
+        <Button type="submit" xstyle={styles.submit} disabled={isPending}>
           <SubmitIcon size={16} />
           Sign in
         </Button>
@@ -72,3 +64,46 @@ export function LoginForm() {
     </div>
   );
 }
+
+const styles = stylex.create({
+  container: {
+    display: 'flex',
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1rem',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+    width: '100%',
+    maxWidth: '20rem',
+  },
+  input: {
+    height: '2.5rem',
+    paddingInline: '0.75rem',
+    borderRadius: radii.md,
+    backgroundColor: colors.surface,
+    color: colors.textLight,
+    fontSize: '0.875rem',
+    lineHeight: 'calc(1.25 / 0.875)',
+    outline: { default: null, ':focus': 'none' },
+    boxShadow: { default: null, ':focus': `0 0 0 2px ${colors.accent}` },
+    '::placeholder': {
+      color: colors.textMuted,
+    },
+  },
+  error: {
+    color: colors.error,
+    fontSize: '0.875rem',
+    lineHeight: 'calc(1.25 / 0.875)',
+  },
+  submit: {
+    gap: '0.5rem',
+    backgroundColor: { default: colors.accent, ':hover': colors.accentHover },
+    color: colors.white,
+    cursor: { default: 'pointer', ':disabled': 'not-allowed' },
+    opacity: { default: null, ':disabled': 0.5 },
+  },
+});

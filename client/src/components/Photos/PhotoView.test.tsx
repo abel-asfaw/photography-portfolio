@@ -31,7 +31,10 @@ const defaultProps = {
   photoName: 'photo.jpg',
 };
 
-const tile = () => screen.getByRole('img').closest('.group')!;
+// The hover/fade wrapper is the photo's grandparent (img → motion.div →
+// tile). StyleX class names are generated, so the delete tests compare the
+// tile's class list before and after rather than asserting a name.
+const tile = () => screen.getByRole('img').parentElement!.parentElement!;
 
 describe('PhotoView', () => {
   afterEach(() => {
@@ -77,13 +80,14 @@ describe('PhotoView', () => {
     render(<PhotoView {...defaultProps} onDelete={onDelete} />);
 
     fireEvent.mouseEnter(tile());
+    const visibleClasses = tile().className;
     fireEvent.click(screen.getByRole('button', { name: 'Delete photo' }));
-    expect(tile()).toHaveClass('opacity-0');
+    expect(tile().className).not.toBe(visibleClasses);
 
     await act(() => vi.advanceTimersByTimeAsync(200));
 
     expect(onDelete).toHaveBeenCalledOnce();
-    expect(tile()).toHaveClass('opacity-0');
+    expect(tile().className).not.toBe(visibleClasses);
   });
 
   it('brings the photo back when the delete fails', async () => {
@@ -95,11 +99,12 @@ describe('PhotoView', () => {
     render(<PhotoView {...defaultProps} onDelete={onDelete} />);
 
     fireEvent.mouseEnter(tile());
+    const visibleClasses = tile().className;
     fireEvent.click(screen.getByRole('button', { name: 'Delete photo' }));
     await act(() => vi.advanceTimersByTimeAsync(200));
 
     expect(onDelete).toHaveBeenCalledOnce();
-    expect(tile()).not.toHaveClass('opacity-0');
+    expect(tile().className).toBe(visibleClasses);
     expect(consoleError).toHaveBeenCalled();
     consoleError.mockRestore();
   });

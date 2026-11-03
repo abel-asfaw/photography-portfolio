@@ -1,4 +1,5 @@
 import { Image } from '@imagekit/react';
+import * as stylex from '@stylexjs/stylex';
 import { motion } from 'motion/react';
 import { useEffect } from 'react';
 
@@ -22,9 +23,9 @@ export function PhotoOverlay({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div {...stylex.props(styles.overlay)}>
       <motion.div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        {...stylex.props(styles.backdrop)}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -32,17 +33,52 @@ export function PhotoOverlay({
       />
       <motion.div
         layoutId={`photo-${photoId}`}
-        className="relative z-10 max-h-full max-w-[90vw] overflow-hidden rounded-xl"
+        {...stylex.props(styles.photo)}
+        style={{ borderRadius: 12 }}
+        layoutCrossfade={false}
       >
+        {/* Same props as the grid tile so the browser reuses the cached
+            image, and auto sizing so the box always matches its shape. */}
         <Image
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
           src={`/${photoName}`}
           loading="eager"
           height={600}
           width={600}
-          className="max-h-[90vh] max-w-[90vw] object-contain"
+          sizes="600px"
+          {...stylex.props(styles.image)}
         />
       </motion.div>
     </div>
   );
 }
+
+const styles = stylex.create({
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    zIndex: 50,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backdrop: {
+    position: 'absolute',
+    inset: 0,
+    backgroundColor: 'rgb(0 0 0 / 0.8)',
+    backdropFilter: 'blur(8px)',
+  },
+  photo: {
+    position: 'relative',
+    zIndex: 10,
+    maxHeight: '100%',
+    maxWidth: '90vw',
+    overflow: 'hidden',
+  },
+  image: {
+    width: 'auto',
+    height: 'auto',
+    maxWidth: '90vw',
+    maxHeight: '90vh',
+  },
+});

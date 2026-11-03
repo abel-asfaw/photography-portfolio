@@ -21,11 +21,10 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@imagekit/react": "^5.0.1",
+    "@stylexjs/stylex": "0.19.1",
     "@supabase/supabase-js": "^2.118.0",
-    "@tailwindcss/vite": "^4.1.10",
     "@tanstack/react-query": "^5.80.7",
     "axios": "^1.13.2",
-    "classnames": "^2.5.1",
     "motion": "^12.33.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -35,6 +34,7 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@stylexjs/unplugin": "0.19.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -48,8 +48,8 @@
     "oxfmt": "^0.67.0",
     "oxlint": "^1.82.0",
     "oxlint-tsgolint": "^7.0.2001",
-    "tailwindcss": "^4.1.10",
     "typescript": "^7.0.2",
+    "unplugin": "^2.3.11",
     "vite": "^6.3.5",
     "vitest": "^4.0.18"
   },
