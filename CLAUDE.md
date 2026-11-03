@@ -36,14 +36,14 @@ The client uses Bun as its package manager (`bun.lock`; there is no `package-loc
 
 ```bash
 cd api
-python -m venv .venv && source .venv/bin/activate
+python3.15 -m venv .venv && source .venv/bin/activate  # The API targets Python 3.15
 pip install -r requirements-dev.txt
 uvicorn src.main:app --reload --host 0.0.0.0 --port 4000
 alembic upgrade head  # Apply migrations
 alembic check         # Verify the models match the database schema
 ```
 
-`requirements.txt` lists only the runtime dependencies the app imports directly; `requirements-dev.txt` adds the test tools. The Dockerfile installs runtime dependencies and runs uvicorn without `--reload`; `docker-compose.yaml` builds the dev container with `requirements-dev.txt` and adds `--reload`.
+`requirements.txt` lists only the runtime dependencies the app imports directly; `requirements-dev.txt` adds the test and lint tools. The Dockerfile (`python:3.15-slim`) installs runtime dependencies and runs uvicorn without `--reload`; `docker-compose.yaml` builds the dev container with `requirements-dev.txt` and adds `--reload`. The `/api` prefix that Nginx strips is passed to uvicorn as `--root-path` (overridable with `ROOT_PATH` in the image), not to `FastAPI()`.
 
 ### Backend tests
 
@@ -57,6 +57,16 @@ docker compose exec api python -m pytest  # Run inside the running container
 
 Route tests in `tests/test_photos.py` override `get_db` and `require_admin` and stub the S3 helpers, so they need no database or AWS access.
 
+### Linting and formatting (backend)
+
+The API uses ruff (`api/ruff.toml`) for linting and formatting. It's in `requirements-dev.txt`, so it runs in the dev container; on the host, use the official image:
+
+```bash
+cd api
+docker compose exec api ruff check --fix . && docker compose exec api ruff format .
+docker run --rm -v "$PWD":/io -w /io ghcr.io/astral-sh/ruff:0.17.3 check .  # Without the stack running
+```
+
 ### Linting and formatting (frontend)
 
 The client uses oxlint (`client/.oxlintrc.json`, type-aware rules enabled) and oxfmt (`client/.oxfmtrc.json`, which also sorts imports and Tailwind classes). ESLint and Prettier are not used.
@@ -67,17 +77,17 @@ bun run lint
 bun run format
 ```
 
-A lefthook pre-commit hook (`lefthook.yml` at the repo root) runs oxlint and `oxfmt --check` on staged client files. It is installed automatically by `bun install` in `client/`.
+A lefthook pre-commit hook (`lefthook.yml` at the repo root) runs oxlint and `oxfmt --check` on staged client files, and `ruff check` and `ruff format --check` on staged API files (through ruff's Docker image, so Docker must be running). It is installed automatically by `bun install` in `client/`. Keep the ruff image tag in `lefthook.yml` in sync with `ruff` in `api/requirements-dev.txt`.
 
 ## Architecture
 
 ### Request Flow
 
-Client (port 3000) and API (port 4000) are behind an Nginx reverse proxy (port 3005). Nginx routes `/` to the client and `/api/` to the backend (stripping the `/api` prefix). Max upload size is 20MB.
+Client (port 3000) and API (port 4000) are behind an Nginx reverse proxy (port 3005). Nginx routes `/` to the client and `/api/` to the backend (stripping the `/api` prefix). Max upload size is 20MB, enforced by Nginx locally and by the API itself (`MAX_UPLOAD_MB`), since production may not run behind Nginx.
 
 ### Backend (api/src/)
 
-- **main.py** - FastAPI app init, exception handlers, CORS (origins from `CORS_ORIGINS`), router mounting, `GET /healthz`
+- **main.py** - FastAPI app init, exception handlers, CORS (origins from `CORS_ORIGINS`), router mounting, `GET /healthz` (runs `SELECT 1`, so it returns 503 when the database is down)
 - **config.py** - Pydantic `BaseSettings` loading from `.env`
 - **database.py** - SQLAlchemy 2.0 engine (`pool_pre_ping` for the Supabase pooler), session factory, `Base`, and the `get_db` dependency (use the `DbSession` annotation in routes). Queries use `select()`, not the legacy `db.query()`
 - **models.py** - Single `Photo` ORM model (UUID id, name, url, sort_order, created_at)
@@ -85,7 +95,7 @@ Client (port 3000) and API (port 4000) are behind an Nginx reverse proxy (port 3
 - **auth.py** - `require_admin` dependency: Supabase Auth JWT validation via ES256/JWKS, plus a check that `sub` equals `ADMIN_USER_ID`
 - **storage.py** - S3 upload/delete helpers
 - **exceptions.py** - App-level handlers that turn SQLAlchemy and S3 errors into JSON responses; routes don't catch these themselves
-- **routers/photos.py** - `GET /photos` (public), `POST /photos`, `PUT /photos/reorder`, `DELETE /photos/{id}` (admin). Uploads are stored under a generated key, which is the photo's `name`
+- **routers/photos.py** - `GET /photos` (public), `POST /photos`, `PUT /photos/reorder`, `DELETE /photos/{id}` (admin). Uploads are stored under a generated key, which is the photo's `name`. `/reorder` requires every photo ID exactly once
 
 Admin routes declare `dependencies=[Depends(require_admin)]`. Tests override `get_db` and `require_admin` through `app.dependency_overrides`.
 

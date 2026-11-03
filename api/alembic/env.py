@@ -2,7 +2,7 @@ from logging.config import fileConfig
 
 from alembic import context
 
-from src.database import Base, DATABASE_URL, engine
+from src.database import DATABASE_URL, Base, engine
 from src.models import Photo  # noqa: F401 — ensure model is registered
 
 # this is the Alembic Config object, which provides
@@ -33,9 +33,7 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode, using the app's engine and URL."""
     with engine.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

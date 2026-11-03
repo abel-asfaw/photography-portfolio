@@ -1,0 +1,20 @@
+# The oldest Python the code must run on, not the one it runs on (3.15, see
+# the Dockerfile). The formatter only uses syntax valid on this version, so
+# 3.13 keeps brackets in multi-exception handlers like except (A, B):, which
+# 3.14+ would let it drop.
+target-version = "py313"
+line-length = 88
+
+[lint]
+# Ruff's defaults plus import sorting, pyupgrade and bugbear.
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[lint.isort]
+# api/alembic/ holds migrations, so ruff would otherwise treat the alembic
+# package as first-party.
+known-first-party = ["src"]
+known-third-party = ["alembic"]
+
+[lint.flake8-bugbear]
+# FastAPI declares dependencies as default arguments.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Security"]

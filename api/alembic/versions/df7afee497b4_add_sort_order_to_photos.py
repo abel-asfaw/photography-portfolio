@@ -5,23 +5,25 @@ Revises: 2ea64bbab31e
 Create Date: 2026-02-09 23:17:37.698439
 
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = 'df7afee497b4'
-down_revision: Union[str, Sequence[str], None] = '2ea64bbab31e'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision: str = "df7afee497b4"
+down_revision: str | Sequence[str] | None = "2ea64bbab31e"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
     op.add_column(
         "photos",
-        sa.Column("sort_order", sa.Integer(), nullable=False, server_default=sa.text("0")),
+        sa.Column(
+            "sort_order", sa.Integer(), nullable=False, server_default=sa.text("0")
+        ),
     )
     # Backfill existing rows: assign sequential sort_order based on created_at DESC
     # so current display order is preserved (newest = 0, next = 1, etc.)

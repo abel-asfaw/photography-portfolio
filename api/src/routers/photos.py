@@ -3,11 +3,12 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from botocore.exceptions import BotoCoreError, ClientError
-from fastapi import APIRouter, Depends, UploadFile, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from loguru import logger
 from sqlalchemy import func, select
 
 from src.auth import require_admin
+from src.config import settings
 from src.database import DbSession
 from src.models import Photo
 from src.schemas import PhotoResponse, ReorderRequest
@@ -59,6 +60,13 @@ def add_photo(file: UploadFile, db: DbSession) -> Any:
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
             detail="File must be an image",
         )
+    # The proxy also caps request bodies, but production may not run behind
+    # it, so the API enforces the limit itself.
+    if file.size is not None and file.size > settings.MAX_UPLOAD_MB * 1024 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+            detail=f"File must be {settings.MAX_UPLOAD_MB} MB or smaller",
+        )
 
     photo_name = make_photo_name(file.filename)
     photo_url = upload_to_s3(file, photo_name)
@@ -85,15 +93,20 @@ def reorder_photos(body: ReorderRequest, db: DbSession) -> None:
     """
     Reorders photos based on the provided list of photo IDs.
     Each photo's sort_order is set to its index in the list.
+
+    The list must contain every photo exactly once. A partial list would give
+    the listed photos indices that collide with the others' sort_order.
     """
-    existing = db.scalars(select(Photo).where(Photo.id.in_(body.photo_ids))).all()
-    if len(existing) != len(body.photo_ids):
+    id_to_photo = {photo.id: photo for photo in db.scalars(select(Photo)).all()}
+    if (
+        len(body.photo_ids) != len(id_to_photo)
+        or set(body.photo_ids) != id_to_photo.keys()
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="One or more photo IDs do not exist",
+            detail="photo_ids must list every photo exactly once",
         )
 
-    id_to_photo = {photo.id: photo for photo in existing}
     for index, photo_id in enumerate(body.photo_ids):
         id_to_photo[photo_id].sort_order = index
 

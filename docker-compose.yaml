@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
       args:
         REQUIREMENTS: requirements-dev.txt
-    command: uvicorn src.main:app --host 0.0.0.0 --port 4000 --reload
+    command: uvicorn src.main:app --host 0.0.0.0 --port 4000 --root-path /api --reload
     volumes:
       - ./api:/app:delegated
     restart: always

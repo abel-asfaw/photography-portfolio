@@ -19,8 +19,8 @@ OTHER_KEY = ec.generate_private_key(ec.SECP256R1())
 
 
 class FakeJWKClient:
-    def __init__(self, key=SIGNING_KEY.public_key(), error=None):
-        self.key = key
+    def __init__(self, key=None, error=None):
+        self.key = key or SIGNING_KEY.public_key()
         self.error = error
 
     def get_signing_key_from_jwt(self, _token):
@@ -103,7 +103,9 @@ def test_rejects_wrong_signature(client):
 
 
 def test_rejects_hs256_token(client):
-    token = make_token(key="legacy-shared-secret-that-is-long-enough", algorithm="HS256")
+    token = make_token(
+        key="legacy-shared-secret-that-is-long-enough", algorithm="HS256"
+    )
     assert post(client, token).status_code == 401
 
 

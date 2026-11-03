@@ -9,3 +9,13 @@ pre-commit:
       root: "client/"
       glob: "*.{ts,tsx,js,jsx,json,css,md}"
       run: bunx oxfmt --check {staged_files}
+    # Ruff runs from its official image so no Python tooling is needed on the
+    # host. Keep the tag in sync with ruff in api/requirements-dev.txt.
+    - name: ruff
+      root: "api/"
+      glob: "*.py"
+      run: docker run --rm -v "$PWD":/io -w /io ghcr.io/astral-sh/ruff:0.17.3 check {staged_files}
+    - name: ruff-format
+      root: "api/"
+      glob: "*.py"
+      run: docker run --rm -v "$PWD":/io -w /io ghcr.io/astral-sh/ruff:0.17.3 format --check {staged_files}

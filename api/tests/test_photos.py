@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.exc import IntegrityError, OperationalError
 
 from src.auth import require_admin
+from src.config import settings
 from src.database import get_db
 from src.main import app
 from src.routers import photos
@@ -59,6 +60,15 @@ def test_uploads_with_the_same_filename_get_different_keys(client, saved_photo):
     assert upload(client).json()["name"] != upload(client).json()["name"]
 
 
+def test_upload_rejects_files_over_the_size_limit(client, s3, monkeypatch):
+    monkeypatch.setattr(settings, "MAX_UPLOAD_MB", 0)
+
+    response = upload(client)
+
+    assert response.status_code == 413
+    s3.upload_to_s3.assert_not_called()
+
+
 def test_upload_rejects_non_images(client, s3):
     response = upload(client, "notes.txt", "text/plain")
 
@@ -66,7 +76,9 @@ def test_upload_rejects_non_images(client, s3):
     s3.upload_to_s3.assert_not_called()
 
 
-def test_upload_removes_s3_object_when_the_row_is_not_saved(client, db, s3, saved_photo):
+def test_upload_removes_s3_object_when_the_row_is_not_saved(
+    client, db, s3, saved_photo
+):
     db.commit.side_effect = IntegrityError("INSERT", {}, Exception("duplicate"))
 
     response = upload(client)
@@ -116,12 +128,24 @@ def test_reorder_sets_sort_order_from_list_position(client, db):
     db.commit.assert_called_once()
 
 
-def test_reorder_with_unknown_id_returns_400(client, db):
-    db.scalars.return_value.all.return_value = []
+@pytest.mark.parametrize(
+    "photo_ids",
+    [
+        lambda a, b: [a, b, uuid4()],
+        lambda a, b: [a],
+        lambda a, b: [a, a],
+    ],
+    ids=["unknown-id", "partial-list", "duplicate-id"],
+)
+def test_reorder_requires_every_photo_exactly_once(client, db, photo_ids):
+    first, second = MagicMock(id=uuid4()), MagicMock(id=uuid4())
+    db.scalars.return_value.all.return_value = [first, second]
 
-    response = client.put("/photos/reorder", json={"photo_ids": [PHOTO_ID]})
+    ids = [str(i) for i in photo_ids(first.id, second.id)]
+    response = client.put("/photos/reorder", json={"photo_ids": ids})
 
     assert response.status_code == 400
+    db.commit.assert_not_called()
 
 
 def test_database_outage_returns_503(client, db):
@@ -135,7 +159,11 @@ def test_database_outage_returns_503(client, db):
 
 @pytest.mark.parametrize(
     "method, path",
-    [("post", "/photos"), ("put", "/photos/reorder"), ("delete", f"/photos/{PHOTO_ID}")],
+    [
+        ("post", "/photos"),
+        ("put", "/photos/reorder"),
+        ("delete", f"/photos/{PHOTO_ID}"),
+    ],
 )
 def test_admin_routes_require_a_token(db, s3, method, path):
     app.dependency_overrides[get_db] = lambda: db
@@ -146,3 +174,14 @@ def test_admin_routes_require_a_token(db, s3, method, path):
 
     assert response.status_code in (401, 403)
     db.commit.assert_not_called()
+
+
+def test_healthcheck_queries_the_database(client, db):
+    assert client.get("/healthz").json() == {"status": "ok"}
+    db.execute.assert_called_once()
+
+
+def test_healthcheck_returns_503_when_the_database_is_down(client, db):
+    db.execute.side_effect = OperationalError("SELECT 1", {}, Exception("down"))
+
+    assert client.get("/healthz").status_code == 503

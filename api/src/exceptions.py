@@ -18,7 +18,10 @@ ERROR_RESPONSES: dict[type[Exception], tuple[int, str]] = {
         "Database error occurred",
     ),
     ClientError: (status.HTTP_502_BAD_GATEWAY, "Storage service rejected the request"),
-    BotoCoreError: (status.HTTP_503_SERVICE_UNAVAILABLE, "Storage service is unavailable"),
+    BotoCoreError: (
+        status.HTTP_503_SERVICE_UNAVAILABLE,
+        "Storage service is unavailable",
+    ),
 }
 
 

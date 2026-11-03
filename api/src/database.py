@@ -7,7 +7,6 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from src.config import settings
 
-
 # URL.create escapes the credentials, so a password with characters like
 # "@" or "/" still produces a valid URL.
 DATABASE_URL = URL.create(

@@ -1,13 +1,13 @@
 # Runtime dependencies, installed in every image. Transitive packages are
 # left to pip; add one here only when the app imports it directly.
-alembic~=1.16.5
-boto3~=1.40.35
-fastapi~=0.117.1
+alembic~=1.20.1
+boto3~=1.43.123
+fastapi~=0.162.0
 loguru~=0.7.3
-psycopg2-binary~=2.9.10
-pydantic~=2.11.9
-pydantic-settings~=2.10.1
-PyJWT[crypto]~=2.10.1
-python-multipart~=0.0.20
-SQLAlchemy~=2.0.43
-uvicorn~=0.36.0
+psycopg2-binary~=2.9.13
+pydantic~=2.14.2
+pydantic-settings~=2.16.2
+PyJWT[crypto]~=2.15.1
+python-multipart~=0.0.33
+SQLAlchemy~=2.1.6
+uvicorn~=0.54.0
