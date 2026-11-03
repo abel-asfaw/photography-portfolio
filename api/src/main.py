@@ -2,9 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.config import settings
+from src.exceptions import register_exception_handlers
 from src.routers import photos
 
 app = FastAPI(root_path=settings.ROOT_PATH, debug=settings.DEBUG)
+register_exception_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,

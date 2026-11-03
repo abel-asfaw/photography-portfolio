@@ -11,7 +11,6 @@ import boto3
 import jwt
 
 from src.config import settings
-from src.exceptions import s3_exception_handler
 
 S3_RESOURCE = boto3.resource(
     "s3",
@@ -80,18 +79,17 @@ class VerifyToken:
 
 def upload_to_s3(file: UploadFile, photo_name: str) -> str:
     """
-    Uploads a photo to to S3, compressing and converting to JPEG if needed
-    based on size and format.
+    Uploads a photo to S3 under the given key, keeping its content type.
 
     :param file: A file to be uploaded to S3.
-    :param photo_name: The name for the photo.
+    :param photo_name: The S3 key for the photo.
+    :return: The photo's S3 URL.
     """
     try:
-        with s3_exception_handler():
-            S3_RESOURCE.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(
-                file.file, photo_name
-            )
-            return f"https://{settings.S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
+        S3_RESOURCE.Bucket(settings.S3_BUCKET_NAME).upload_fileobj(
+            file.file, photo_name, ExtraArgs={"ContentType": file.content_type}
+        )
+        return f"https://{settings.S3_BUCKET_NAME}.s3.amazonaws.com/{photo_name}"
     finally:
         file.file.close()
 
@@ -102,5 +100,4 @@ def delete_from_s3(photo_name: str) -> None:
 
     :param photo_name: The name of the photo to be deleted from the S3 bucket.
     """
-    with s3_exception_handler():
-        S3_RESOURCE.Object(settings.S3_BUCKET_NAME, photo_name).delete()
+    S3_RESOURCE.Object(settings.S3_BUCKET_NAME, photo_name).delete()

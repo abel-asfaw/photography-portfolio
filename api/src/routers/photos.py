@@ -1,5 +1,10 @@
+from pathlib import PurePosixPath
 from typing import Any
+from uuid import UUID, uuid4
+
+from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter, UploadFile, Security, HTTPException, status
+from loguru import logger
 from sqlalchemy import func
 
 from src.database import get_db
@@ -14,6 +19,18 @@ from src.utils import (
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
 auth = VerifyToken()
+
+
+def make_photo_name(filename: str | None) -> str:
+    """
+    Builds a unique S3 key for an upload, keeping the original extension so
+    the image type stays recognizable. The client's filename is never used as
+    the key, so an upload can't overwrite an existing photo.
+    """
+    suffix = PurePosixPath(filename or "").suffix.lower()
+    if not suffix[1:].isalnum():
+        suffix = ""
+    return f"{uuid4().hex}{suffix}"
 
 
 @router.get("", response_model=list[Photo])
@@ -40,23 +57,31 @@ def add_photo(
     :return: A Photo instance with the photo's unique id, generated name,
             and the corresponding url in the S3 bucket.
     """
-    photo_name = file.filename
-    if photo_name is None:
+    if not (file.content_type or "").startswith("image/"):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="File does not have a filename",
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="File must be an image",
         )
 
+    photo_name = make_photo_name(file.filename)
     photo_url = upload_to_s3(file, photo_name)
-    with get_db() as db:
-        min_order = db.query(func.min(Photos.sort_order)).scalar()
-        new_order = (min_order - 1) if min_order is not None else 0
+    try:
+        with get_db() as db:
+            min_order = db.query(func.min(Photos.sort_order)).scalar()
+            new_order = (min_order - 1) if min_order is not None else 0
 
-        photo = Photos(name=photo_name, url=photo_url, sort_order=new_order)
-        db.add(photo)
-        db.commit()
-        db.refresh(photo)
-        return photo
+            photo = Photos(name=photo_name, url=photo_url, sort_order=new_order)
+            db.add(photo)
+            db.commit()
+            db.refresh(photo)
+            return photo
+    except Exception:
+        # The row wasn't saved, so remove the object rather than orphan it.
+        try:
+            delete_from_s3(photo_name)
+        except (ClientError, BotoCoreError):
+            logger.exception(f"Could not remove orphaned S3 object {photo_name}")
+        raise
 
 
 @router.put("/reorder", status_code=status.HTTP_200_OK)
@@ -87,22 +112,29 @@ def reorder_photos(
 
 @router.delete("/{photo_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_photo(
-    photo_id: str,
+    photo_id: UUID,
     _: None = Security(auth.verify),
 ) -> None:
     """
-    Deletes a photo's entry from the database using its unique id.
+    Deletes a photo's database entry, then its object in S3.
 
     :param photo_id: A unique identifier of a photo.
     """
     with get_db() as db:
-        photo = db.query(Photos).filter(Photos.id == photo_id)
-        photo_obj = photo.first()
-        if not photo_obj:
+        photo = db.get(Photos, photo_id)
+        if photo is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Photo does not exist",
             )
-        delete_from_s3(photo_obj.name)
-        photo.delete(synchronize_session=False)
+        photo_name = photo.name
+        db.delete(photo)
         db.commit()
+
+    # The row is gone, so the photo is deleted as far as the client is
+    # concerned. If S3 fails here, the leftover object is unreferenced and
+    # harmless, which beats a row pointing at a missing file.
+    try:
+        delete_from_s3(photo_name)
+    except (ClientError, BotoCoreError):
+        logger.exception(f"Deleted photo {photo_id} but not its S3 object {photo_name}")

@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     ROOT_PATH: str = "/api"
-    DEBUG: bool = True
+    DEBUG: bool = False
 
     DB_NAME: str
     DB_PASS: str
