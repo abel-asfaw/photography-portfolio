@@ -12,6 +12,8 @@
 }
 
 html {
+  /* Keeps the layout still when the viewer hides the scrollbar. */
+  scrollbar-gutter: stable;
   line-height: 1.5;
   font-family:
     ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
@@ -26,6 +28,11 @@ body {
 img,
 svg {
   display: block;
+}
+
+/* The viewer draws its own backdrop, which fades. */
+dialog::backdrop {
+  background: transparent;
 }
 
 /* The overlay's auto sizing depends on images never exceeding their box. */

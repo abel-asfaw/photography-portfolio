@@ -5,7 +5,7 @@ import { Route, Routes } from 'react-router-dom';
 import { queryClient } from '@/src/api/queryClient';
 import { Admin, withAuthGuard } from '@/src/components/Admin';
 import { PhotoList } from '@/src/components/Photos';
-import { Footer } from '@/src/components/ui';
+import { Footer, SiteHeader } from '@/src/components/ui';
 
 const ProtectedAdmin = withAuthGuard(Admin);
 
@@ -14,7 +14,16 @@ export default function App() {
     <div {...stylex.props(styles.app)}>
       <QueryClientProvider client={queryClient}>
         <Routes>
-          <Route index path="/" element={<PhotoList />} />
+          <Route
+            index
+            path="/"
+            element={
+              <>
+                <SiteHeader />
+                <PhotoList />
+              </>
+            }
+          />
           <Route path="/admin" element={<ProtectedAdmin />} />
         </Routes>
         <Footer />

@@ -1,6 +1,7 @@
 import type { Session } from '@supabase/supabase-js';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/src/api/supabase';
@@ -28,17 +29,18 @@ describe('withAuthGuard', () => {
   });
 
   it('shows a loading state until the session is known', () => {
-    render(<Protected />);
+    render(<Protected />, { wrapper: MemoryRouter });
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('shows the login form when signed out', () => {
     useSession.setState({ isLoading: false });
-    render(<Protected />);
+    render(<Protected />, { wrapper: MemoryRouter });
     expect(screen.queryByText('Secret admin page')).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /sign in/i }),
     ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Abel Asfaw' })).toBeVisible();
   });
 
   it('renders the wrapped component when signed in', () => {
@@ -56,7 +58,7 @@ describe('withAuthGuard', () => {
       },
     };
     useSession.setState({ session, isLoading: false });
-    render(<Protected />);
+    render(<Protected />, { wrapper: MemoryRouter });
     expect(screen.getByText('Secret admin page')).toBeInTheDocument();
   });
 
@@ -65,7 +67,7 @@ describe('withAuthGuard', () => {
       error: { message: 'Invalid login credentials' },
     });
     useSession.setState({ isLoading: false });
-    render(<Protected />);
+    render(<Protected />, { wrapper: MemoryRouter });
 
     await userEvent.type(screen.getByLabelText('Email'), 'me@example.com');
     await userEvent.type(screen.getByLabelText('Password'), 'hunter2');

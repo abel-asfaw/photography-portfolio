@@ -9,16 +9,8 @@ vi.mock('motion/react', () => ({
     div: ({
       onTap,
       children,
-      layoutId: _l,
-      whileHover: _w,
-      onLayoutAnimationComplete: _c,
       ...props
-    }: React.HTMLAttributes<HTMLDivElement> & {
-      onTap?: () => void;
-      layoutId?: string;
-      whileHover?: object;
-      onLayoutAnimationComplete?: () => void;
-    }) => (
+    }: React.HTMLAttributes<HTMLDivElement> & { onTap?: () => void }) => (
       <div onClick={onTap} {...props}>
         {children}
       </div>
@@ -27,7 +19,6 @@ vi.mock('motion/react', () => ({
 }));
 
 const defaultProps = {
-  photoId: '1234',
   photoName: 'photo.jpg',
 };
 
@@ -79,7 +70,7 @@ describe('PhotoView', () => {
     const onDelete = vi.fn().mockResolvedValue(undefined);
     render(<PhotoView {...defaultProps} onDelete={onDelete} />);
 
-    fireEvent.mouseEnter(tile());
+    fireEvent.pointerEnter(tile());
     const visibleClasses = tile().className;
     fireEvent.click(screen.getByRole('button', { name: 'Delete photo' }));
     expect(tile().className).not.toBe(visibleClasses);
@@ -98,7 +89,7 @@ describe('PhotoView', () => {
     const onDelete = vi.fn().mockRejectedValue(new Error('403'));
     render(<PhotoView {...defaultProps} onDelete={onDelete} />);
 
-    fireEvent.mouseEnter(tile());
+    fireEvent.pointerEnter(tile());
     const visibleClasses = tile().className;
     fireEvent.click(screen.getByRole('button', { name: 'Delete photo' }));
     await act(() => vi.advanceTimersByTimeAsync(200));

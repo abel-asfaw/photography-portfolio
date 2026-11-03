@@ -10,4 +10,5 @@ vi.mock('@imagekit/react', () => ({
     ...props
   }: ComponentProps<'img'> & { urlEndpoint?: string }) =>
     createElement('img', props),
+  buildSrc: ({ src }: { src: string }) => src,
 }));

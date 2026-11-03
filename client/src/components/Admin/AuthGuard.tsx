@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { useSession } from '@/src/api/supabase';
+import { SiteHeader } from '@/src/components/ui';
 import { colors } from '@/src/styles/tokens.stylex';
 
 import { LoginForm } from './LoginForm';
@@ -21,7 +22,14 @@ export function withAuthGuard<P extends object>(
       return <div {...stylex.props(styles.loading)}>Loading...</div>;
     }
 
-    if (!session) return <LoginForm />;
+    if (!session) {
+      return (
+        <>
+          <SiteHeader label="Admin" />
+          <LoginForm />
+        </>
+      );
+    }
 
     return <Component {...props} />;
   };

@@ -4,6 +4,8 @@ export const colors = stylex.defineVars({
   textLight: '#e5e5e5',
   textMuted: '#737373',
   textDim: '#9ca3af',
+  textSubtle: '#a1a1a6',
+  textCaption: '#8a8a8f',
   surface: '#27272a',
   light: '#f9fafb',
   lightHover: '#d1d5db',
@@ -23,4 +25,5 @@ export const radii = stylex.defineVars({
 
 export const breakpoints = stylex.defineConsts({
   sm: '@media (min-width: 40rem)',
+  lg: '@media (min-width: 64rem)',
 });

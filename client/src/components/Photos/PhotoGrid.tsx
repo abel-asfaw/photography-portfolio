@@ -9,13 +9,15 @@ interface PhotoGridProps extends PropsWithChildren {
   isLoading: boolean;
   isError: boolean;
   stretch?: boolean;
+  /** Tighter padding for a full-width masonry layout. */
+  masonry?: boolean;
 }
 
 const statusMessage = ({
   photos,
   isLoading,
   isError,
-}: Omit<PhotoGridProps, 'stretch' | 'children'>) => {
+}: Omit<PhotoGridProps, 'stretch' | 'masonry' | 'children'>) => {
   if (photos) return photos.length > 0 ? null : 'No photos to display...';
   if (isLoading) return 'Loading...';
   if (isError) return 'Failed to load photos. Please try again.';
@@ -28,11 +30,18 @@ const statusMessage = ({
  */
 export function PhotoGrid({
   stretch = false,
+  masonry = false,
   children,
   ...status
 }: PhotoGridProps) {
   return (
-    <div {...stylex.props(styles.grid, stretch && styles.stretch)}>
+    <div
+      {...stylex.props(
+        styles.grid,
+        stretch && styles.stretch,
+        masonry && styles.masonry,
+      )}
+    >
       {statusMessage(status) ?? children}
     </div>
   );
@@ -53,5 +62,10 @@ const styles = stylex.create({
   },
   stretch: {
     alignItems: 'stretch',
+  },
+  masonry: {
+    alignItems: 'flex-start',
+    paddingInline: { default: '0.75rem', [breakpoints.sm]: '3rem' },
+    paddingTop: { default: '0.5rem', [breakpoints.sm]: '1rem' },
   },
 });

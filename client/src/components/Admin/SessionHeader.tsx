@@ -3,9 +3,10 @@ import { LogOut } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 
 import { supabase } from '@/src/api/supabase';
-import { Button } from '@/src/components/ui';
+import { SiteHeader } from '@/src/components/ui';
 import { colors } from '@/src/styles/tokens.stylex';
 
+/** The site header, labelled for the admin page, with a sign-out action. */
 export function SessionHeader() {
   const navigate = useNavigate();
 
@@ -19,30 +20,35 @@ export function SessionHeader() {
   };
 
   return (
-    <div {...stylex.props(styles.header)}>
-      <Button
-        xstyle={styles.signOut}
-        aria-label="Sign out"
-        danger
+    <SiteHeader label="Admin">
+      <button
+        type="button"
         onClick={handleLogout}
+        {...stylex.props(styles.signOut)}
       >
-        <LogOut size={16} />
-      </Button>
-    </div>
+        <LogOut size={16} aria-hidden />
+        Sign out
+      </button>
+    </SiteHeader>
   );
 }
 
 const styles = stylex.create({
-  header: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    padding: '0.75rem',
-    borderBottomWidth: '1px',
-    borderBottomStyle: 'solid',
-    borderBottomColor: colors.surface,
-  },
   signOut: {
-    color: colors.white,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    height: '2.75rem',
+    paddingInline: '0.75rem',
+    borderRadius: 9999,
+    fontSize: '0.875rem',
     cursor: 'pointer',
+    color: { default: colors.textSubtle, ':hover': colors.white },
+    backgroundColor: {
+      default: 'transparent',
+      ':hover': 'rgb(255 255 255 / 0.06)',
+    },
+    transitionProperty: 'color, background-color',
+    transitionDuration: '200ms',
   },
 });

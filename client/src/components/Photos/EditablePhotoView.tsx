@@ -49,11 +49,7 @@ export function EditablePhotoView({
       {...attributes}
       {...listeners}
     >
-      <PhotoView
-        photoId={photoId}
-        photoName={photoName}
-        onDelete={() => deletePhoto(photoId)}
-      />
+      <PhotoView photoName={photoName} onDelete={() => deletePhoto(photoId)} />
     </div>
   );
 }
