@@ -69,16 +69,17 @@ Client (port 3000) and API (port 4000) are behind an Nginx reverse proxy (port 3
 
 ### Backend (api/src/)
 
-- **main.py** - FastAPI app init, CORS config, router mounting
+- **main.py** - FastAPI app init, exception handlers, CORS (origins from `CORS_ORIGINS`), router mounting, `GET /healthz`
 - **config.py** - Pydantic `BaseSettings` loading from `.env`
-- **database.py** - SQLAlchemy engine, session factory, `get_db()` context manager
-- **models.py** - Single `Photo` model (UUID id, name, url, created_at)
+- **database.py** - SQLAlchemy engine, session factory, and the `get_db` dependency (use the `DbSession` annotation in routes)
+- **models.py** - Single `Photos` model (UUID id, name, url, sort_order, created_at)
 - **schemas.py** - Pydantic request/response schemas
-- **utils.py** - `VerifyToken` (Supabase Auth JWT validation via ES256/JWKS, plus a check that `sub` equals `ADMIN_USER_ID`), S3 upload/delete helpers
-- **exceptions.py** - S3 exception context manager
-- **routers/photos.py** - All endpoints: `GET /photos` (public), `POST /photos` (auth), `DELETE /photos/{id}` (auth), `GET /healthz`
+- **auth.py** - `require_admin` dependency: Supabase Auth JWT validation via ES256/JWKS, plus a check that `sub` equals `ADMIN_USER_ID`
+- **storage.py** - S3 upload/delete helpers
+- **exceptions.py** - App-level handlers that turn SQLAlchemy and S3 errors into JSON responses; routes don't catch these themselves
+- **routers/photos.py** - `GET /photos` (public), `POST /photos`, `PUT /photos/reorder`, `DELETE /photos/{id}` (admin). Uploads are stored under a generated key, which is the photo's `name`
 
-Auth is enforced via FastAPI `Security()` dependency using `VerifyToken`.
+Admin routes declare `dependencies=[Depends(require_admin)]`. Tests override `get_db` and `require_admin` through `app.dependency_overrides`.
 
 ### Frontend (client/src/)
 

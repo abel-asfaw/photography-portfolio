@@ -6,6 +6,11 @@ class Settings(BaseSettings):
 
     ROOT_PATH: str = "/api"
     DEBUG: bool = False
+    # Set as a JSON list in the environment, e.g. CORS_ORIGINS='["https://..."]'.
+    CORS_ORIGINS: list[str] = [
+        "https://photography.abelasfaw.com",
+        "http://localhost:3005",
+    ]
 
     DB_NAME: str
     DB_PASS: str

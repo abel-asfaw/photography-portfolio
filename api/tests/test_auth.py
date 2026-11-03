@@ -4,12 +4,12 @@ from types import SimpleNamespace
 import jwt
 import pytest
 from cryptography.hazmat.primitives.asymmetric import ec
-from fastapi import FastAPI, Security
+from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 from jwt.exceptions import PyJWKClientConnectionError
 
+from src import auth
 from src.config import settings
-from src.utils import VerifyToken
 
 ISSUER = "https://example.supabase.co/auth/v1"
 ADMIN_ID = settings.ADMIN_USER_ID
@@ -46,17 +46,16 @@ def make_token(key=SIGNING_KEY, algorithm="ES256", **overrides):
 @pytest.fixture
 def jwks(monkeypatch):
     fake = FakeJWKClient()
-    monkeypatch.setattr(VerifyToken, "jwks_client", fake)
+    monkeypatch.setattr(auth, "jwks_client", fake)
     return fake
 
 
 @pytest.fixture
 def client(jwks):
-    auth = VerifyToken()
     app = FastAPI()
 
-    @app.post("/protected")
-    def protected(_: None = Security(auth.verify)):
+    @app.post("/protected", dependencies=[Depends(auth.require_admin)])
+    def protected():
         return {"ok": True}
 
     return TestClient(app)
@@ -67,9 +66,9 @@ def post(client, token):
 
 
 def test_derives_supabase_endpoints_from_project_url():
-    assert VerifyToken.issuer == ISSUER
-    assert VerifyToken.audience == "authenticated"
-    assert VerifyToken.algorithms == ["ES256"]
+    assert auth.ISSUER == ISSUER
+    assert auth.AUDIENCE == "authenticated"
+    assert auth.ALGORITHMS == ["ES256"]
 
 
 def test_accepts_admin_token(client):

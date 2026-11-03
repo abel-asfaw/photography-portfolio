@@ -1,6 +1,9 @@
-from contextlib import contextmanager
+from collections.abc import Iterator
+from typing import Annotated
+
+from fastapi import Depends
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import Session, sessionmaker, declarative_base
 
 from src.config import settings
 
@@ -18,10 +21,9 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-@contextmanager
-def get_db():
+def get_db() -> Iterator[Session]:
     """
-    Provides a database session for handling database operations.
+    FastAPI dependency that provides a database session for one request.
 
     Errors propagate unchanged; the app's exception handlers turn database
     errors into responses (see src/exceptions.py). Closing the session rolls
@@ -34,3 +36,6 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+DbSession = Annotated[Session, Depends(get_db)]

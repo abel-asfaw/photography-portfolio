@@ -6,7 +6,8 @@ from botocore.exceptions import EndpointConnectionError
 from fastapi.testclient import TestClient
 from sqlalchemy.exc import IntegrityError, OperationalError
 
-from src import database
+from src.auth import require_admin
+from src.database import get_db
 from src.main import app
 from src.routers import photos
 
@@ -14,10 +15,8 @@ PHOTO_ID = "6f1c2d3e-4b5a-4c6d-8e7f-901234567890"
 
 
 @pytest.fixture
-def db(monkeypatch):
-    session = MagicMock()
-    monkeypatch.setattr(database, "SessionLocal", lambda: session)
-    return session
+def db():
+    return MagicMock()
 
 
 @pytest.fixture
@@ -31,7 +30,8 @@ def s3(monkeypatch):
 
 @pytest.fixture
 def client(db, s3):
-    app.dependency_overrides[photos.auth.verify] = lambda: None
+    app.dependency_overrides[get_db] = lambda: db
+    app.dependency_overrides[require_admin] = lambda: None
     yield TestClient(app)
     app.dependency_overrides.clear()
 
@@ -118,3 +118,18 @@ def test_database_outage_returns_503(client, db):
 
     assert response.status_code == 503
     assert response.json() == {"detail": "Database is unavailable"}
+
+
+@pytest.mark.parametrize(
+    "method, path",
+    [("post", "/photos"), ("put", "/photos/reorder"), ("delete", f"/photos/{PHOTO_ID}")],
+)
+def test_admin_routes_require_a_token(db, s3, method, path):
+    app.dependency_overrides[get_db] = lambda: db
+    try:
+        response = TestClient(app).request(method, path)
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code in (401, 403)
+    db.commit.assert_not_called()
