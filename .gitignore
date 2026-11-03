@@ -10,6 +10,8 @@ api/bin/
 api/include/
 api/lib/
 api/pyvenv.cfg
+api/.venv/
+api/.pytest_cache/
 api/*.log
 api/server-env/*
 

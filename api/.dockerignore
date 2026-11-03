@@ -1,11 +1,17 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+.pytest_cache/
 
 # Virtual environment
+.venv/
 bin/
 include/
 lib/
 pyvenv.cfg
+
+# Secrets and local config
+.env
+.config
 
 # Logs
 *.log

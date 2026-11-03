@@ -36,9 +36,14 @@ The client uses Bun as its package manager (`bun.lock`; there is no `package-loc
 
 ```bash
 cd api
-pip install -r requirements.txt
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements-dev.txt
 uvicorn src.main:app --reload --host 0.0.0.0 --port 4000
+alembic upgrade head  # Apply migrations
+alembic check         # Verify the models match the database schema
 ```
+
+`requirements.txt` lists only the runtime dependencies the app imports directly; `requirements-dev.txt` adds the test tools. The Dockerfile installs runtime dependencies and runs uvicorn without `--reload`; `docker-compose.yaml` builds the dev container with `requirements-dev.txt` and adds `--reload`.
 
 ### Backend tests
 
@@ -47,7 +52,10 @@ cd api
 pytest                        # Run all tests
 pytest tests/test_auth.py     # Run a specific test file
 pytest tests/test_auth.py -k "test_name"  # Run a single test
+docker compose exec api python -m pytest  # Run inside the running container
 ```
+
+Route tests in `tests/test_photos.py` override `get_db` and `require_admin` and stub the S3 helpers, so they need no database or AWS access.
 
 ### Linting and formatting (frontend)
 
