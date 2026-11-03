@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Photography portfolio web app: React + TypeScript frontend, FastAPI backend, PostgreSQL database, AWS S3 for photo storage, Auth0 for authentication, and ImageKit for image optimization. All services run via Docker Compose behind an Nginx reverse proxy.
+Photography portfolio web app: React + TypeScript frontend, FastAPI backend, PostgreSQL database, AWS S3 for photo storage, Supabase Auth for the admin login, and ImageKit for image optimization. All services run via Docker Compose behind an Nginx reverse proxy.
 
 ## Development Commands
 
@@ -45,8 +45,8 @@ uvicorn src.main:app --reload --host 0.0.0.0 --port 4000
 ```bash
 cd api
 pytest                        # Run all tests
-pytest tests/test_main.py     # Run a specific test file
-pytest tests/test_main.py -k "test_name"  # Run a single test
+pytest tests/test_auth.py     # Run a specific test file
+pytest tests/test_auth.py -k "test_name"  # Run a single test
 ```
 
 ### Linting and formatting (frontend)
@@ -74,7 +74,7 @@ Client (port 3000) and API (port 4000) are behind an Nginx reverse proxy (port 3
 - **database.py** - SQLAlchemy engine, session factory, `get_db()` context manager
 - **models.py** - Single `Photo` model (UUID id, name, url, created_at)
 - **schemas.py** - Pydantic request/response schemas
-- **utils.py** - `VerifyToken` (Auth0 JWT validation via RS256/JWKS), S3 upload/delete helpers
+- **utils.py** - `VerifyToken` (Supabase Auth JWT validation via ES256/JWKS, plus a check that `sub` equals `ADMIN_USER_ID`), S3 upload/delete helpers
 - **exceptions.py** - S3 exception context manager
 - **routers/photos.py** - All endpoints: `GET /photos` (public), `POST /photos` (auth), `DELETE /photos/{id}` (auth), `GET /healthz`
 
@@ -82,15 +82,15 @@ Auth is enforced via FastAPI `Security()` dependency using `VerifyToken`.
 
 ### Frontend (client/src/)
 
-- **api/apiClient.ts** - Axios instance with interceptor that injects Auth0 JWT on POST/DELETE
-- **api/authToken.ts** - Singleton managing the `getAccessTokenSilently` function from Auth0
+- **api/apiClient.ts** - Axios instance with interceptor that injects the Supabase access token on non-GET requests
+- **api/supabase.ts** - The Supabase client and `useSession`, a zustand store mirroring the auth session
 - **api/services/photos.api.ts** - API call functions (fetch, upload, delete)
-- **api/services/photos.query.ts** - React Query hooks (`useFetchPhotos`, `useUploadPhotos`, `useDeletePhoto`) with 1-hour stale time
+- **api/services/photos.query.ts** - React Query hooks (`useFetchPhotos`, `useUploadPhotos`, `useDeletePhoto`, `useReorderPhotos`) with 1-hour stale time; reorder writes the new order to the cache optimistically and rolls back on error
 - **api/schemas/photos.schema.ts** - Zod schemas for API responses
 - **api/queryClient.ts** - The shared React Query client
-- **components/** - React components; `withAuthGuard` wraps protected route components, `Admin` is the authenticated management page
+- **components/** - React components; `withAuthGuard` wraps protected route components and shows `LoginForm` (email + password) when signed out. `PhotoList` is the public read-only gallery; `PhotoManager` is the admin editor (uploader plus drag-to-reorder and delete via `EditablePhotoView`, which keeps a local copy of the order so dragging stays smooth). `PhotoGrid` owns the loading, error and empty states for both. Only `PhotoList` and `PhotoManager` are exported from `components/Photos`. `Admin` is `SessionHeader` + `PhotoManager`
 
-Routes: `/` (public gallery), `/admin` (protected, requires Auth0 login).
+Routes: `/` (public gallery), `/admin` (protected, requires Supabase login).
 
 Import alias: `@/*` maps to the `client/` root, so imports look like `@/src/components/ui`.
 
@@ -100,4 +100,4 @@ Single `photos` table in PostgreSQL 17. Columns: `id` (UUID, server-generated), 
 
 ### Environment
 
-All services share root `.env`. Backend uses Pydantic Settings; frontend uses `VITE_`-prefixed vars via `import.meta.env`. Required env vars cover: AWS S3 credentials, PostgreSQL connection, Auth0 config (both frontend and backend), ImageKit URL, and API base URL.
+All services share root `.env`. Backend uses Pydantic Settings; frontend uses `VITE_`-prefixed vars via `import.meta.env`. Required env vars cover: AWS S3 credentials, PostgreSQL connection (Supabase session pooler in production), Supabase Auth config (`SUPABASE_URL` and `ADMIN_USER_ID` for the API, `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` for the client), ImageKit URL, and API base URL.

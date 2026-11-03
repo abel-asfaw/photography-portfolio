@@ -1,157 +1,31 @@
-import {
-  DndContext,
-  DragEndEvent,
-  PointerSensor,
-  TouchSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import { restrictToParentElement } from '@dnd-kit/modifiers';
-import {
-  SortableContext,
-  arrayMove,
-  rectSortingStrategy,
-} from '@dnd-kit/sortable';
 import { AnimatePresence } from 'motion/react';
-import { PropsWithChildren, useState } from 'react';
+import { useState } from 'react';
 
 import { Photo } from '@/src/api/schemas/photos.schema';
-import {
-  useFetchPhotos,
-  useReorderPhotos,
-} from '@/src/api/services/photos.query';
+import { useFetchPhotos } from '@/src/api/services/photos.query';
 
+import { PhotoGrid } from './PhotoGrid';
 import { PhotoOverlay } from './PhotoOverlay';
 import { PhotoView } from './PhotoView';
-import { SortablePhotoView } from './SortablePhotoView';
 
-function PhotosListWrapper({ children }: PropsWithChildren) {
-  return (
-    <div className="flex grow flex-wrap items-center justify-center gap-12 px-10 pt-10 pb-2 text-neutral-200 sm:gap-16 sm:px-20 sm:pt-20 sm:pb-12">
-      {children}
-    </div>
-  );
-}
-
-interface PhotoListProps {
-  isAuthenticated?: boolean;
-}
-
-export function PhotoList({ isAuthenticated = false }: PhotoListProps) {
+/** The public, read-only gallery. Tapping a photo opens it full size. */
+export function PhotoList() {
   const { data: photos, isLoading, isError } = useFetchPhotos();
-  const { mutate: reorder } = useReorderPhotos();
-  const [localPhotos, setLocalPhotos] = useState<Photo[]>(photos ?? []);
-  const [syncedPhotos, setSyncedPhotos] = useState(photos);
-  const [selectedPhoto, setSelectedPhoto] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
-
-  // Re-seed the optimistic local order whenever the server list changes.
-  // Done during render rather than in an effect so there is no extra
-  // commit showing stale order in between.
-  if (photos && photos !== syncedPhotos) {
-    setSyncedPhotos(photos);
-    setLocalPhotos(photos);
-  }
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 200, tolerance: 5 },
-    }),
-  );
-
-  if (!photos) {
-    return (
-      <PhotosListWrapper>
-        {isLoading
-          ? 'Loading...'
-          : isError
-            ? 'Failed to load photos. Please try again.'
-            : ''}
-      </PhotosListWrapper>
-    );
-  }
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = localPhotos.findIndex(p => p.id === active.id);
-    const newIndex = localPhotos.findIndex(p => p.id === over.id);
-    if (oldIndex === -1 || newIndex === -1) return;
-
-    const newOrder = arrayMove(localPhotos, oldIndex, newIndex);
-    setLocalPhotos(newOrder);
-    reorder(newOrder.map(p => p.id));
-  };
-
-  if (isAuthenticated) {
-    return (
-      <>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToParentElement]}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="flex grow flex-wrap items-stretch justify-center gap-12 px-10 pt-10 pb-2 text-neutral-200 sm:gap-16 sm:px-20 sm:pt-20 sm:pb-12">
-            {localPhotos.length > 0 ? (
-              <SortableContext
-                items={localPhotos.map(p => p.id)}
-                strategy={rectSortingStrategy}
-              >
-                {localPhotos.map(({ id, name }) => (
-                  <SortablePhotoView
-                    key={id}
-                    photoId={id}
-                    photoName={name}
-                    onSelect={(photoId, photoName) =>
-                      setSelectedPhoto({ id: photoId, name: photoName })
-                    }
-                  />
-                ))}
-              </SortableContext>
-            ) : (
-              'No photos to display...'
-            )}
-          </div>
-        </DndContext>
-        <AnimatePresence>
-          {selectedPhoto && (
-            <PhotoOverlay
-              photoId={selectedPhoto.id}
-              photoName={selectedPhoto.name}
-              onClose={() => setSelectedPhoto(null)}
-            />
-          )}
-        </AnimatePresence>
-      </>
-    );
-  }
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   return (
     <>
-      <PhotosListWrapper>
-        {photos.length > 0
-          ? photos.map(({ id, name }) => (
-              <PhotoView
-                key={id}
-                photoName={name}
-                photoId={id}
-                canDelete={false}
-                isSelected={selectedPhoto?.id === id}
-                onSelect={(photoId, photoName) =>
-                  setSelectedPhoto({ id: photoId, name: photoName })
-                }
-              />
-            ))
-          : 'No photos to display...'}
-      </PhotosListWrapper>
+      <PhotoGrid photos={photos} isLoading={isLoading} isError={isError}>
+        {photos?.map(photo => (
+          <PhotoView
+            key={photo.id}
+            photoId={photo.id}
+            photoName={photo.name}
+            isSelected={selectedPhoto?.id === photo.id}
+            onSelect={() => setSelectedPhoto(photo)}
+          />
+        ))}
+      </PhotoGrid>
       <AnimatePresence>
         {selectedPhoto && (
           <PhotoOverlay

@@ -1,18 +1,29 @@
-import { withAuthenticationRequired } from '@auth0/auth0-react';
+import { useSession } from '@/src/api/supabase';
+
+import { LoginForm } from './LoginForm';
 
 /**
- * Wraps a component so it only renders for an authenticated user,
- * redirecting to Auth0 login otherwise. Apply at module scope so the
- * protected component is created once, not on every render.
+ * Wraps a component so it only renders for a signed-in user, showing the
+ * login form otherwise. Apply at module scope so the protected component
+ * is created once, not on every render.
  */
 export function withAuthGuard<P extends object>(
-  component: React.ComponentType<P>,
+  Component: React.ComponentType<P>,
 ) {
-  return withAuthenticationRequired(component, {
-    onRedirecting: () => (
-      <div className="flex grow items-center justify-center text-neutral-200">
-        Loading...
-      </div>
-    ),
-  });
+  return function AuthGuard(props: P) {
+    const session = useSession(state => state.session);
+    const isLoading = useSession(state => state.isLoading);
+
+    if (isLoading) {
+      return (
+        <div className="flex grow items-center justify-center text-neutral-200">
+          Loading...
+        </div>
+      );
+    }
+
+    if (!session) return <LoginForm />;
+
+    return <Component {...props} />;
+  };
 }

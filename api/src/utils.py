@@ -1,7 +1,11 @@
 from dataclasses import dataclass
 from fastapi import Depends, UploadFile, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jwt.exceptions import ExpiredSignatureError, InvalidKeyError, InvalidAlgorithmError
+from jwt.exceptions import (
+    ExpiredSignatureError,
+    PyJWKClientConnectionError,
+    PyJWTError,
+)
 from loguru import logger
 import boto3
 import jwt
@@ -20,11 +24,13 @@ S3_RESOURCE = boto3.resource(
 @dataclass
 class VerifyToken:
     """
-    Verifies the JWT token.
+    Verifies a Supabase Auth JWT and checks that it belongs to the admin user.
     """
 
-    jwks_url = f"https://{settings.DOMAIN}/.well-known/jwks.json"
-    jwks_client = jwt.PyJWKClient(jwks_url)
+    issuer = f"{settings.SUPABASE_URL.rstrip('/')}/auth/v1"
+    audience = "authenticated"
+    algorithms = ["ES256"]
+    jwks_client = jwt.PyJWKClient(f"{issuer}/.well-known/jwks.json")
 
     def verify(
         self, token: HTTPAuthorizationCredentials = Depends(HTTPBearer())
@@ -34,20 +40,27 @@ class VerifyToken:
             signing_key = self.jwks_client.get_signing_key_from_jwt(
                 token.credentials
             ).key
-            _ = jwt.decode(
+            claims = jwt.decode(
                 token.credentials,
                 signing_key,
-                algorithms=[settings.ALGORITHMS],
-                audience=settings.API_AUDIENCE,
-                issuer=settings.ISSUER,
+                algorithms=self.algorithms,
+                audience=self.audience,
+                issuer=self.issuer,
+                options={"require": ["exp", "sub"]},
             )
         except ExpiredSignatureError as e:
             logger.error(f"Token is expired: {e}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail=error_detail
             ) from e
-        except (InvalidKeyError, InvalidAlgorithmError) as e:
-            logger.error(f"Token has invalid key or algorithm: {e}")
+        except PyJWKClientConnectionError as e:
+            logger.error(f"Could not fetch JWKS: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Unable to verify token",
+            ) from e
+        except PyJWTError as e:
+            logger.error(f"Token is invalid: {e}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail=error_detail
             ) from e
@@ -57,6 +70,12 @@ class VerifyToken:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Unexpected token handling error",
             ) from e
+
+        if claims["sub"] != settings.ADMIN_USER_ID:
+            logger.warning(f"Rejected token for non-admin user {claims['sub']}")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+            )
 
 
 def upload_to_s3(file: UploadFile, photo_name: str) -> str:
