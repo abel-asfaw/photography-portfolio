@@ -71,9 +71,9 @@ Client (port 3000) and API (port 4000) are behind an Nginx reverse proxy (port 3
 
 - **main.py** - FastAPI app init, exception handlers, CORS (origins from `CORS_ORIGINS`), router mounting, `GET /healthz`
 - **config.py** - Pydantic `BaseSettings` loading from `.env`
-- **database.py** - SQLAlchemy engine, session factory, and the `get_db` dependency (use the `DbSession` annotation in routes)
-- **models.py** - Single `Photos` model (UUID id, name, url, sort_order, created_at)
-- **schemas.py** - Pydantic request/response schemas
+- **database.py** - SQLAlchemy 2.0 engine (`pool_pre_ping` for the Supabase pooler), session factory, `Base`, and the `get_db` dependency (use the `DbSession` annotation in routes). Queries use `select()`, not the legacy `db.query()`
+- **models.py** - Single `Photo` ORM model (UUID id, name, url, sort_order, created_at)
+- **schemas.py** - Pydantic request/response schemas (`PhotoResponse`, `ReorderRequest`)
 - **auth.py** - `require_admin` dependency: Supabase Auth JWT validation via ES256/JWKS, plus a check that `sub` equals `ADMIN_USER_ID`
 - **storage.py** - S3 upload/delete helpers
 - **exceptions.py** - App-level handlers that turn SQLAlchemy and S3 errors into JSON responses; routes don't catch these themselves
@@ -97,7 +97,7 @@ Import alias: `@/*` maps to the `client/` root, so imports look like `@/src/comp
 
 ### Database
 
-Single `photos` table in PostgreSQL 17. Columns: `id` (UUID, server-generated), `name` (unique text), `url` (unique text), `created_at` (timestamptz). Alembic is installed for migrations.
+Single `photos` table in PostgreSQL 17. Columns: `id` (UUID, server-generated), `name` (unique text), `url` (unique text), `sort_order` (int), `created_at` (timestamptz). Row level security is enabled with no policies, so the Supabase Data API can't reach it; the API connects as the table owner. Migrations are managed with Alembic (`alembic upgrade head` in `api/`), which reads its URL from `src.database`; `alembic check` confirms the models match the schema.
 
 ### Environment
 

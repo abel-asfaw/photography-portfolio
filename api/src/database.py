@@ -2,23 +2,31 @@ from collections.abc import Iterator
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker, declarative_base
+from sqlalchemy import URL, create_engine
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from src.config import settings
 
 
-SQLALCHEMY_DATABASE_URL = (
-    f"postgresql://{settings.DB_USER}:"
-    f"{settings.DB_PASS}@"
-    f"{settings.DB_HOST}/"
-    f"{settings.DB_NAME}"
+# URL.create escapes the credentials, so a password with characters like
+# "@" or "/" still produces a valid URL.
+DATABASE_URL = URL.create(
+    "postgresql+psycopg2",
+    username=settings.DB_USER,
+    password=settings.DB_PASS,
+    host=settings.DB_HOST,
+    port=settings.DB_PORT,
+    database=settings.DB_NAME,
 )
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# The Supabase pooler closes idle connections, so check each one before use
+# rather than failing the first request after a quiet period.
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+SessionLocal = sessionmaker(bind=engine, autoflush=False)
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 
 def get_db() -> Iterator[Session]:

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     DB_PASS: str
     DB_USER: str
     DB_HOST: str
+    DB_PORT: int = 5432
 
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str

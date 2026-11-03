@@ -1,9 +1,9 @@
 from pydantic import BaseModel, ConfigDict, UUID4
 
 
-class Photo(BaseModel):
+class PhotoResponse(BaseModel):
     """
-    Photo schema
+    A photo as returned by the API.
     """
 
     model_config = ConfigDict(from_attributes=True)

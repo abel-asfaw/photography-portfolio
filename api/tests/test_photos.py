@@ -42,7 +42,7 @@ def upload(client, filename="IMG_001.JPG", content_type="image/jpeg"):
 
 @pytest.fixture
 def saved_photo(db):
-    db.query.return_value.scalar.return_value = None
+    db.scalar.return_value = None
     db.refresh.side_effect = lambda photo: setattr(photo, "id", uuid4())
 
 
@@ -103,8 +103,21 @@ def test_delete_succeeds_when_only_s3_cleanup_fails(client, db, s3):
     assert client.delete(f"/photos/{PHOTO_ID}").status_code == 204
 
 
+def test_reorder_sets_sort_order_from_list_position(client, db):
+    first, second = MagicMock(id=uuid4()), MagicMock(id=uuid4())
+    db.scalars.return_value.all.return_value = [first, second]
+
+    response = client.put(
+        "/photos/reorder", json={"photo_ids": [str(second.id), str(first.id)]}
+    )
+
+    assert response.status_code == 200
+    assert (second.sort_order, first.sort_order) == (0, 1)
+    db.commit.assert_called_once()
+
+
 def test_reorder_with_unknown_id_returns_400(client, db):
-    db.query.return_value.filter.return_value.all.return_value = []
+    db.scalars.return_value.all.return_value = []
 
     response = client.put("/photos/reorder", json={"photo_ids": [PHOTO_ID]})
 
@@ -112,7 +125,7 @@ def test_reorder_with_unknown_id_returns_400(client, db):
 
 
 def test_database_outage_returns_503(client, db):
-    db.query.side_effect = OperationalError("SELECT", {}, Exception("down"))
+    db.scalars.side_effect = OperationalError("SELECT", {}, Exception("down"))
 
     response = client.get("/photos")
 

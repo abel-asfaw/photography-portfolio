@@ -5,12 +5,12 @@ from uuid import UUID, uuid4
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter, Depends, UploadFile, HTTPException, status
 from loguru import logger
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 from src.auth import require_admin
 from src.database import DbSession
-from src.models import Photos
-from src.schemas import Photo, ReorderRequest
+from src.models import Photo
+from src.schemas import PhotoResponse, ReorderRequest
 from src.storage import delete_from_s3, upload_to_s3
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
@@ -30,20 +30,20 @@ def make_photo_name(filename: str | None) -> str:
     return f"{uuid4().hex}{suffix}"
 
 
-@router.get("", response_model=list[Photo])
+@router.get("", response_model=list[PhotoResponse])
 def get_photos(db: DbSession) -> list[Any]:
     """
     Fetches all photo entries from the database.
 
-    :return: A list of Photo objects.
+    :return: The photos in display order.
     """
-    return db.query(Photos).order_by(Photos.sort_order).all()
+    return db.scalars(select(Photo).order_by(Photo.sort_order)).all()
 
 
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
-    response_model=Photo,
+    response_model=PhotoResponse,
     dependencies=admin_only,
 )
 def add_photo(file: UploadFile, db: DbSession) -> Any:
@@ -51,7 +51,7 @@ def add_photo(file: UploadFile, db: DbSession) -> Any:
     Uploads a photo to an S3 bucket and records its details in the database.
 
     :param file: The photo to be uploaded.
-    :return: A Photo instance with the photo's unique id, generated name,
+    :return: The new photo with the photo's unique id, generated name,
             and the corresponding url in the S3 bucket.
     """
     if not (file.content_type or "").startswith("image/"):
@@ -63,10 +63,10 @@ def add_photo(file: UploadFile, db: DbSession) -> Any:
     photo_name = make_photo_name(file.filename)
     photo_url = upload_to_s3(file, photo_name)
     try:
-        min_order = db.query(func.min(Photos.sort_order)).scalar()
+        min_order = db.scalar(select(func.min(Photo.sort_order)))
         new_order = (min_order - 1) if min_order is not None else 0
 
-        photo = Photos(name=photo_name, url=photo_url, sort_order=new_order)
+        photo = Photo(name=photo_name, url=photo_url, sort_order=new_order)
         db.add(photo)
         db.commit()
         db.refresh(photo)
@@ -86,18 +86,16 @@ def reorder_photos(body: ReorderRequest, db: DbSession) -> None:
     Reorders photos based on the provided list of photo IDs.
     Each photo's sort_order is set to its index in the list.
     """
-    photo_ids = [str(pid) for pid in body.photo_ids]
-
-    existing = db.query(Photos).filter(Photos.id.in_(photo_ids)).all()
-    if len(existing) != len(photo_ids):
+    existing = db.scalars(select(Photo).where(Photo.id.in_(body.photo_ids))).all()
+    if len(existing) != len(body.photo_ids):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="One or more photo IDs do not exist",
         )
 
-    id_to_photo = {str(p.id): p for p in existing}
-    for index, pid in enumerate(photo_ids):
-        id_to_photo[pid].sort_order = index
+    id_to_photo = {photo.id: photo for photo in existing}
+    for index, photo_id in enumerate(body.photo_ids):
+        id_to_photo[photo_id].sort_order = index
 
     db.commit()
 
@@ -111,7 +109,7 @@ def delete_photo(photo_id: UUID, db: DbSession) -> None:
 
     :param photo_id: A unique identifier of a photo.
     """
-    photo = db.get(Photos, photo_id)
+    photo = db.get(Photo, photo_id)
     if photo is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

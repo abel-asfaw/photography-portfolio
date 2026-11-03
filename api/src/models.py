@@ -1,25 +1,25 @@
 from datetime import datetime
-from sqlalchemy import Integer, UUID, TIMESTAMP, Text, text
+from uuid import UUID
+
+from sqlalchemy import TIMESTAMP, Integer, Text, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.database import Base
 
 
-class Photos(Base):
+class Photo(Base):
     """
     Represents the photos table in the database.
     """
 
     __tablename__ = "photos"
 
-    id: Mapped[str] = mapped_column(
-        UUID, primary_key=True, nullable=False, server_default=text("gen_random_uuid()")
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, server_default=text("gen_random_uuid()")
     )
-    name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
-    url: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
-    sort_order: Mapped[int] = mapped_column(
-        Integer, nullable=False, server_default=text("0")
-    )
+    name: Mapped[str] = mapped_column(Text, unique=True)
+    url: Mapped[str] = mapped_column(Text, unique=True)
+    sort_order: Mapped[int] = mapped_column(Integer, server_default=text("0"))
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+        TIMESTAMP(timezone=True), server_default=text("now()")
     )
