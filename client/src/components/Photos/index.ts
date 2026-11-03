@@ -1,5 +1,2 @@
 export * from './PhotoList';
-export * from './PhotoOverlay';
-export * from './PhotoUploader';
-export * from './PhotoView';
-export * from './SortablePhotoView';
+export * from './PhotoManager';

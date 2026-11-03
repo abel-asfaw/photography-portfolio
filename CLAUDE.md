@@ -85,10 +85,10 @@ Auth is enforced via FastAPI `Security()` dependency using `VerifyToken`.
 - **api/apiClient.ts** - Axios instance with interceptor that injects the Supabase access token on non-GET requests
 - **api/supabase.ts** - The Supabase client and `useSession`, a zustand store mirroring the auth session
 - **api/services/photos.api.ts** - API call functions (fetch, upload, delete)
-- **api/services/photos.query.ts** - React Query hooks (`useFetchPhotos`, `useUploadPhotos`, `useDeletePhoto`) with 1-hour stale time
+- **api/services/photos.query.ts** - React Query hooks (`useFetchPhotos`, `useUploadPhotos`, `useDeletePhoto`, `useReorderPhotos`) with 1-hour stale time; reorder writes the new order to the cache optimistically and rolls back on error
 - **api/schemas/photos.schema.ts** - Zod schemas for API responses
 - **api/queryClient.ts** - The shared React Query client
-- **components/** - React components; `withAuthGuard` wraps protected route components and shows `LoginForm` (email + password) when signed out, `Admin` is the authenticated management page
+- **components/** - React components; `withAuthGuard` wraps protected route components and shows `LoginForm` (email + password) when signed out. `PhotoList` is the public read-only gallery; `PhotoManager` is the admin editor (uploader plus drag-to-reorder and delete via `EditablePhotoView`, which keeps a local copy of the order so dragging stays smooth). `PhotoGrid` owns the loading, error and empty states for both. Only `PhotoList` and `PhotoManager` are exported from `components/Photos`. `Admin` is `SessionHeader` + `PhotoManager`
 
 Routes: `/` (public gallery), `/admin` (protected, requires Supabase login).
 

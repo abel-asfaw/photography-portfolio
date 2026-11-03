@@ -5,6 +5,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+import { useDeletePhoto } from '@/src/api/services/photos.query';
+
 import { PhotoView } from './PhotoView';
 
 const animateLayoutChanges: AnimateLayoutChanges = args => {
@@ -12,17 +14,15 @@ const animateLayoutChanges: AnimateLayoutChanges = args => {
   return defaultAnimateLayoutChanges(args);
 };
 
-interface SortablePhotoViewProps {
+interface EditablePhotoViewProps {
   photoId: string;
   photoName: string;
-  onSelect: (photoId: string, photoName: string) => void;
 }
 
-export function SortablePhotoView({
+export function EditablePhotoView({
   photoId,
   photoName,
-  onSelect,
-}: SortablePhotoViewProps) {
+}: EditablePhotoViewProps) {
   const {
     attributes,
     listeners,
@@ -31,6 +31,7 @@ export function SortablePhotoView({
     transition,
     isDragging,
   } = useSortable({ id: photoId, animateLayoutChanges });
+  const { mutateAsync: deletePhoto } = useDeletePhoto();
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -50,9 +51,7 @@ export function SortablePhotoView({
       <PhotoView
         photoId={photoId}
         photoName={photoName}
-        canDelete={true}
-        onSelect={onSelect}
-        disableLayoutId
+        onDelete={() => deletePhoto(photoId)}
       />
     </div>
   );

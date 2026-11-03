@@ -4,24 +4,23 @@ import { motion } from 'motion/react';
 import { useState } from 'react';
 import { X } from 'react-feather';
 
-import { useDeletePhoto } from '@/src/api/services/photos.query';
 import { Button } from '@/src/components/ui';
 
 interface PhotoViewProps {
   photoId: string;
   photoName: string;
-  canDelete: boolean;
-  onSelect: (photoId: string, photoName: string) => void;
-  disableLayoutId?: boolean;
+  /** Opens the photo full size; also enables the shared-layout animation. */
+  onSelect?: () => void;
+  /** Shows a delete button on hover. */
+  onDelete?: () => Promise<unknown>;
   isSelected?: boolean;
 }
 
 export function PhotoView({
   photoId,
   photoName,
-  canDelete,
   onSelect,
-  disableLayoutId = false,
+  onDelete,
   isSelected = false,
 }: PhotoViewProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -31,12 +30,17 @@ export function PhotoView({
   const [isRaised, setIsRaised] = useState(false);
   if (isSelected && !isRaised) setIsRaised(true);
 
-  const { mutateAsync: deletePhoto } = useDeletePhoto();
-
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    if (!onDelete) return;
+    // Fade out first, then delete; bring the tile back if the delete fails.
     setIsDeleted(true);
     setTimeout(async () => {
-      await deletePhoto(photoId);
+      try {
+        await onDelete();
+      } catch (error) {
+        console.error('Failed to delete photo', error);
+        setIsDeleted(false);
+      }
     }, 200);
   };
 
@@ -55,14 +59,14 @@ export function PhotoView({
       onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
-        layoutId={disableLayoutId ? undefined : `photo-${photoId}`}
+        layoutId={onSelect ? `photo-${photoId}` : undefined}
         className="relative transform-gpu overflow-hidden rounded-xl will-change-transform hover:cursor-pointer"
         transition={{
           type: 'spring',
           stiffness: 150,
           damping: 20,
         }}
-        onTap={() => !disableLayoutId && onSelect(photoId, photoName)}
+        onTap={onSelect}
         onLayoutAnimationComplete={() => {
           if (!isSelected) setIsRaised(false);
         }}
@@ -75,10 +79,11 @@ export function PhotoView({
           width={600}
           sizes="600px"
         />
-        {canDelete && isHovered ? (
+        {onDelete && isHovered ? (
           <Button
             primary
             circular
+            aria-label="Delete photo"
             onPointerDownCapture={e => e.stopPropagation()}
             onClick={handleDelete}
             className="absolute top-2 right-2 shadow-sm shadow-zinc-700 hover:cursor-pointer"
