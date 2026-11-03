@@ -150,6 +150,8 @@ describe('PhotoOverlay', () => {
     renderOverlay(0);
 
     expect(exitDirection()).toBe('0');
+    // AnimatePresence animates it out; rendering it too mounts a duplicate.
+    expect(document.querySelector('[data-custom]')).toBeNull();
   });
 
   it('moves focus to the close button when it opens', () => {

@@ -176,34 +176,38 @@ export function PhotoOverlay({
       >
         {/* One grid cell, so the leaving and arriving photos overlap. */}
         <div {...stylex.props(styles.frame)}>
-          {/* `propagate` sinks the photo when the whole viewer closes. */}
+          {/* `propagate` sinks the photo when the whole viewer closes. Stop
+              rendering it then: Motion (12.43–14.9) otherwise mounts a
+              duplicate that fades in. */}
           <AnimatePresence propagate custom={isPresent ? move.direction : 0}>
-            <motion.div
-              key={move.count}
-              custom={move.direction}
-              variants={photoMotion}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              {...stylex.props(styles.photo)}
-              style={{
-                boxShadow: color ? `0 40px 120px -30px ${color}` : undefined,
-              }}
-            >
-              {/* Same props as the grid tile so the browser reuses the
-                  cached image, and auto sizing so the box always matches
-                  its shape. */}
-              <Image
-                urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
-                src={`/${photo.name}`}
-                loading="eager"
-                height={600}
-                width={600}
-                sizes="600px"
-                alt=""
-                {...stylex.props(styles.image)}
-              />
-            </motion.div>
+            {isPresent && (
+              <motion.div
+                key={move.count}
+                custom={move.direction}
+                variants={photoMotion}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                {...stylex.props(styles.photo)}
+                style={{
+                  boxShadow: color ? `0 40px 120px -30px ${color}` : undefined,
+                }}
+              >
+                {/* Same props as the grid tile so the browser reuses the
+                    cached image, and auto sizing so the box always matches
+                    its shape. */}
+                <Image
+                  urlEndpoint={import.meta.env.VITE_IMAGE_KIT_URL}
+                  src={`/${photo.name}`}
+                  loading="eager"
+                  height={600}
+                  width={600}
+                  sizes="600px"
+                  alt=""
+                  {...stylex.props(styles.image)}
+                />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
         {/* Taps rather than clicks, so a swipe that ends on a zone doesn't
