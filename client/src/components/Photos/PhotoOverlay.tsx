@@ -276,7 +276,10 @@ const styles = stylex.create({
     margin: 0,
     padding: 0,
     borderWidth: 0,
-    overflow: 'hidden',
+    // Clip, not hidden: a hidden box can still be scrolled by code, and the
+    // thumbnail strip's scrollIntoView would slide the whole viewer sideways
+    // while a photo slides in past its edge.
+    overflow: 'clip',
     backgroundColor: 'transparent',
     color: 'inherit',
     zIndex: 50,
