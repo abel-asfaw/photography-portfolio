@@ -10,6 +10,7 @@ import type { Photo } from '@/src/api/schemas/photos.schema';
 import { breakpoints, colors } from '@/src/styles/tokens.stylex';
 
 import { formatPosition } from './format';
+import { dragZone } from './markers.stylex';
 import { Thumbnail } from './Thumbnail';
 
 // A held photo tilts and lifts off the grid. It eases into that on pickup
@@ -20,7 +21,13 @@ const FLAT_SHADOW = '0 0 0 0 rgb(0 0 0 / 0)';
 const SETTLE_MS = 280;
 const SETTLE_EASING = 'cubic-bezier(0.2, 0, 0, 1)';
 
-/** Set by dnd-kit on the overlay while its drop animation runs. */
+// dnd-kit marks the overlay while a photo is dragged and while it drops.
+// At the end of the drop it takes the overlay out of the top layer and
+// removes these at once, but only reports the drag as over a moment later.
+// Showing and hiding by these attributes, rather than by React state that
+// follows that report, swaps the overlay for the tile in the same frame;
+// otherwise the photo flashes in the page flow or its spot flashes empty.
+const DRAGGING = '[data-dnd-dragging]';
 const DROPPING = '[data-dnd-dropping]';
 
 // Only a mouse drags, once it has moved 8px, so a click still selects.
@@ -75,38 +82,40 @@ export function LibraryGrid({
         if (!event.canceled) onReorder(move(photos, event));
       }}
     >
-      <ol {...stylex.props(styles.grid)}>
-        {photos.map((photo, index) => (
-          <LibraryTile
-            key={photo.id}
-            photo={photo}
-            index={index}
-            selected={selectedIds.includes(photo.id)}
-            selecting={selecting}
-            // Hidden while selecting, which has its own Delete, and while
-            // any photo is being dragged.
-            deletable={!selecting && !dragging}
-            onToggle={() => onToggle(photo.id)}
-            onDelete={() => onDelete(photo.id)}
-          />
-        ))}
-      </ol>
-      <DragOverlay
-        dropAnimation={{ duration: SETTLE_MS, easing: SETTLE_EASING }}
-        {...stylex.props(stylex.defaultMarker())}
-      >
-        {/* Rendered until the drop animation ends, not just the drag. */}
-        {source => {
-          const photo = photos.find(p => p.id === source.id);
-          return photo ? (
-            // dnd-kit measures the overlay to find where the drop lands, so
-            // it stays untransformed; the tilt lives on this inner layer.
-            <div {...stylex.props(styles.lifted)}>
-              <Thumbnail photoName={photo.name} />
-            </div>
-          ) : null;
-        }}
-      </DragOverlay>
+      <div {...stylex.props(dragZone)}>
+        <ol {...stylex.props(styles.grid)}>
+          {photos.map((photo, index) => (
+            <LibraryTile
+              key={photo.id}
+              photo={photo}
+              index={index}
+              selected={selectedIds.includes(photo.id)}
+              selecting={selecting}
+              // Hidden while selecting, which has its own Delete, and while
+              // any photo is being dragged.
+              deletable={!selecting && !dragging}
+              onToggle={() => onToggle(photo.id)}
+              onDelete={() => onDelete(photo.id)}
+            />
+          ))}
+        </ol>
+        <DragOverlay
+          dropAnimation={{ duration: SETTLE_MS, easing: SETTLE_EASING }}
+          {...stylex.props(stylex.defaultMarker())}
+        >
+          {/* Rendered until the drop animation ends, not just the drag. */}
+          {source => {
+            const photo = photos.find(p => p.id === source.id);
+            return photo ? (
+              // dnd-kit measures the overlay to find where the drop lands, so
+              // it stays untransformed; the tilt lives on this inner layer.
+              <div {...stylex.props(styles.lifted)}>
+                <Thumbnail photoName={photo.name} />
+              </div>
+            ) : null;
+          }}
+        </DragOverlay>
+      </div>
     </DragDropProvider>
   );
 }
@@ -144,9 +153,7 @@ function LibraryTile({
       {...stylex.props(
         stylex.defaultMarker(),
         styles.tile,
-        isDragSource && styles.slot,
-        // The overlay covers the spot while it settles into it.
-        isDropping && styles.invisible,
+        (isDragSource || isDropping) && styles.source,
       )}
     >
       <button
@@ -158,7 +165,7 @@ function LibraryTile({
         {...stylex.props(
           styles.select,
           selected && styles.selected,
-          isDragSource && styles.invisible,
+          (isDragSource || isDropping) && styles.sourceContent,
         )}
       >
         <Thumbnail
@@ -208,11 +215,31 @@ const styles = stylex.create({
     borderRadius: { default: 4, [breakpoints.sm]: 12 },
     touchAction: 'manipulation',
   },
-  // The empty spot a dragged photo will drop into.
-  slot: {
-    outline: `2px dashed ${colors.highlight}`,
+  // The dragged photo's tile, shown as the empty spot it will drop into,
+  // then hidden while the overlay settles over it. Both hold only while
+  // the overlay is out (see DRAGGING above).
+  source: {
+    outline: {
+      default: null,
+      [stylex.when.ancestor(`:has(${DRAGGING})`, dragZone)]:
+        `2px dashed ${colors.highlight}`,
+    },
     outlineOffset: -2,
-    backgroundColor: colors.highlightSoft,
+    backgroundColor: {
+      default: null,
+      [stylex.when.ancestor(`:has(${DRAGGING})`, dragZone)]:
+        colors.highlightSoft,
+    },
+    opacity: {
+      default: null,
+      [stylex.when.ancestor(`:has(${DROPPING})`, dragZone)]: 0,
+    },
+  },
+  sourceContent: {
+    opacity: {
+      default: null,
+      [stylex.when.ancestor(`:has(${DRAGGING})`, dragZone)]: 0,
+    },
   },
   select: {
     position: 'absolute',
@@ -233,9 +260,6 @@ const styles = stylex.create({
   },
   selected: {
     outlineColor: colors.highlight,
-  },
-  invisible: {
-    opacity: 0,
   },
   dimmed: {
     opacity: 0.55,
@@ -303,6 +327,10 @@ const styles = stylex.create({
     },
   },
   lifted: {
+    visibility: {
+      default: 'hidden',
+      [stylex.when.ancestor(DRAGGING)]: 'visible',
+    },
     width: '100%',
     height: '100%',
     overflow: 'hidden',
