@@ -21,7 +21,7 @@ export function SessionHeader() {
   };
 
   return (
-    <SiteHeader label="Editor" solid>
+    <SiteHeader label="Editor">
       <Link to="/" aria-label="View site" {...stylex.props(styles.action)}>
         <span {...stylex.props(styles.label)}>View site</span>
         <ArrowUpRight size={16} aria-hidden />

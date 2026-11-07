@@ -19,7 +19,7 @@ export default function App() {
             path="/"
             element={
               <>
-                <SiteHeader />
+                <SiteHeader hideOnScroll />
                 <PhotoList />
                 <Footer />
               </>
