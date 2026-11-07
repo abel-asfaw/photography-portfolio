@@ -8,11 +8,11 @@ import {
   useReorderPhotos,
 } from '@/src/api/services/photos.query';
 import { Button } from '@/src/components/ui';
-import { breakpoints, colors } from '@/src/styles/tokens.stylex';
+import { breakpoints, colors, radii } from '@/src/styles/tokens.stylex';
 
+import { plural } from './format';
 import { ArrangeList } from './manager/ArrangeList';
 import { SelectionBar, UndoToast } from './manager/FloatingBars';
-import { plural } from './manager/format';
 import { LibraryGrid } from './manager/LibraryGrid';
 import { reconcileOrder } from './manager/order';
 import { DropZone, UploadPanel } from './manager/Uploads';
@@ -389,7 +389,7 @@ const styles = stylex.create({
     gap: '0.375rem',
     paddingBlock: 2,
     paddingInline: '0.625rem',
-    borderRadius: 9999,
+    borderRadius: radii.full,
     backgroundColor: colors.raised,
     color: colors.textSubtle,
     fontSize: '0.75rem',

@@ -12,12 +12,12 @@ import { useId, useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'react-feather';
 
 import type { Photo } from '@/src/api/schemas/photos.schema';
+import { formatPosition } from '@/src/components/Photos/format';
 import { Button } from '@/src/components/ui';
 import { shared } from '@/src/styles/shared';
-import { breakpoints, colors } from '@/src/styles/tokens.stylex';
+import { breakpoints, colors, radii } from '@/src/styles/tokens.stylex';
 
 import { withPhotoAnnouncements } from './announcements';
-import { formatPosition } from './format';
 import { Thumbnail } from './Thumbnail';
 
 // The handle drags once it has moved 4px, for every kind of pointer. The
@@ -202,7 +202,7 @@ const styles = stylex.create({
     gridTemplateColumns: '1fr auto 1fr',
     alignItems: 'center',
     paddingBlock: '0.5rem',
-    backgroundColor: 'rgb(10 10 10 / 0.9)',
+    backgroundColor: `color-mix(in srgb, ${colors.page} 90%, transparent)`,
   },
   start: {
     justifySelf: 'start',
@@ -238,7 +238,7 @@ const styles = stylex.create({
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: colors.borderSubtle,
-    borderRadius: '0.75rem',
+    borderRadius: radii.xl,
     backgroundColor: colors.card,
     // The lift eases in and out as a photo is picked up and dropped.
     transitionProperty: 'scale, box-shadow, border-color, background-color',
@@ -255,7 +255,7 @@ const styles = stylex.create({
     flexShrink: 0,
     width: '2.75rem',
     height: '2.75rem',
-    borderRadius: '0.5rem',
+    borderRadius: radii.md,
     appearance: 'none',
     backgroundColor: { default: 'transparent', ':hover': colors.raised },
     color: colors.textCaption,
@@ -273,7 +273,7 @@ const styles = stylex.create({
     flexShrink: 0,
     width: '3rem',
     height: '3rem',
-    borderRadius: '0.375rem',
+    borderRadius: radii.sm,
   },
   spacer: {
     flexGrow: 1,
@@ -285,7 +285,7 @@ const styles = stylex.create({
     justifyContent: 'center',
     width: '2.75rem',
     height: '3.25rem',
-    borderRadius: '0.5rem',
+    borderRadius: radii.md,
     color: colors.textCaption,
     backgroundColor: 'transparent',
     cursor: { default: 'grab', ':active': 'grabbing' },

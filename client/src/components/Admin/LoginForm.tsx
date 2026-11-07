@@ -4,6 +4,7 @@ import { Loader, LogIn } from 'react-feather';
 
 import { supabase } from '@/src/api/supabase';
 import { Button } from '@/src/components/ui';
+import { shared } from '@/src/styles/shared';
 import { colors, radii } from '@/src/styles/tokens.stylex';
 
 export function LoginForm() {
@@ -37,7 +38,7 @@ export function LoginForm() {
           placeholder="Email"
           autoComplete="username"
           required
-          {...stylex.props(styles.input)}
+          {...stylex.props(styles.input, shared.focusRing)}
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
@@ -47,7 +48,7 @@ export function LoginForm() {
           placeholder="Password"
           autoComplete="current-password"
           required
-          {...stylex.props(styles.input)}
+          {...stylex.props(styles.input, shared.focusRing)}
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
@@ -83,19 +84,17 @@ const styles = stylex.create({
   input: {
     height: '2.5rem',
     paddingInline: '0.75rem',
-    borderRadius: radii.md,
+    borderRadius: radii.sm,
     backgroundColor: colors.surface,
     color: colors.textLight,
     fontSize: '0.875rem',
     lineHeight: 'calc(1.25 / 0.875)',
-    outline: { default: null, ':focus': 'none' },
-    boxShadow: { default: null, ':focus': `0 0 0 2px ${colors.accent}` },
     '::placeholder': {
       color: colors.textMuted,
     },
   },
   error: {
-    color: colors.error,
+    color: colors.dangerText,
     fontSize: '0.875rem',
     lineHeight: 'calc(1.25 / 0.875)',
   },

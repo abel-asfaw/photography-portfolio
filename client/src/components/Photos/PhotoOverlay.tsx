@@ -9,10 +9,12 @@ import {
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { X } from 'react-feather';
 
-import { Photo } from '@/src/api/schemas/photos.schema';
-import { breakpoints, colors } from '@/src/styles/tokens.stylex';
+import type { Photo } from '@/src/api/schemas/photos.schema';
+import { shared } from '@/src/styles/shared';
+import { breakpoints, colors, radii } from '@/src/styles/tokens.stylex';
 
 import { AmbientGlow } from './AmbientGlow';
+import { formatPosition } from './format';
 import { usePhotoColor } from './photoColor';
 
 interface PhotoOverlayProps {
@@ -23,8 +25,6 @@ interface PhotoOverlayProps {
 }
 
 const SWIPE_DISTANCE = 50;
-
-const pad = (n: number) => String(n).padStart(2, '0');
 
 const fade = {
   initial: { opacity: 0 },
@@ -155,14 +155,14 @@ export function PhotoOverlay({
       </motion.div>
       <motion.div {...stylex.props(styles.topBar)} {...fade}>
         <span {...stylex.props(styles.counter)}>
-          {pad(index + 1)} / {pad(photos.length)}
+          {formatPosition(index + 1)} / {formatPosition(photos.length)}
         </span>
         <button
           type="button"
           ref={closeButton}
           aria-label="Close"
           onClick={onClose}
-          {...stylex.props(styles.close)}
+          {...stylex.props(styles.close, shared.focusRing)}
         >
           <X size={24} strokeWidth={1.75} />
         </button>
@@ -245,6 +245,7 @@ export function PhotoOverlay({
             onClick={() => navigate(i)}
             {...stylex.props(
               styles.thumbnail,
+              shared.focusRing,
               i === index && styles.currentThumbnail,
             )}
           >
@@ -342,7 +343,7 @@ const styles = stylex.create({
     position: 'relative',
     pointerEvents: 'auto',
     overflow: 'hidden',
-    borderRadius: 12,
+    borderRadius: radii.xl,
   },
   image: {
     width: 'auto',
@@ -386,7 +387,7 @@ const styles = stylex.create({
     flexShrink: 0,
     width: { default: '1.75rem', [breakpoints.sm]: '2.5rem' },
     height: { default: '2.75rem', [breakpoints.sm]: '3.5rem' },
-    borderRadius: 6,
+    borderRadius: radii.sm,
     overflow: 'hidden',
     cursor: 'pointer',
     opacity: { default: 0.4, ':hover': 0.75 },

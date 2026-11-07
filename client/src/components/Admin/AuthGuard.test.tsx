@@ -30,7 +30,7 @@ describe('withAuthGuard', () => {
 
   it('shows a loading state until the session is known', () => {
     render(<Protected />, { wrapper: MemoryRouter });
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading…')).toBeInTheDocument();
   });
 
   it('shows the login form when signed out', () => {

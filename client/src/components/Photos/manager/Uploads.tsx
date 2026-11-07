@@ -2,11 +2,11 @@ import * as stylex from '@stylexjs/stylex';
 import { Image as ImageIcon, X } from 'react-feather';
 
 import { MAX_UPLOAD_MB } from '@/src/api/limits';
+import { plural } from '@/src/components/Photos/format';
 import { Button } from '@/src/components/ui';
 import { shared } from '@/src/styles/shared';
-import { breakpoints, colors } from '@/src/styles/tokens.stylex';
+import { breakpoints, colors, radii } from '@/src/styles/tokens.stylex';
 
-import { plural } from './format';
 import type { UploadItem } from './useUploadQueue';
 
 interface DropZoneProps {
@@ -188,7 +188,7 @@ const styles = stylex.create({
     borderWidth: 1.5,
     borderStyle: 'dashed',
     borderColor: { default: colors.borderStrong, ':hover': colors.textMuted },
-    borderRadius: '0.875rem',
+    borderRadius: radii.xxl,
     backgroundColor: colors.sunken,
     color: colors.textSubtle,
     fontSize: '0.875rem',
@@ -244,7 +244,7 @@ const styles = stylex.create({
     borderBottomWidth: { default: 0, [breakpoints.sm]: 1 },
     borderRadius: {
       default: '1.375rem 1.375rem 0 0',
-      [breakpoints.sm]: '0.875rem',
+      [breakpoints.sm]: radii.xxl,
     },
     backgroundColor: colors.panel,
     color: colors.textLight,
@@ -257,7 +257,7 @@ const styles = stylex.create({
     alignSelf: 'center',
     width: 40,
     height: 5,
-    borderRadius: 9999,
+    borderRadius: radii.full,
     backgroundColor: colors.borderStrong,
   },
   heading: {
@@ -287,14 +287,14 @@ const styles = stylex.create({
     marginInline: '-0.625rem',
     paddingBlock: '0.375rem',
     paddingInline: '0.625rem 0.25rem',
-    borderRadius: '0.75rem',
+    borderRadius: radii.xl,
     backgroundColor: colors.dangerSoft,
   },
   preview: {
     flexShrink: 0,
     width: { default: '3rem', [breakpoints.sm]: '2.25rem' },
     height: { default: '3rem', [breakpoints.sm]: '2.25rem' },
-    borderRadius: '0.375rem',
+    borderRadius: radii.sm,
     objectFit: 'cover',
     backgroundColor: colors.raised,
   },
@@ -334,14 +334,14 @@ const styles = stylex.create({
   },
   track: {
     height: 4,
-    borderRadius: 9999,
+    borderRadius: radii.full,
     overflow: 'hidden',
     backgroundColor: colors.control,
   },
   bar: (progress: number) => ({
     width: `${Math.round(progress * 100)}%`,
     height: '100%',
-    borderRadius: 9999,
+    borderRadius: radii.full,
     backgroundColor: colors.highlight,
     transitionProperty: 'width',
     transitionDuration: '200ms',

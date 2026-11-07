@@ -1,10 +1,10 @@
-import { apiClient } from '../apiClient';
+import { apiClient } from '@/src/api/apiClient';
 import {
   GetPhotosResponseSchema,
+  type Photo,
   PhotoSchema,
-  Photo,
-} from '../schemas/photos.schema';
-import { useSession } from '../supabase';
+} from '@/src/api/schemas/photos.schema';
+import { useSession } from '@/src/api/supabase';
 
 export const fetchPhotos = async () => {
   const response = await apiClient.get('/photos');

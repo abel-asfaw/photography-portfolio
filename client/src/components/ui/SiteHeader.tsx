@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { type PropsWithChildren, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { breakpoints, colors } from '@/src/styles/tokens.stylex';
@@ -84,7 +84,7 @@ const styles = stylex.create({
     minHeight: { default: '3.75rem', [breakpoints.sm]: '5rem' },
     paddingBlock: '0.5rem',
     paddingInline: { default: '1rem', [breakpoints.sm]: '3rem' },
-    backgroundColor: 'rgb(10 10 10 / 0.85)',
+    backgroundColor: `color-mix(in srgb, ${colors.page} 85%, transparent)`,
     backdropFilter: 'blur(12px)',
     borderBottomWidth: 1,
     borderBottomStyle: 'solid',

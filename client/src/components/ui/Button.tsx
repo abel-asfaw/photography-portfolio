@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { shared } from '@/src/styles/shared';
-import { colors } from '@/src/styles/tokens.stylex';
+import { colors, radii } from '@/src/styles/tokens.stylex';
 
 // className and style are omitted: StyleX owns them, so pass overrides via
 // xstyle, which is applied after the variant styles.
@@ -53,7 +53,7 @@ const styles = stylex.create({
     flexShrink: 0,
     height: '2.75rem',
     paddingInline: '1rem',
-    borderRadius: '0.625rem',
+    borderRadius: radii.lg,
     fontSize: '0.875rem',
     fontWeight: 600,
     whiteSpace: 'nowrap',
@@ -88,7 +88,7 @@ const styles = stylex.create({
     color: { default: colors.textSubtle, ':hover:enabled': colors.white },
     backgroundColor: {
       default: 'transparent',
-      ':hover:enabled': 'rgb(255 255 255 / 0.06)',
+      ':hover:enabled': colors.hoverWash,
     },
   },
   iconOnly: {
@@ -97,7 +97,7 @@ const styles = stylex.create({
   },
   large: {
     height: '3.125rem',
-    borderRadius: '0.75rem',
+    borderRadius: radii.xl,
     fontSize: '0.9375rem',
   },
 });

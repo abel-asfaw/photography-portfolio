@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
-import { Photo } from '@/src/api/schemas/photos.schema';
+import type { Photo } from '@/src/api/schemas/photos.schema';
 import { breakpoints, colors } from '@/src/styles/tokens.stylex';
 
 import { statusMessage } from './statusMessage';

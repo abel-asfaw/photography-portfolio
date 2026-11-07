@@ -9,5 +9,5 @@
   "sortImports": {
     "internalPattern": ["@/"]
   },
-  "ignorePatterns": ["dist", "public", "package-lock.json"]
+  "ignorePatterns": ["dist", "public"]
 }

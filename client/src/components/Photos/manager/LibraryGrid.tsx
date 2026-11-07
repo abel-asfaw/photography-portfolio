@@ -7,9 +7,10 @@ import { useState } from 'react';
 import { Check, Trash2 } from 'react-feather';
 
 import type { Photo } from '@/src/api/schemas/photos.schema';
-import { breakpoints, colors } from '@/src/styles/tokens.stylex';
+import { formatPosition } from '@/src/components/Photos/format';
+import { shared } from '@/src/styles/shared';
+import { breakpoints, colors, radii } from '@/src/styles/tokens.stylex';
 
-import { formatPosition } from './format';
 import { dragZone } from './markers.stylex';
 import { Thumbnail } from './Thumbnail';
 
@@ -186,7 +187,7 @@ function LibraryTile({
           type="button"
           aria-label={`Delete photo ${position}`}
           onClick={onDelete}
-          {...stylex.props(styles.delete)}
+          {...stylex.props(styles.delete, shared.focusRing)}
         >
           <Trash2 size={16} aria-hidden />
         </button>
@@ -212,7 +213,7 @@ const styles = stylex.create({
   tile: {
     position: 'relative',
     aspectRatio: '1 / 1',
-    borderRadius: { default: 4, [breakpoints.sm]: 12 },
+    borderRadius: { default: radii.xs, [breakpoints.sm]: radii.xl },
     touchAction: 'manipulation',
   },
   // The dragged photo's tile, shown as the empty spot it will drop into,
@@ -271,8 +272,8 @@ const styles = stylex.create({
     minWidth: '1.625rem',
     paddingBlock: 2,
     paddingInline: 6,
-    borderRadius: 6,
-    backgroundColor: 'rgb(10 10 10 / 0.72)',
+    borderRadius: radii.sm,
+    backgroundColor: `color-mix(in srgb, ${colors.page} 72%, transparent)`,
     color: colors.textLight,
     fontSize: { default: '0.6875rem', [breakpoints.sm]: '0.75rem' },
     fontWeight: 600,
@@ -288,7 +289,7 @@ const styles = stylex.create({
     justifyContent: 'center',
     width: '1.625rem',
     height: '1.625rem',
-    borderRadius: 9999,
+    borderRadius: radii.full,
   },
   checked: {
     backgroundColor: colors.highlight,
@@ -297,8 +298,7 @@ const styles = stylex.create({
   unchecked: {
     borderWidth: 2,
     borderStyle: 'solid',
-    borderColor: 'rgb(255 255 255 / 0.85)',
-    backgroundColor: 'rgb(10 10 10 / 0.3)',
+    backgroundColor: `color-mix(in srgb, ${colors.page} 30%, transparent)`,
   },
   // Shown on hover or keyboard focus, and only with a mouse: on touch it
   // would appear on every tap.
@@ -318,11 +318,11 @@ const styles = stylex.create({
     justifyContent: 'center',
     width: '2rem',
     height: '2rem',
-    borderRadius: 8,
+    borderRadius: radii.md,
     cursor: 'pointer',
     color: colors.dangerText,
     backgroundColor: {
-      default: 'rgb(10 10 10 / 0.78)',
+      default: `color-mix(in srgb, ${colors.page} 78%, transparent)`,
       ':hover': colors.dangerSoft,
     },
   },
@@ -334,7 +334,7 @@ const styles = stylex.create({
     width: '100%',
     height: '100%',
     overflow: 'hidden',
-    borderRadius: 12,
+    borderRadius: radii.xl,
     cursor: 'grabbing',
     rotate: { default: '-2.5deg', [stylex.when.ancestor(DROPPING)]: '0deg' },
     scale: { default: 1.04, [stylex.when.ancestor(DROPPING)]: 1 },

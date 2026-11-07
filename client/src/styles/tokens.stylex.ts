@@ -1,14 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
 
 export const colors = stylex.defineVars({
+  // The page background; index.css sets the same value on the body.
+  page: 'rgb(10 10 10)',
   textLight: '#e5e5e5',
   textMuted: '#737373',
-  textDim: '#9ca3af',
   textSubtle: '#a1a1a6',
   textCaption: '#8a8a8f',
   surface: '#27272a',
-  accent: '#0ea5e9',
-  error: '#ef4444',
   white: '#ffffff',
   // The admin editor's surfaces, darkest first, and its highlight color.
   sunken: '#101012',
@@ -17,6 +16,8 @@ export const colors = stylex.defineVars({
   raised: '#1c1c1f',
   control: '#2a2a2e',
   controlHover: '#36363b',
+  // A faint light wash for hovering quiet controls.
+  hoverWash: 'rgb(255 255 255 / 0.06)',
   border: '#2a2a2e',
   borderSubtle: '#1f1f22',
   borderPanel: '#232326',
@@ -36,7 +37,13 @@ export const colors = stylex.defineVars({
 });
 
 export const radii = stylex.defineVars({
-  md: '0.375rem',
+  xs: '0.25rem',
+  sm: '0.375rem',
+  md: '0.5rem',
+  lg: '0.625rem',
+  xl: '0.75rem',
+  xxl: '0.875rem',
+  full: '9999px',
 });
 
 export const breakpoints = stylex.defineConsts({

@@ -125,7 +125,7 @@ describe('PhotoManager', () => {
     render(<PhotoManager />);
 
     expect(fileInput()).toBeInTheDocument();
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading…')).toBeInTheDocument();
   });
 
   it('keeps uploads available when photos fail to load', () => {

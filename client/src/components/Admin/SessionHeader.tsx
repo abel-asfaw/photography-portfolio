@@ -3,11 +3,14 @@ import { ArrowUpRight, LogOut } from 'react-feather';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { signOut } from '@/src/api/supabase';
-import { SiteHeader } from '@/src/components/ui';
-import { breakpoints, colors } from '@/src/styles/tokens.stylex';
+import { Button, SiteHeader } from '@/src/components/ui';
+import { shared } from '@/src/styles/shared';
+import { breakpoints, colors, radii } from '@/src/styles/tokens.stylex';
 
-/** The site header, labelled for the admin page, with a link back to the
- * public gallery and a sign-out action. Labels are icon-only on a phone. */
+/**
+ * The site header, labelled for the admin page, with a link back to the
+ * public gallery and a sign-out action. Labels are icon-only on a phone.
+ */
 export function SessionHeader() {
   const navigate = useNavigate();
 
@@ -22,42 +25,48 @@ export function SessionHeader() {
 
   return (
     <SiteHeader label="Editor">
-      <Link to="/" aria-label="View site" {...stylex.props(styles.action)}>
+      <Link
+        to="/"
+        aria-label="View site"
+        {...stylex.props(styles.link, shared.focusRing, styles.action)}
+      >
         <span {...stylex.props(styles.label)}>View site</span>
         <ArrowUpRight size={16} aria-hidden />
       </Link>
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         aria-label="Sign out"
         onClick={handleLogout}
-        {...stylex.props(styles.action)}
+        xstyle={styles.action}
       >
         <LogOut size={16} aria-hidden />
         <span {...stylex.props(styles.label)}>Sign out</span>
-      </button>
+      </Button>
     </SiteHeader>
   );
 }
 
 const styles = stylex.create({
-  action: {
-    display: 'flex',
+  // Matches the ghost Button beside it.
+  link: {
+    display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: '0.5rem',
+    color: { default: colors.textSubtle, ':hover': colors.white },
+    backgroundColor: { default: 'transparent', ':hover': colors.hoverWash },
+    transitionProperty: 'background-color, color',
+    transitionDuration: '150ms',
+    outlineOffset: 2,
+  },
+  // A pill, icon-only on a phone.
+  action: {
     minWidth: '2.75rem',
     height: '2.75rem',
     paddingInline: { default: 0, [breakpoints.sm]: '0.75rem' },
-    borderRadius: 9999,
+    borderRadius: radii.full,
     fontSize: '0.875rem',
-    cursor: 'pointer',
-    color: { default: colors.textSubtle, ':hover': colors.white },
-    backgroundColor: {
-      default: 'transparent',
-      ':hover': 'rgb(255 255 255 / 0.06)',
-    },
-    transitionProperty: 'color, background-color',
-    transitionDuration: '200ms',
+    fontWeight: 400,
   },
   label: {
     display: { default: 'none', [breakpoints.sm]: 'inline' },

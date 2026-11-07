@@ -19,7 +19,7 @@ export function withAuthGuard<P extends object>(
     const isLoading = useSession(state => state.isLoading);
 
     if (isLoading) {
-      return <div {...stylex.props(styles.loading)}>Loading...</div>;
+      return <div {...stylex.props(styles.loading)}>Loading…</div>;
     }
 
     if (!session) {

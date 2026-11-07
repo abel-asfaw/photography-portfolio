@@ -2,7 +2,7 @@ import { Image } from '@imagekit/react';
 import * as stylex from '@stylexjs/stylex';
 import { motion } from 'motion/react';
 
-import { breakpoints } from '@/src/styles/tokens.stylex';
+import { breakpoints, radii } from '@/src/styles/tokens.stylex';
 
 interface PhotoViewProps {
   photoName: string;
@@ -71,7 +71,7 @@ const styles = stylex.create({
   fluid: {
     width: '100%',
     scale: null,
-    borderRadius: 12,
+    borderRadius: radii.xl,
   },
   active: {
     scale: 1.02,
@@ -87,7 +87,7 @@ const styles = stylex.create({
   photo: {
     position: 'relative',
     overflow: 'hidden',
-    borderRadius: 12,
+    borderRadius: radii.xl,
     cursor: 'pointer',
   },
 });

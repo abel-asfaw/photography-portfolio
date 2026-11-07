@@ -22,7 +22,8 @@ html {
 }
 
 body {
-  background-color: rgb(10, 10, 10);
+  /* colors.page */
+  background-color: rgb(10 10 10);
 }
 
 img,

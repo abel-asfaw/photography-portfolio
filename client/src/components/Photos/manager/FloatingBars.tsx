@@ -1,10 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
 import { X } from 'react-feather';
 
+import { plural } from '@/src/components/Photos/format';
 import { Button } from '@/src/components/ui';
-import { breakpoints, colors } from '@/src/styles/tokens.stylex';
-
-import { plural } from './format';
+import { breakpoints, colors, radii } from '@/src/styles/tokens.stylex';
 
 interface SelectionBarProps {
   count: number;
@@ -81,7 +80,7 @@ const styles = stylex.create({
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: colors.border,
-    borderRadius: '0.875rem',
+    borderRadius: radii.xxl,
     backgroundColor: colors.raised,
     color: colors.textLight,
     boxShadow: '0 20px 50px -12px rgb(0 0 0 / 0.75)',

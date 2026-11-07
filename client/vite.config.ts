@@ -9,7 +9,7 @@ export default defineConfig({
   // StyleX must run before react() to keep Fast Refresh working.
   plugins: [
     // StyleX resolves .stylex.ts imports itself, so it needs the alias too.
-    stylex({ aliases: { '@/*': [resolve(__dirname, '*')] } }),
+    stylex({ aliases: { '@/*': [resolve(import.meta.dirname, '*')] } }),
     react(),
   ],
   server: {
@@ -18,6 +18,6 @@ export default defineConfig({
     allowedHosts: ['client'],
   },
   resolve: {
-    alias: [{ find: '@', replacement: resolve(__dirname, './') }],
+    alias: [{ find: '@', replacement: resolve(import.meta.dirname, './') }],
   },
 });

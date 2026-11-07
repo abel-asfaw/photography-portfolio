@@ -9,14 +9,14 @@ import { defineConfig } from 'vitest/config';
 // never opens one, so the run hangs for 10s at exit. Written against
 // @stylexjs/unplugin 0.19.1; recheck when upgrading.
 const stylexPlugin = {
-  ...stylex({ aliases: { '@/*': [resolve(__dirname, '*')] } }),
+  ...stylex({ aliases: { '@/*': [resolve(import.meta.dirname, '*')] } }),
   configureServer: undefined,
 };
 
 export default defineConfig({
   plugins: [stylexPlugin, react()],
   resolve: {
-    alias: [{ find: '@', replacement: resolve(__dirname, './') }],
+    alias: [{ find: '@', replacement: resolve(import.meta.dirname, './') }],
   },
   test: {
     globals: true,

@@ -29,7 +29,6 @@ export function Thumbnail({ photoName, size = 360, xstyle }: ThumbnailProps) {
 
 const styles = stylex.create({
   image: {
-    display: 'block',
     width: '100%',
     height: '100%',
     objectFit: 'cover',

@@ -66,7 +66,7 @@ describe('PhotoList', () => {
   it('shows a loading message until photos arrive', () => {
     render(<PhotoList />);
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading…')).toBeInTheDocument();
   });
 
   it('shows an error message when photos fail to load', () => {
@@ -82,7 +82,7 @@ describe('PhotoList', () => {
     fetchState.isLoading = false;
     render(<PhotoList />);
 
-    expect(screen.getByText('No photos to display...')).toBeInTheDocument();
+    expect(screen.getByText('No photos to display…')).toBeInTheDocument();
   });
 
   it('renders the gallery read-only', () => {
