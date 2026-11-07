@@ -1,18 +1,13 @@
 import { Image } from '@imagekit/react';
 import * as stylex from '@stylexjs/stylex';
 import { motion } from 'motion/react';
-import { useState } from 'react';
-import { X } from 'react-feather';
 
-import { Button } from '@/src/components/ui';
 import { breakpoints } from '@/src/styles/tokens.stylex';
 
 interface PhotoViewProps {
   photoName: string;
   /** Opens the photo full size. */
   onSelect?: () => void;
-  /** Shows a delete button on hover. */
-  onDelete?: () => Promise<unknown>;
   /** Fills its column instead of a fixed width, without the hover zoom. */
   fluid?: boolean;
   /** Lifts the tile, or fades it back while another tile is hovered. */
@@ -28,30 +23,12 @@ interface PhotoViewProps {
 export function PhotoView({
   photoName,
   onSelect,
-  onDelete,
   fluid = false,
   emphasis,
   glowColor,
   onHoverStart,
   onHoverEnd,
 }: PhotoViewProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false);
-
-  const handleDelete = () => {
-    if (!onDelete) return;
-    // Fade out first, then delete; bring the tile back if the delete fails.
-    setIsDeleted(true);
-    setTimeout(async () => {
-      try {
-        await onDelete();
-      } catch (error) {
-        console.error('Failed to delete photo', error);
-        setIsDeleted(false);
-      }
-    }, 200);
-  };
-
   return (
     <div
       {...stylex.props(
@@ -60,14 +37,11 @@ export function PhotoView({
         emphasis === 'active' && styles.active,
         emphasis === 'active' && glowColor ? styles.glow(glowColor) : null,
         emphasis === 'dimmed' && styles.dimmed,
-        isDeleted && styles.deleted,
       )}
       onPointerEnter={e => {
-        setIsHovered(true);
         if (e.pointerType === 'mouse') onHoverStart?.();
       }}
       onPointerLeave={e => {
-        setIsHovered(false);
         if (e.pointerType === 'mouse') onHoverEnd?.();
       }}
     >
@@ -80,18 +54,6 @@ export function PhotoView({
           width={600}
           sizes="600px"
         />
-        {onDelete && isHovered ? (
-          <Button
-            primary
-            circular
-            aria-label="Delete photo"
-            onPointerDownCapture={e => e.stopPropagation()}
-            onClick={handleDelete}
-            xstyle={styles.deleteButton}
-          >
-            <X size={12} color="black" />
-          </Button>
-        ) : null}
       </motion.div>
     </div>
   );
@@ -122,20 +84,10 @@ const styles = stylex.create({
   dimmed: {
     opacity: 0.4,
   },
-  deleted: {
-    opacity: 0,
-  },
   photo: {
     position: 'relative',
     overflow: 'hidden',
     borderRadius: 12,
     cursor: 'pointer',
-  },
-  deleteButton: {
-    position: 'absolute',
-    top: '0.5rem',
-    right: '0.5rem',
-    cursor: 'pointer',
-    boxShadow: '0 1px 3px 0 #3f3f46, 0 1px 2px -1px #3f3f46',
   },
 });

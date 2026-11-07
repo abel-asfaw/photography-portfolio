@@ -49,7 +49,9 @@ describe('useReorderPhotos', () => {
   });
 
   it('writes the new order to the photos cache', async () => {
-    reorderPhotos.mockResolvedValue(undefined);
+    reorderPhotos.mockImplementation(async (photoIds: string[]) =>
+      orderByIds(photos, photoIds),
+    );
     const { result } = renderReorder();
 
     act(() => result.current.mutate(['2', '3', '1']));
@@ -59,6 +61,23 @@ describe('useReorderPhotos', () => {
       '2',
       '3',
       '1',
+    ]);
+  });
+
+  it('shows the order the server saved', async () => {
+    // The server fitted the order to photos added and deleted meanwhile.
+    const added = { id: '4', name: '4.jpg', url: 'https://example.com/4.jpg' };
+    reorderPhotos.mockResolvedValue([photos[2], photos[1], added]);
+    const { result } = renderReorder();
+
+    act(() => result.current.mutate(['3', '1', '2']));
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(reorderPhotos).toHaveBeenCalledWith(['3', '1', '2']);
+    expect(ids(queryClient.getQueryData<Photo[]>(['photos']))).toEqual([
+      '3',
+      '2',
+      '4',
     ]);
   });
 

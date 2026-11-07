@@ -25,7 +25,7 @@ export function withAuthGuard<P extends object>(
     if (!session) {
       return (
         <>
-          <SiteHeader label="Admin" />
+          <SiteHeader label="Editor" />
           <LoginForm />
         </>
       );

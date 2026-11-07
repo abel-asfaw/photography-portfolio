@@ -6,6 +6,7 @@ from botocore.exceptions import EndpointConnectionError
 from fastapi.testclient import TestClient
 from sqlalchemy.exc import IntegrityError, OperationalError
 
+from src import storage
 from src.auth import require_admin
 from src.config import settings
 from src.database import get_db
@@ -22,11 +23,11 @@ def db():
 
 @pytest.fixture
 def s3(monkeypatch):
-    storage = MagicMock()
-    storage.upload_to_s3.side_effect = lambda _file, name: f"https://bucket/{name}"
-    monkeypatch.setattr(photos, "upload_to_s3", storage.upload_to_s3)
-    monkeypatch.setattr(photos, "delete_from_s3", storage.delete_from_s3)
-    return storage
+    stub = MagicMock()
+    stub.upload_to_s3.side_effect = lambda _file, name: f"https://bucket/{name}"
+    monkeypatch.setattr(photos, "upload_to_s3", stub.upload_to_s3)
+    monkeypatch.setattr(photos, "delete_from_s3", stub.delete_from_s3)
+    return stub
 
 
 @pytest.fixture
@@ -87,65 +88,82 @@ def test_upload_removes_s3_object_when_the_row_is_not_saved(
     s3.delete_from_s3.assert_called_once_with(s3.upload_to_s3.call_args.args[1])
 
 
-def test_delete_missing_photo_returns_404(client, db):
-    db.get.return_value = None
-    assert client.delete(f"/photos/{PHOTO_ID}").status_code == 404
+def make_photos(count):
+    photos = [MagicMock(id=uuid4(), url=f"https://bucket/{i}") for i in range(count)]
+    for i, photo in enumerate(photos):
+        photo.name = f"{i}.jpg"
+    return photos
 
 
-def test_delete_rejects_malformed_id(client, db):
-    assert client.delete("/photos/not-a-uuid").status_code == 422
-    db.get.assert_not_called()
+def delete(client, *ids):
+    return client.request(
+        "DELETE", "/photos", json={"photo_ids": [str(i) for i in ids]}
+    )
 
 
-def test_delete_removes_row_before_s3_object(client, db, s3):
+def test_delete_ignores_unknown_ids(client, db, s3):
+    db.scalars.return_value.all.return_value = []
+
+    assert delete(client, PHOTO_ID).status_code == 204
+    db.commit.assert_not_called()
+    s3.delete_from_s3.assert_not_called()
+
+
+def test_delete_rejects_malformed_ids(client, db):
+    assert delete(client, "not-a-uuid").status_code == 422
+    db.scalars.assert_not_called()
+
+
+def test_delete_removes_rows_before_s3_objects(client, db, s3):
+    db.scalars.return_value.all.return_value = make_photos(2)
     calls = MagicMock()
-    db.get.return_value.name = "photo.jpg"
     calls.attach_mock(db.commit, "commit")
     calls.attach_mock(s3.delete_from_s3, "delete_from_s3")
 
-    assert client.delete(f"/photos/{PHOTO_ID}").status_code == 204
+    assert delete(client, PHOTO_ID).status_code == 204
     assert [c[0] for c in calls.mock_calls] == ["commit", "delete_from_s3"]
-    s3.delete_from_s3.assert_called_once_with("photo.jpg")
-
-
-def test_delete_succeeds_when_only_s3_cleanup_fails(client, db, s3):
-    db.get.return_value.name = "photo.jpg"
-    s3.delete_from_s3.side_effect = EndpointConnectionError(endpoint_url="s3")
-
-    assert client.delete(f"/photos/{PHOTO_ID}").status_code == 204
-
-
-def test_reorder_sets_sort_order_from_list_position(client, db):
-    first, second = MagicMock(id=uuid4()), MagicMock(id=uuid4())
-    db.scalars.return_value.all.return_value = [first, second]
-
-    response = client.put(
-        "/photos/reorder", json={"photo_ids": [str(second.id), str(first.id)]}
-    )
-
-    assert response.status_code == 200
-    assert (second.sort_order, first.sort_order) == (0, 1)
-    db.commit.assert_called_once()
+    s3.delete_from_s3.assert_called_once_with("0.jpg", "1.jpg")
+    assert db.delete.call_count == 2
 
 
 @pytest.mark.parametrize(
-    "photo_ids",
-    [
-        lambda a, b: [a, b, uuid4()],
-        lambda a, b: [a],
-        lambda a, b: [a, a],
-    ],
-    ids=["unknown-id", "partial-list", "duplicate-id"],
+    "error",
+    [EndpointConnectionError(endpoint_url="s3"), storage.S3DeleteError([])],
+    ids=["unreachable", "partial-failure"],
 )
-def test_reorder_requires_every_photo_exactly_once(client, db, photo_ids):
-    first, second = MagicMock(id=uuid4()), MagicMock(id=uuid4())
-    db.scalars.return_value.all.return_value = [first, second]
+def test_delete_succeeds_when_only_s3_cleanup_fails(client, db, s3, error):
+    [photo] = make_photos(1)
+    db.scalars.return_value.all.return_value = [photo]
+    s3.delete_from_s3.side_effect = error
 
-    ids = [str(i) for i in photo_ids(first.id, second.id)]
-    response = client.put("/photos/reorder", json={"photo_ids": ids})
+    assert delete(client, photo.id).status_code == 204
 
-    assert response.status_code == 400
-    db.commit.assert_not_called()
+
+def reorder(client, db, current, ids):
+    db.scalars.return_value.all.return_value = current
+    return client.put("/photos/reorder", json={"photo_ids": [str(i) for i in ids]})
+
+
+def test_reorder_sets_sort_order_from_list_position(client, db):
+    first, second = make_photos(2)
+
+    response = reorder(client, db, [first, second], [second.id, first.id])
+
+    assert response.status_code == 200
+    assert (second.sort_order, first.sort_order) == (0, 1)
+    assert [p["id"] for p in response.json()] == [str(second.id), str(first.id)]
+    db.commit.assert_called_once()
+
+
+def test_reorder_fits_a_stale_list_to_the_current_photos(client, db):
+    a, b, c = make_photos(3)
+
+    # Lists an unknown photo and a repeat, and leaves out b and c.
+    response = reorder(client, db, [a, b, c], [c.id, uuid4(), c.id])
+
+    assert response.status_code == 200
+    assert [p["id"] for p in response.json()] == [str(c.id), str(a.id), str(b.id)]
+    assert (c.sort_order, a.sort_order, b.sort_order) == (0, 1, 2)
 
 
 def test_database_outage_returns_503(client, db):
@@ -162,7 +180,7 @@ def test_database_outage_returns_503(client, db):
     [
         ("post", "/photos"),
         ("put", "/photos/reorder"),
-        ("delete", f"/photos/{PHOTO_ID}"),
+        ("delete", "/photos"),
     ],
 )
 def test_admin_routes_require_a_token(db, s3, method, path):

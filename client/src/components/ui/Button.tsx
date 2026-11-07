@@ -1,25 +1,27 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colors, radii } from '@/src/styles/tokens.stylex';
+import { shared } from '@/src/styles/shared';
+import { colors } from '@/src/styles/tokens.stylex';
 
-// className is omitted: StyleX owns it, so pass overrides via xstyle.
+// className and style are omitted: StyleX owns them, so pass overrides via
+// xstyle, which is applied after the variant styles.
 interface ButtonProps extends Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
-  'className'
+  'className' | 'style'
 > {
-  circular?: boolean;
-  primary?: boolean;
-  success?: boolean;
-  danger?: boolean;
-  /** StyleX overrides, applied after the variant styles. */
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  /** A square button holding only an icon; give it an `aria-label`. */
+  iconOnly?: boolean;
+  /** The taller buttons in the editor's phone bar and sheets. */
+  large?: boolean;
   xstyle?: stylex.StyleXStyles;
 }
 
+/** The site's buttons: one primary action, quieter secondary ones. */
 export function Button({
-  circular,
-  primary,
-  success,
-  danger,
+  variant = 'secondary',
+  iconOnly = false,
+  large = false,
   xstyle,
   children,
   ...delegated
@@ -30,10 +32,10 @@ export function Button({
       {...delegated}
       {...stylex.props(
         styles.base,
-        circular ? styles.circular : styles.pill,
-        primary && styles.primary,
-        success && styles.success,
-        danger && styles.danger,
+        shared.focusRing,
+        styles[variant],
+        iconOnly && styles.iconOnly,
+        large && styles.large,
         xstyle,
       )}
     >
@@ -44,31 +46,58 @@ export function Button({
 
 const styles = stylex.create({
   base: {
-    display: 'flex',
+    display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '2.5rem',
-    fontSize: '0.875rem',
-    lineHeight: 'calc(1.25 / 0.875)',
-    transitionDuration: '300ms',
-  },
-  circular: {
-    width: '2.5rem',
-    padding: '0.75rem',
-    borderRadius: '9999px',
-  },
-  pill: {
-    paddingBlock: '0.5rem',
+    gap: '0.5rem',
+    flexShrink: 0,
+    height: '2.75rem',
     paddingInline: '1rem',
-    borderRadius: radii.md,
+    borderRadius: '0.625rem',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    whiteSpace: 'nowrap',
+    cursor: { default: 'pointer', ':disabled': 'not-allowed' },
+    opacity: { default: 1, ':disabled': 0.45 },
+    transitionProperty: 'background-color, color',
+    transitionDuration: '150ms',
+    outlineOffset: 2,
   },
   primary: {
-    backgroundColor: { default: colors.light, ':hover': colors.lightHover },
+    color: colors.onHighlight,
+    backgroundColor: {
+      default: colors.highlight,
+      ':hover:enabled': colors.highlightHover,
+    },
   },
-  success: {
-    backgroundColor: { default: colors.success, ':hover': colors.successHover },
+  secondary: {
+    color: colors.textLight,
+    backgroundColor: {
+      default: colors.control,
+      ':hover:enabled': colors.controlHover,
+    },
   },
   danger: {
-    backgroundColor: { default: colors.danger, ':hover': colors.dangerHover },
+    color: colors.white,
+    backgroundColor: {
+      default: colors.dangerFill,
+      ':hover:enabled': colors.dangerFillHover,
+    },
+  },
+  ghost: {
+    color: { default: colors.textSubtle, ':hover:enabled': colors.white },
+    backgroundColor: {
+      default: 'transparent',
+      ':hover:enabled': 'rgb(255 255 255 / 0.06)',
+    },
+  },
+  iconOnly: {
+    width: '2.75rem',
+    paddingInline: 0,
+  },
+  large: {
+    height: '3.125rem',
+    borderRadius: '0.75rem',
+    fontSize: '0.9375rem',
   },
 });

@@ -1,4 +1,5 @@
 import boto3
+from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import UploadFile
 
 from src.config import settings
@@ -9,6 +10,14 @@ S3_RESOURCE = boto3.resource(
     aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     region_name=settings.AWS_REGION,
 )
+
+
+class S3DeleteError(Exception):
+    """S3 accepted a batch delete but failed some of its keys."""
+
+
+# Everything a storage call can raise, for cleanup that should only log.
+S3_ERRORS = (ClientError, BotoCoreError, S3DeleteError)
 
 
 def upload_to_s3(file: UploadFile, photo_name: str) -> str:
@@ -28,10 +37,16 @@ def upload_to_s3(file: UploadFile, photo_name: str) -> str:
         file.file.close()
 
 
-def delete_from_s3(photo_name: str) -> None:
+def delete_from_s3(*photo_names: str) -> None:
     """
-    Deletes a specific photo object from an S3 bucket based on its name.
+    Deletes photo objects from the S3 bucket in one request (S3 takes up to
+    1000 keys at once).
 
-    :param photo_name: The name of the photo to be deleted from the S3 bucket.
+    :param photo_names: The names of the photos to delete.
+    :raises S3DeleteError: If S3 could not delete some of them.
     """
-    S3_RESOURCE.Object(settings.S3_BUCKET_NAME, photo_name).delete()
+    response = S3_RESOURCE.Bucket(settings.S3_BUCKET_NAME).delete_objects(
+        Delete={"Objects": [{"Key": name} for name in photo_names], "Quiet": True}
+    )
+    if errors := response.get("Errors"):
+        raise S3DeleteError(errors)

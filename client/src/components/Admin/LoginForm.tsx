@@ -56,7 +56,7 @@ export function LoginForm() {
             {error}
           </p>
         )}
-        <Button type="submit" xstyle={styles.submit} disabled={isPending}>
+        <Button type="submit" variant="primary" disabled={isPending}>
           <SubmitIcon size={16} />
           Sign in
         </Button>
@@ -98,12 +98,5 @@ const styles = stylex.create({
     color: colors.error,
     fontSize: '0.875rem',
     lineHeight: 'calc(1.25 / 0.875)',
-  },
-  submit: {
-    gap: '0.5rem',
-    backgroundColor: { default: colors.accent, ':hover': colors.accentHover },
-    color: colors.white,
-    cursor: { default: 'pointer', ':disabled': 'not-allowed' },
-    opacity: { default: null, ':disabled': 0.5 },
   },
 });

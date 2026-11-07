@@ -42,8 +42,12 @@ describe('Button', () => {
     const { rerender } = render(<Button>Button</Button>);
     const classNames = [screen.getByRole('button').className];
 
-    for (const variant of ['primary', 'danger', 'success', 'circular']) {
-      rerender(<Button {...{ [variant]: true }}>Button</Button>);
+    for (const variant of ['primary', 'danger', 'ghost'] as const) {
+      rerender(<Button variant={variant}>Button</Button>);
+      classNames.push(screen.getByRole('button').className);
+    }
+    for (const flag of ['iconOnly', 'large'] as const) {
+      rerender(<Button {...{ [flag]: true }}>Button</Button>);
       classNames.push(screen.getByRole('button').className);
     }
 
@@ -51,11 +55,11 @@ describe('Button', () => {
   });
 
   it('applies xstyle overrides', () => {
-    const { rerender } = render(<Button primary>Button</Button>);
+    const { rerender } = render(<Button variant="primary">Button</Button>);
     const base = screen.getByRole('button').className;
 
     rerender(
-      <Button primary xstyle={overrides.danger}>
+      <Button variant="primary" xstyle={overrides.danger}>
         Button
       </Button>,
     );

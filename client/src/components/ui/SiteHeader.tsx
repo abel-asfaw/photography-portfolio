@@ -7,15 +7,21 @@ import { breakpoints, colors } from '@/src/styles/tokens.stylex';
 interface SiteHeaderProps extends PropsWithChildren {
   /** The muted text beside the name. */
   label?: string;
+  /**
+   * Keeps the header opaque at every width, for pages whose content
+   * scrolls under it. The gallery leaves it clear on wide screens.
+   */
+  solid?: boolean;
 }
 
 /** The name header shared by every page; `children` sit at the far end. */
 export function SiteHeader({
   label = 'Photography',
+  solid = false,
   children,
 }: SiteHeaderProps) {
   return (
-    <header {...stylex.props(styles.header)}>
+    <header {...stylex.props(styles.header, solid && styles.solid)}>
       <div {...stylex.props(styles.title)}>
         <h1 {...stylex.props(styles.name)}>
           <Link to="/" {...stylex.props(styles.home)}>
@@ -48,6 +54,13 @@ const styles = stylex.create({
       [breakpoints.sm]: 'transparent',
     },
     backdropFilter: { default: 'blur(12px)', [breakpoints.sm]: 'none' },
+  },
+  solid: {
+    backgroundColor: 'rgb(10 10 10 / 0.85)',
+    backdropFilter: 'blur(12px)',
+    borderBottomWidth: 1,
+    borderBottomStyle: 'solid',
+    borderBottomColor: colors.borderSubtle,
   },
   title: {
     display: 'flex',

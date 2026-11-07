@@ -21,12 +21,12 @@ export default function App() {
               <>
                 <SiteHeader />
                 <PhotoList />
+                <Footer />
               </>
             }
           />
           <Route path="/admin" element={<ProtectedAdmin />} />
         </Routes>
-        <Footer />
       </QueryClientProvider>
     </div>
   );

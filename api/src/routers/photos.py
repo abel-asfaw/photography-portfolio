@@ -1,8 +1,7 @@
 from pathlib import PurePosixPath
 from typing import Any
-from uuid import UUID, uuid4
+from uuid import uuid4
 
-from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from loguru import logger
 from sqlalchemy import func, select
@@ -11,8 +10,8 @@ from src.auth import require_admin
 from src.config import settings
 from src.database import DbSession
 from src.models import Photo
-from src.schemas import PhotoResponse, ReorderRequest
-from src.storage import delete_from_s3, upload_to_s3
+from src.schemas import PhotoIdsRequest, PhotoResponse
+from src.storage import S3_ERRORS, delete_from_s3, upload_to_s3
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
@@ -83,59 +82,51 @@ def add_photo(file: UploadFile, db: DbSession) -> Any:
         # The row wasn't saved, so remove the object rather than orphan it.
         try:
             delete_from_s3(photo_name)
-        except (ClientError, BotoCoreError):
+        except S3_ERRORS:
             logger.exception(f"Could not remove orphaned S3 object {photo_name}")
         raise
 
 
-@router.put("/reorder", status_code=status.HTTP_200_OK, dependencies=admin_only)
-def reorder_photos(body: ReorderRequest, db: DbSession) -> None:
+@router.put("/reorder", response_model=list[PhotoResponse], dependencies=admin_only)
+def reorder_photos(body: PhotoIdsRequest, db: DbSession) -> list[Any]:
     """
-    Reorders photos based on the provided list of photo IDs.
-    Each photo's sort_order is set to its index in the list.
+    Puts the listed photos first, in the order given, followed by any photos
+    the list leaves out in their current order. Unknown and repeated IDs are
+    ignored, so a client whose list is a moment out of date (a photo was just
+    uploaded or deleted) can still save its order.
 
-    The list must contain every photo exactly once. A partial list would give
-    the listed photos indices that collide with the others' sort_order.
+    :return: The photos in their saved order.
     """
-    id_to_photo = {photo.id: photo for photo in db.scalars(select(Photo)).all()}
-    if (
-        len(body.photo_ids) != len(id_to_photo)
-        or set(body.photo_ids) != id_to_photo.keys()
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="photo_ids must list every photo exactly once",
-        )
+    current = db.scalars(select(Photo).order_by(Photo.sort_order)).all()
+    id_to_photo = {photo.id: photo for photo in current}
+    listed = [id_to_photo[i] for i in dict.fromkeys(body.photo_ids) if i in id_to_photo]
+    listed_ids = {photo.id for photo in listed}
+    ordered = listed + [photo for photo in current if photo.id not in listed_ids]
 
-    for index, photo_id in enumerate(body.photo_ids):
-        id_to_photo[photo_id].sort_order = index
+    for index, photo in enumerate(ordered):
+        photo.sort_order = index
+    db.commit()
+    return ordered
 
+
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT, dependencies=admin_only)
+def delete_photos(body: PhotoIdsRequest, db: DbSession) -> None:
+    """
+    Deletes the listed photos' database entries, then their objects in S3.
+    IDs that match no photo are ignored, so retrying a delete is harmless.
+    """
+    found = db.scalars(select(Photo).where(Photo.id.in_(body.photo_ids))).all()
+    if not found:
+        return
+    names = [photo.name for photo in found]
+    for photo in found:
+        db.delete(photo)
     db.commit()
 
-
-@router.delete(
-    "/{photo_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=admin_only
-)
-def delete_photo(photo_id: UUID, db: DbSession) -> None:
-    """
-    Deletes a photo's database entry, then its object in S3.
-
-    :param photo_id: A unique identifier of a photo.
-    """
-    photo = db.get(Photo, photo_id)
-    if photo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Photo does not exist",
-        )
-    photo_name = photo.name
-    db.delete(photo)
-    db.commit()
-
-    # The row is gone, so the photo is deleted as far as the client is
-    # concerned. If S3 fails here, the leftover object is unreferenced and
-    # harmless, which beats a row pointing at a missing file.
+    # The rows are gone, so the photos are deleted as far as the client is
+    # concerned. If S3 fails here, the leftover objects are unreferenced and
+    # harmless, which beats rows pointing at missing files.
     try:
-        delete_from_s3(photo_name)
-    except (ClientError, BotoCoreError):
-        logger.exception(f"Deleted photo {photo_id} but not its S3 object {photo_name}")
+        delete_from_s3(*names)
+    except S3_ERRORS:
+        logger.exception(f"Deleted photos but not all their S3 objects: {names}")
