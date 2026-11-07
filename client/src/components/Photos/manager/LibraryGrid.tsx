@@ -1,19 +1,7 @@
-import {
-  DndContext,
-  DragOverlay,
-  type DropAnimation,
-  MouseSensor,
-  closestCenter,
-  defaultDropAnimationSideEffects,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  rectSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { Accessibility, PointerActivationConstraints } from '@dnd-kit/dom';
+import { move } from '@dnd-kit/helpers';
+import { DragDropProvider, DragOverlay, PointerSensor } from '@dnd-kit/react';
+import { useSortable } from '@dnd-kit/react/sortable';
 import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 import { Check, Trash2 } from 'react-feather';
@@ -21,46 +9,45 @@ import { Check, Trash2 } from 'react-feather';
 import type { Photo } from '@/src/api/schemas/photos.schema';
 import { breakpoints, colors } from '@/src/styles/tokens.stylex';
 
-import { photoAnnouncements } from './announcements';
 import { formatPosition } from './format';
 import { Thumbnail } from './Thumbnail';
 
 // A held photo tilts and lifts off the grid. It eases into that on pickup
-// and back out as it drops, so it lands flat on its spot without a snap.
+// and back out while dnd-kit animates the drop, so it lands flat on its
+// spot without a snap.
 const LIFT_SHADOW = '0 28px 50px -14px rgb(0 0 0 / 0.9)';
 const FLAT_SHADOW = '0 0 0 0 rgb(0 0 0 / 0)';
 const SETTLE_MS = 280;
 const SETTLE_EASING = 'cubic-bezier(0.2, 0, 0, 1)';
 
-const hideDroppedTile = defaultDropAnimationSideEffects({
-  styles: { active: { opacity: '0' } },
-});
+/** Set by dnd-kit on the overlay while its drop animation runs. */
+const DROPPING = '[data-dnd-dropping]';
 
-const dropAnimation: DropAnimation = {
-  duration: SETTLE_MS,
-  easing: SETTLE_EASING,
-  sideEffects: params => {
-    params.dragOverlay.node.querySelector('[data-lift]')?.animate(
-      [
-        { rotate: '-2.5deg', scale: '1.04', boxShadow: LIFT_SHADOW },
-        { rotate: '0deg', scale: '1', boxShadow: FLAT_SHADOW },
-      ],
-      { duration: SETTLE_MS, easing: SETTLE_EASING, fill: 'forwards' },
-    );
-    return hideDroppedTile(params);
-  },
-};
+// Only a mouse drags, once it has moved 8px, so a click still selects.
+// Touch never drags here: on a phone, reordering lives in Arrange mode.
+// There is no keyboard sensor, since Space and Enter toggle selection.
+const sensors = [
+  PointerSensor.configure({
+    activationConstraints: () => [
+      new PointerActivationConstraints.Distance({ value: 8 }),
+    ],
+    preventActivation: event => event.pointerType !== 'mouse',
+  }),
+];
 
-const prefersReducedMotion = () =>
-  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+// The accessibility plugin would overwrite each tile's aria-pressed, which
+// holds its selected state. Arrange mode is the accessible way to reorder,
+// with its own announcements.
+const withoutAccessibility = <T,>(defaults: T[]) =>
+  defaults.filter(plugin => plugin !== Accessibility);
 
 interface LibraryGridProps {
   photos: Photo[];
   selectedIds: string[];
   onToggle: (photoId: string) => void;
   onDelete: (photoId: string) => void;
-  /** Called when `activeId` is dropped onto `overId`'s spot. */
-  onMove: (activeId: string, overId: string) => void;
+  /** Called with the new order after a photo is dragged to a new spot. */
+  onReorder: (photos: Photo[]) => void;
 }
 
 /**
@@ -73,69 +60,60 @@ export function LibraryGrid({
   selectedIds,
   onToggle,
   onDelete,
-  onMove,
+  onReorder,
 }: LibraryGridProps) {
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
-  );
-
+  const [dragging, setDragging] = useState(false);
   const selecting = selectedIds.length > 0;
-  const activePhoto = photos.find(p => p.id === activeId);
-  const ids = photos.map(p => p.id);
 
   return (
-    <DndContext
+    <DragDropProvider
       sensors={sensors}
-      collisionDetection={closestCenter}
-      accessibility={{ announcements: photoAnnouncements(ids) }}
-      onDragStart={({ active }) => setActiveId(String(active.id))}
-      onDragCancel={() => setActiveId(null)}
-      onDragEnd={({ active, over }) => {
-        setActiveId(null);
-        if (over && active.id !== over.id) {
-          onMove(String(active.id), String(over.id));
-        }
+      plugins={withoutAccessibility}
+      onDragStart={() => setDragging(true)}
+      onDragEnd={event => {
+        setDragging(false);
+        if (!event.canceled) onReorder(move(photos, event));
       }}
     >
-      <SortableContext items={ids} strategy={rectSortingStrategy}>
-        <ol {...stylex.props(styles.grid)}>
-          {photos.map((photo, index) => (
-            <LibraryTile
-              key={photo.id}
-              photo={photo}
-              position={index + 1}
-              selected={selectedIds.includes(photo.id)}
-              selecting={selecting}
-              // Hidden while selecting, which has its own Delete, and while
-              // any photo is being dragged.
-              deletable={!selecting && activeId === null}
-              onToggle={() => onToggle(photo.id)}
-              onDelete={() => onDelete(photo.id)}
-            />
-          ))}
-        </ol>
-      </SortableContext>
+      <ol {...stylex.props(styles.grid)}>
+        {photos.map((photo, index) => (
+          <LibraryTile
+            key={photo.id}
+            photo={photo}
+            index={index}
+            selected={selectedIds.includes(photo.id)}
+            selecting={selecting}
+            // Hidden while selecting, which has its own Delete, and while
+            // any photo is being dragged.
+            deletable={!selecting && !dragging}
+            onToggle={() => onToggle(photo.id)}
+            onDelete={() => onDelete(photo.id)}
+          />
+        ))}
+      </ol>
       <DragOverlay
-        dropAnimation={prefersReducedMotion() ? null : dropAnimation}
+        dropAnimation={{ duration: SETTLE_MS, easing: SETTLE_EASING }}
+        {...stylex.props(stylex.defaultMarker())}
       >
-        {activePhoto ? (
-          // dnd-kit measures this outer box to find where the drop lands, so
-          // it stays untransformed; the tilt lives on the inner layer.
-          <div {...stylex.props(styles.overlayFrame)}>
-            <div data-lift {...stylex.props(styles.lifted)}>
-              <Thumbnail photoName={activePhoto.name} />
+        {/* Rendered until the drop animation ends, not just the drag. */}
+        {source => {
+          const photo = photos.find(p => p.id === source.id);
+          return photo ? (
+            // dnd-kit measures the overlay to find where the drop lands, so
+            // it stays untransformed; the tilt lives on this inner layer.
+            <div {...stylex.props(styles.lifted)}>
+              <Thumbnail photoName={photo.name} />
             </div>
-          </div>
-        ) : null}
+          ) : null;
+        }}
       </DragOverlay>
-    </DndContext>
+    </DragDropProvider>
   );
 }
 
 interface LibraryTileProps {
   photo: Photo;
-  position: number;
+  index: number;
   selected: boolean;
   selecting: boolean;
   deletable: boolean;
@@ -145,28 +123,34 @@ interface LibraryTileProps {
 
 function LibraryTile({
   photo,
-  position,
+  index,
   selected,
   selecting,
   deletable,
   onToggle,
   onDelete,
 }: LibraryTileProps) {
-  const { setNodeRef, listeners, transform, transition, isDragging } =
-    useSortable({ id: photo.id });
+  // The select button is the handle, so a press on the delete button never
+  // starts a drag.
+  const { ref, handleRef, isDragSource, isDropping } = useSortable({
+    id: photo.id,
+    index,
+  });
+  const position = index + 1;
 
   return (
     <li
-      ref={setNodeRef}
-      style={{ transform: CSS.Translate.toString(transform), transition }}
+      ref={ref}
       {...stylex.props(
         stylex.defaultMarker(),
         styles.tile,
-        isDragging && styles.slot,
+        isDragSource && styles.slot,
+        // The overlay covers the spot while it settles into it.
+        isDropping && styles.invisible,
       )}
-      {...listeners}
     >
       <button
+        ref={handleRef}
         type="button"
         aria-pressed={selected}
         aria-label={`Photo ${position}`}
@@ -174,7 +158,7 @@ function LibraryTile({
         {...stylex.props(
           styles.select,
           selected && styles.selected,
-          isDragging && styles.invisible,
+          isDragSource && styles.invisible,
         )}
       >
         <Thumbnail
@@ -194,8 +178,6 @@ function LibraryTile({
         <button
           type="button"
           aria-label={`Delete photo ${position}`}
-          // Keeps a press on the button from starting a drag.
-          onMouseDown={e => e.stopPropagation()}
           onClick={onDelete}
           {...stylex.props(styles.delete)}
         >
@@ -320,19 +302,21 @@ const styles = stylex.create({
       ':hover': colors.dangerSoft,
     },
   },
-  overlayFrame: {
-    width: '100%',
-    height: '100%',
-  },
   lifted: {
     width: '100%',
     height: '100%',
     overflow: 'hidden',
     borderRadius: 12,
     cursor: 'grabbing',
-    rotate: '-2.5deg',
-    scale: 1.04,
-    boxShadow: LIFT_SHADOW,
+    rotate: { default: '-2.5deg', [stylex.when.ancestor(DROPPING)]: '0deg' },
+    scale: { default: 1.04, [stylex.when.ancestor(DROPPING)]: 1 },
+    boxShadow: {
+      default: LIFT_SHADOW,
+      [stylex.when.ancestor(DROPPING)]: FLAT_SHADOW,
+    },
+    transitionProperty: 'rotate, scale, box-shadow',
+    transitionDuration: `${SETTLE_MS}ms`,
+    transitionTimingFunction: SETTLE_EASING,
     animationName: {
       default: liftIn,
       '@media (prefers-reduced-motion: reduce)': 'none',

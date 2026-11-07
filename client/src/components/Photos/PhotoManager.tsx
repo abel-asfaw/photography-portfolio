@@ -1,4 +1,3 @@
-import { arrayMove } from '@dnd-kit/sortable';
 import * as stylex from '@stylexjs/stylex';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Check, Plus, Upload } from 'react-feather';
@@ -72,13 +71,6 @@ export function PhotoManager() {
     if (all.every((p, i) => p.id === localPhotos[i]?.id)) return;
     setLocalPhotos(all);
     reorder(all.map(p => p.id));
-  };
-
-  const handleMove = (activeId: string, overId: string) => {
-    const from = visible.findIndex(p => p.id === activeId);
-    const to = visible.findIndex(p => p.id === overId);
-    if (from === -1 || to === -1) return;
-    saveOrder(arrayMove(visible, from, to));
   };
 
   const toggle = (photoId: string) =>
@@ -252,7 +244,7 @@ export function PhotoManager() {
             selectedIds={selectedIds}
             onToggle={toggle}
             onDelete={id => deletePhotos([id])}
-            onMove={handleMove}
+            onReorder={saveOrder}
           />
         ) : (
           <div {...stylex.props(styles.empty)}>

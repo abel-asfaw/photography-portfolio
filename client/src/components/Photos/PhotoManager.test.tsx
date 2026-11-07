@@ -1,4 +1,3 @@
-import type { DragEndEvent } from '@dnd-kit/core';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -21,7 +20,7 @@ const { fetchState, reorderState, reorder, deletePhotos, upload, dnd } =
     deletePhotos: vi.fn(),
     upload: vi.fn(),
     dnd: {
-      onDragEnd: undefined as ((event: DragEndEvent) => void) | undefined,
+      onDragEnd: undefined as ((event: DropEvent) => void) | undefined,
     },
   }));
 
@@ -36,15 +35,25 @@ vi.mock('@/src/api/services/photos.query', () => ({
   useDeletePhotos: () => ({ mutateAsync: deletePhotos }),
 }));
 
+/** The parts of dnd-kit's drag-end event that the editor reads. */
+interface DropEvent {
+  operation: {
+    source: { id: string };
+    target: { id: string } | null;
+    canceled: boolean;
+  };
+  canceled: boolean;
+}
+
 // Capture the drag handler so tests can simulate a drop without pointer
 // events, which jsdom cannot lay out.
-vi.mock('@dnd-kit/core', async importOriginal => ({
-  ...(await importOriginal<typeof import('@dnd-kit/core')>()),
-  DndContext: ({
+vi.mock('@dnd-kit/react', async importOriginal => ({
+  ...(await importOriginal<typeof import('@dnd-kit/react')>()),
+  DragDropProvider: ({
     onDragEnd,
     children,
   }: {
-    onDragEnd: (event: DragEndEvent) => void;
+    onDragEnd: (event: DropEvent) => void;
     children: React.ReactNode;
   }) => {
     dnd.onDragEnd = onDragEnd;
@@ -53,28 +62,33 @@ vi.mock('@dnd-kit/core', async importOriginal => ({
   DragOverlay: () => null,
 }));
 
+// With no provider there is no drag manager to register with.
+vi.mock('@dnd-kit/react/sortable', () => ({
+  useSortable: () => ({
+    ref: () => {},
+    handleRef: () => {},
+    isDragging: false,
+    isDragSource: false,
+    isDropping: false,
+  }),
+}));
+
 const photos: Photo[] = ['1', '2', '3'].map(id => ({
   id,
   name: `${id}.jpg`,
   url: `https://example.com/${id}.jpg`,
 }));
 
-const rect = { width: 0, height: 0, top: 0, left: 0, right: 0, bottom: 0 };
-
-const drop = (activeId: string, overId: string | null) =>
+/** Drops `sourceId` onto `targetId`'s spot, or outside any spot. */
+const drop = (sourceId: string, targetId: string | null) =>
   act(() =>
     dnd.onDragEnd!({
-      active: {
-        id: activeId,
-        data: { current: undefined },
-        rect: { current: { initial: null, translated: null } },
+      operation: {
+        source: { id: sourceId },
+        target: targetId ? { id: targetId } : null,
+        canceled: false,
       },
-      over: overId
-        ? { id: overId, rect, disabled: false, data: { current: undefined } }
-        : null,
-      collisions: null,
-      delta: { x: 0, y: 0 },
-      activatorEvent: new Event('pointerdown'),
+      canceled: false,
     }),
   );
 

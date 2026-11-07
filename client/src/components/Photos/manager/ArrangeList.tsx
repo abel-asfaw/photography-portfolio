@@ -1,22 +1,14 @@
+import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers';
+import { PointerActivationConstraints } from '@dnd-kit/dom';
+import { arrayMove, move } from '@dnd-kit/helpers';
 import {
-  DndContext,
+  DragDropProvider,
   KeyboardSensor,
   PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import {
-  SortableContext,
-  arrayMove,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from '@dnd-kit/react';
+import { useSortable } from '@dnd-kit/react/sortable';
 import * as stylex from '@stylexjs/stylex';
-import { useId, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'react-feather';
 
 import type { Photo } from '@/src/api/schemas/photos.schema';
@@ -24,9 +16,24 @@ import { Button } from '@/src/components/ui';
 import { shared } from '@/src/styles/shared';
 import { breakpoints, colors } from '@/src/styles/tokens.stylex';
 
-import { photoAnnouncements } from './announcements';
+import { withPhotoAnnouncements } from './announcements';
 import { formatPosition } from './format';
 import { Thumbnail } from './Thumbnail';
+
+// The handle drags once it has moved 4px, for every kind of pointer. The
+// default for touch is a 250ms long press, which is exactly when iOS shows
+// its image preview. The keyboard sensor lets the focused handle pick a
+// photo up with Space and move it with the arrow keys.
+const sensors = [
+  PointerSensor.configure({
+    activationConstraints: () => [
+      new PointerActivationConstraints.Distance({ value: 4 }),
+    ],
+  }),
+  KeyboardSensor,
+];
+
+const modifiers = [RestrictToVerticalAxis];
 
 interface ArrangeListProps {
   photos: Photo[];
@@ -43,16 +50,11 @@ interface ArrangeListProps {
 export function ArrangeList({ photos, onCancel, onDone }: ArrangeListProps) {
   const titleId = useId();
   const [draft, setDraft] = useState(photos);
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
+  const plugins = useMemo(
+    () => withPhotoAnnouncements(draft.length),
+    [draft.length],
   );
-
-  const ids = draft.map(p => p.id);
-
-  const move = (from: number, to: number) => {
+  const moveTo = (from: number, to: number) => {
     if (to < 0 || to >= draft.length || from === to) return;
     setDraft(prev => arrayMove(prev, from, to));
   };
@@ -77,66 +79,44 @@ export function ArrangeList({ photos, onCancel, onDone }: ArrangeListProps) {
       <p {...stylex.props(styles.hint)}>
         Drag the handle, use the arrows, or tap a number.
       </p>
-      <DndContext
+      <DragDropProvider
         sensors={sensors}
-        collisionDetection={closestCenter}
-        modifiers={[restrictToVerticalAxis]}
-        accessibility={{ announcements: photoAnnouncements(ids) }}
-        onDragEnd={({ active, over }) => {
-          if (!over) return;
-          move(ids.indexOf(String(active.id)), ids.indexOf(String(over.id)));
+        modifiers={modifiers}
+        plugins={plugins}
+        onDragEnd={event => {
+          if (!event.canceled) setDraft(move(draft, event));
         }}
       >
-        <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-          <ol {...stylex.props(styles.list)}>
-            {draft.map((photo, index) => (
-              <ArrangeRow
-                key={photo.id}
-                photo={photo}
-                position={index + 1}
-                total={draft.length}
-                onMoveTo={to => move(index, to)}
-              />
-            ))}
-          </ol>
-        </SortableContext>
-      </DndContext>
+        <ol {...stylex.props(styles.list)}>
+          {draft.map((photo, index) => (
+            <ArrangeRow
+              key={photo.id}
+              photo={photo}
+              index={index}
+              total={draft.length}
+              onMoveTo={to => moveTo(index, to)}
+            />
+          ))}
+        </ol>
+      </DragDropProvider>
     </section>
   );
 }
 
-const LIFT_TRANSITION =
-  'scale 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease';
-
 interface ArrangeRowProps {
   photo: Photo;
-  position: number;
+  index: number;
   total: number;
   /** Moves this photo to a zero-based index. */
   onMoveTo: (index: number) => void;
 }
 
-function ArrangeRow({ photo, position, total, onMoveTo }: ArrangeRowProps) {
-  const {
-    setNodeRef,
-    setActivatorNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: photo.id });
+function ArrangeRow({ photo, index, total, onMoveTo }: ArrangeRowProps) {
+  const { ref, handleRef, isDragging } = useSortable({ id: photo.id, index });
+  const position = index + 1;
 
   return (
-    <li
-      ref={setNodeRef}
-      style={{
-        transform: CSS.Translate.toString(transform),
-        // The lift eases in and out alongside dnd-kit's own transition.
-        transition: [transition, LIFT_TRANSITION].filter(Boolean).join(', '),
-      }}
-      {...stylex.props(styles.row, isDragging && styles.rowLifted)}
-    >
+    <li ref={ref} {...stylex.props(styles.row, isDragging && styles.rowLifted)}>
       <select
         aria-label={`Position of photo ${position}`}
         value={position}
@@ -175,9 +155,7 @@ function ArrangeRow({ photo, position, total, onMoveTo }: ArrangeRowProps) {
       </Button>
       <button
         type="button"
-        ref={setActivatorNodeRef}
-        {...attributes}
-        {...listeners}
+        ref={handleRef}
         aria-label={`Drag photo ${position}`}
         {...stylex.props(
           styles.handle,
@@ -262,6 +240,9 @@ const styles = stylex.create({
     borderColor: colors.borderSubtle,
     borderRadius: '0.75rem',
     backgroundColor: colors.card,
+    // The lift eases in and out as a photo is picked up and dropped.
+    transitionProperty: 'scale, box-shadow, border-color, background-color',
+    transitionDuration: '180ms',
   },
   rowLifted: {
     zIndex: 5,
