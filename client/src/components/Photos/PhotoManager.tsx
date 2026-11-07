@@ -26,7 +26,8 @@ const hasFiles = (event: DragEvent) =>
 /**
  * The admin editor. The library is a grid of numbered tiles: select photos
  * to move or delete them together, drag with a mouse to reorder, and drop
- * files anywhere to upload. Arrange mode reorders as a list for touch.
+ * files anywhere to upload. Arrange mode reorders as a list for touch
+ * and is not offered with a mouse.
  */
 export function PhotoManager() {
   const { data: photos, isLoading, isError } = useFetchPhotos();
@@ -222,6 +223,7 @@ export function PhotoManager() {
           <Button
             onClick={() => setArranging(true)}
             disabled={visible.length < 2}
+            xstyle={styles.touchOnly}
           >
             Arrange
           </Button>
@@ -408,10 +410,16 @@ const styles = stylex.create({
     display: { default: 'none', [breakpoints.sm]: 'flex' },
     gap: '0.625rem',
   },
+  // A mouse drags tiles in the grid, so Arrange is only offered for touch.
+  touchOnly: {
+    display: { default: 'inline-flex', [breakpoints.finePointer]: 'none' },
+  },
   uploads: {
     display: { default: 'contents', [breakpoints.sm]: 'flex' },
     flexWrap: 'wrap',
-    alignItems: 'stretch',
+    // The upload card grows and shrinks as files come and go; the drop zone
+    // beside it keeps its own height.
+    alignItems: 'flex-start',
     gap: '1rem',
   },
   empty: {
